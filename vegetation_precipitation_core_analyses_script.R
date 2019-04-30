@@ -26,3 +26,4 @@ coefs<-lag_full$coefficients
 coefs.df<-data.frame(coefs)
 
 #code to export this to a folder....
+

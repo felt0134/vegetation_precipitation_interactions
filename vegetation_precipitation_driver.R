@@ -1,8 +1,11 @@
 rm(list=ls())
-setwd("C:/Users/A02296270/Desktop/CONUS_AFRI/CONUS")
-rangeland_npp_covariates<- read.csv("/Users/A02296270/Desktop/CONUS_AFRI/CONUS/npp_climate_rangelands.csv")
-head(rangeland_npp_covariates)
+setwd("")
+test_wd<-"C:/Users/A02296270/Desktop/My Drive/CONUS_rangelands_NPP_Sensitivity/Processing NPP Data/NPP Data processing/"
+rangeland_npp_covariates<-readRDS(file.path(test_wd, "npp_climate_rangelands_final.rds")) #loads file and name it annualSWA_OctDec I guess
+as.data.frame(rangeland_npp_covariates)
+summary(rangeland_npp_covariates)
 
+#get mean annual precip
 mean_mm_site<-aggregate(mm~x+y+region,mean,data=rangeland_npp_covariates)
 head(mean_mm_site)
 summary(mean_mm_site)
@@ -16,9 +19,9 @@ library(splitstackshape)
 #hotdeserts
 hot_deserts_1 <-subset(mean_mm_site,region=="hot_deserts")
 summary(hot_deserts_1)
-hot_deserts_below <-hot_deserts_1 %>% dplyr::filter(mm < 253.84)
+hot_deserts_below <-hot_deserts_1 %>% dplyr::filter(mm < 286.14)
 hot_deserts_below$map <- 'below'
-hot_deserts_above  <-hot_deserts_1 %>%  dplyr::filter(mm > 253.84)
+hot_deserts_above  <-hot_deserts_1 %>%  dplyr::filter(mm > 286.14)
 hot_deserts_above$map <- 'above'
 hot_deserts_above_below <- rbind(hot_deserts_above,hot_deserts_below)
 hot_deserts_above_below_2<-hot_deserts_above_below[-3]
@@ -28,18 +31,18 @@ hot_deserts_above_below_2<-hot_deserts_above_below[-3]
 #cold_deserts
 cold_deserts_1 <-subset(mean_mm_site,region=="cold_deserts")
 summary(cold_deserts_1)
-cold_deserts_below <-cold_deserts_1 %>% dplyr::filter(mm < 285.99)
+cold_deserts_below <-cold_deserts_1 %>% dplyr::filter(mm < 288.1)
 cold_deserts_below$map <- 'below'
-cold_deserts_above  <-cold_deserts_1 %>%  dplyr::filter(mm > 285.99)
+cold_deserts_above  <-cold_deserts_1 %>%  dplyr::filter(mm > 288.1 )
 cold_deserts_above$map <- 'above'
 cold_deserts_above_below <- rbind(cold_deserts_above,cold_deserts_below)
 
 #california_annuals
 california_annuals_1 <-subset(mean_mm_site,region=="california_annuals")
 summary(california_annuals_1)
-california_annuals_below <-california_annuals_1 %>% dplyr::filter(mm < 403.5)
+california_annuals_below <-california_annuals_1 %>% dplyr::filter(mm < 403.9)
 california_annuals_below$map <- 'below'
-california_annuals_above  <-california_annuals_1 %>%  dplyr::filter(mm > 403.5)
+california_annuals_above  <-california_annuals_1 %>%  dplyr::filter(mm > 403.9)
 california_annuals_above$map <- 'above'
 california_annuals_above_below <- rbind(california_annuals_above,california_annuals_below)
 
@@ -76,8 +79,10 @@ rangeland_npp_covariates_deviations_1<-merge(rangeland_npp_covariates,mm_product
 #head(rangeland_npp_covariates_deviations_1)
 
 #add percent mm and percent npp deviations
-rangeland_npp_covariates_deviations_1$npp.dev<-((rangeland_npp_covariates_deviations_1$npp.x - rangeland_npp_covariates_deviations_1$npp.y)/ rangeland_npp_covariates_deviations_1$npp.y)
-rangeland_npp_covariates_deviations_1$mm.dev<-((rangeland_npp_covariates_deviations_1$mm.x - rangeland_npp_covariates_deviations_1$mm.y)/rangeland_npp_covariates_deviations_1$mm.y)
+rangeland_npp_covariates_deviations_1$npp.dev<-((rangeland_npp_covariates_deviations_1$npp.x - rangeland_npp_covariates_deviations_1$npp.y)/ rangeland_npp_covariates_deviations_1$npp.y)*100
+rangeland_npp_covariates_deviations_1$mm.dev<-((rangeland_npp_covariates_deviations_1$mm.x - rangeland_npp_covariates_deviations_1$mm.y)/rangeland_npp_covariates_deviations_1$mm.y)*100
+summary(rangeland_npp_covariates_deviations_1)
+
 #head(rangeland_npp_covariates_deviations_1)
 
 ###to assess spatial range of autocorrelation####
