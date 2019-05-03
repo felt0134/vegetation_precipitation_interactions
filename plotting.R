@@ -12,10 +12,11 @@ z = predict(hot_deserts.loess,hot_deserts_fit)
 hot_deserts_fit$npp <- as.numeric(z)
 
 wireframe(npp ~ mm.dev*mm.y, data = hot_deserts_fit,
-          xlab = "% PPT deviation", ylab = "Mean annual precipitation",zlab = 'NPP',
+          xlab = list("% Precipitation change",rot=-50,cex=1.4), zlab = list("% NPP change",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Hot deserts",
           drape = TRUE,
           colorkey = TRUE,
+          col.regions = colorRampPalette(c("orange", "green"))(100),
           screen = list(z = -60, x = -60)
 )
 
@@ -29,10 +30,11 @@ z = predict(cali_annuals.loess,cali_annuals_fit)
 cali_annuals_fit$npp <- as.numeric(z)
 
 wireframe(npp ~ mm.dev*mm.y, data = cali_annuals_fit,
-          xlab = "% PPT deviation", ylab = "Mean annual precipitation",zlab = 'NPP',
+          xlab = "", ylab = "",zlab = '',
           main = "California annuals",
           drape = TRUE,
           colorkey = TRUE,
+          col.regions = colorRampPalette(c("orange", "green"))(100),
           screen = list(z = -60, x = -60)
 )
 
@@ -46,10 +48,11 @@ z = predict(cold_deserts.loess,cold_deserts_fit)
 cold_deserts_fit$npp <- as.numeric(z)
 
 wireframe(npp ~ mm.dev*mm.y, data = cold_deserts_fit,
-          xlab = "% PPT deviation", ylab = "Mean annual precipitation",zlab = 'NPP',
+          xlab = "", ylab = "",zlab = '',
           main = "Cold deserts",
           drape = TRUE,
           colorkey = TRUE,
+          col.regions = colorRampPalette(c("orange", "green"))(100),
           screen = list(z = -60, x = -60)
 )
 
@@ -64,13 +67,14 @@ z = predict(sgs.loess,sgs_fit)
 sgs_fit$npp <- as.numeric(z)
 
 wireframe(npp ~ mm.dev*mm.y, data = sgs_fit,
-          xlab = "% PPT deviation", ylab = "Mean annual precipitation",zlab = 'NPP',
+          xlab = "", ylab = "",zlab = '',
           main = "shortgrass steppe",
           drape = TRUE,
           colorkey = TRUE,
+          col.regions = colorRampPalette(c("orange", "green"))(100),
           screen = list(z = -60, x = -60)
 )
-
+?colorkey
 #northern mixed prairies
 northern_mixed_surface<-subset(stratified_final,region.x=='northern_mixed_prairies')
 northern_mixed.loess<-lm(npp.dev~mm.dev*mm.y,data=northern_mixed_surface)
@@ -81,10 +85,11 @@ z = predict(northern_mixed.loess,northern_mixed_fit)
 northern_mixed_fit$npp <- as.numeric(z)
 
 wireframe(npp ~ mm.dev*mm.y, data = northern_mixed_fit,
-          xlab = "% PPT deviation", ylab = "Mean annual precipitation",zlab = 'NPP',
+          xlab = "% PPT change", ylab = "Mean annual precipitation",zlab = '% NPP change',
           main = "northern mixed prairies",
           drape = TRUE,
           colorkey = TRUE,
+          col.regions = colorRampPalette(c("orange", "green"))(100),
           screen = list(z = -60, x = -60)
 )
 

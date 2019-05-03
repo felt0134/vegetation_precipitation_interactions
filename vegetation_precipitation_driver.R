@@ -14,7 +14,7 @@ summary(mean_mm_site)
 library(dplyr)
 library(spdep)
 library(splitstackshape)
-
+library(raster)
 #make MAP groupings for each vegetation type
 #hotdeserts
 hot_deserts_1 <-subset(mean_mm_site,region=="hot_deserts")
