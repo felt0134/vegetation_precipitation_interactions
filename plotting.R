@@ -30,8 +30,8 @@ z = predict(cali_annuals.loess,cali_annuals_fit)
 cali_annuals_fit$npp <- as.numeric(z)
 
 wireframe(npp ~ mm.dev*mm.y, data = cali_annuals_fit,
-          xlab = "", ylab = "",zlab = '',
-          main = "California annuals",
+          xlab = list("% rainfall change",rot=-50,cex=1.4), zlab = list("% Forage change",rot=92,cex=1.4),ylab = list('Mean annual rainfall',rot=22,cex=1.4),
+          main = "California rangelands: annual rainfall",
           drape = TRUE,
           colorkey = TRUE,
           col.regions = colorRampPalette(c("orange", "green"))(100),

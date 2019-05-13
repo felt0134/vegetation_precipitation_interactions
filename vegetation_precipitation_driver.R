@@ -1,5 +1,13 @@
-rm(list=ls())
-setwd("")
+#driver script
+#load packages
+library(dplyr)
+library(spdep)
+library(splitstackshape)
+library(raster)
+library(gstat)
+
+#load initial dataframe
+
 test_wd<-"C:/Users/A02296270/Desktop/My Drive/CONUS_rangelands_NPP_Sensitivity/Processing NPP Data/NPP Data processing/"
 rangeland_npp_covariates<-readRDS(file.path(test_wd, "npp_climate_rangelands_final.rds")) #loads file and name it annualSWA_OctDec I guess
 as.data.frame(rangeland_npp_covariates)
@@ -10,12 +18,7 @@ mean_mm_site<-aggregate(mm~x+y+region,mean,data=rangeland_npp_covariates)
 head(mean_mm_site)
 summary(mean_mm_site)
 
-#load packages
-library(dplyr)
-library(spdep)
-library(splitstackshape)
-library(raster)
-#make MAP groupings for each vegetation type
+#make MAP groupings for each vegetation type in preparation for stratification
 #hotdeserts
 hot_deserts_1 <-subset(mean_mm_site,region=="hot_deserts")
 summary(hot_deserts_1)
@@ -64,50 +67,18 @@ northern_mixed_prairies_above  <-northern_mixed_prairies_1 %>%  dplyr::filter(mm
 northern_mixed_prairies_above$map <- 'above'
 northern_mixed_prairies_above_below <- rbind(northern_mixed_prairies_above,northern_mixed_prairies_below)
 
-stratified_df<-rbind(northern_mixed_prairies_above_below, semiarid_steppe_above_below, california_annuals_above_below, 
-                     cold_deserts_above_below, hot_deserts_above_below)
-
-#summary(stratified_df)
-
 #making colomn for per-pixel mean precip and npp
 rangeland_mean_npp<-aggregate(npp ~ x + y + region,mean,data=rangeland_npp_covariates)
 rangeland_mean_mm<-aggregate(mm ~ x + y + region,mean,data=rangeland_npp_covariates)
 mm_production_mean<-merge(rangeland_mean_npp,rangeland_mean_mm,by=c('x','y','region'))
-#head(mm_production_mean)
+head(mm_production_mean)
+summary(mm_production_mean)
 
+#merge initial dataframe with means
 rangeland_npp_covariates_deviations_1<-merge(rangeland_npp_covariates,mm_production_mean,by=c('x','y'))
-#head(rangeland_npp_covariates_deviations_1)
+head(rangeland_npp_covariates_deviations_1)
 
-#add percent mm and percent npp deviations
+#add percent mm and percent npp deviations to relatavize
 rangeland_npp_covariates_deviations_1$npp.dev<-((rangeland_npp_covariates_deviations_1$npp.x - rangeland_npp_covariates_deviations_1$npp.y)/ rangeland_npp_covariates_deviations_1$npp.y)*100
 rangeland_npp_covariates_deviations_1$mm.dev<-((rangeland_npp_covariates_deviations_1$mm.x - rangeland_npp_covariates_deviations_1$mm.y)/rangeland_npp_covariates_deviations_1$mm.y)*100
 summary(rangeland_npp_covariates_deviations_1)
-
-#head(rangeland_npp_covariates_deviations_1)
-
-###to assess spatial range of autocorrelation####
-library(gstat)
-subset_1996<-subset<-subset(stratified_final,year=='1996')
-coordinates(subset_1996)= ~ x+y
-TheVariogram_1996.2=variogram(resids~1, data=subset_1996)
-plot(TheVariogram_1996.2,main='1996') #5 
-
-subset_1986<-subset<-subset(stratified_final,year=='1986')
-coordinates(subset_1986)= ~ x+y
-TheVariogram_1986.2=variogram(resids~1, data=subset_1986)
-plot(TheVariogram_1986.2,main='1986')
-
-subset_2006<-subset<-subset(stratified_final,year=='2006')
-coordinates(subset_2006)= ~ x+y
-TheVariogram_2006.2=variogram(resids~1, data=subset_2006)
-plot(TheVariogram_2006.2,main='2006')
-
-subset_2015<-subset<-subset(stratified_final,year=='2015')
-coordinates(subset_2015)= ~ x+y
-TheVariogram_2015.2=variogram(resids~1, data=subset_2015)
-plot(TheVariogram_2015.2,main='2015')
-
-subset_2000<-subset<-subset(stratified_final,year=='2000')
-coordinates(subset_2000)= ~ x+y
-TheVariogram_2000.2=variogram(resids~1, data=subset_2000)
-plot(TheVariogram_2000.2,main='2000')
