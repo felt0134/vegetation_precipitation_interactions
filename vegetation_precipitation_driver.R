@@ -27,7 +27,7 @@ hot_deserts_below$map <- 'below'
 hot_deserts_above  <-hot_deserts_1 %>%  dplyr::filter(mm > 286.14)
 hot_deserts_above$map <- 'above'
 hot_deserts_above_below <- rbind(hot_deserts_above,hot_deserts_below)
-hot_deserts_above_below_2<-hot_deserts_above_below[-3]
+#hot_deserts_above_below_2<-hot_deserts_above_below[-3]
 #head(hot_deserts_above_below_2)
 #summary(hot_deserts_above_below)
 
@@ -82,3 +82,4 @@ head(rangeland_npp_covariates_deviations_1)
 rangeland_npp_covariates_deviations_1$npp.dev<-((rangeland_npp_covariates_deviations_1$npp.x - rangeland_npp_covariates_deviations_1$npp.y)/ rangeland_npp_covariates_deviations_1$npp.y)*100
 rangeland_npp_covariates_deviations_1$mm.dev<-((rangeland_npp_covariates_deviations_1$mm.x - rangeland_npp_covariates_deviations_1$mm.y)/rangeland_npp_covariates_deviations_1$mm.y)*100
 summary(rangeland_npp_covariates_deviations_1)
+head(rangeland_npp_covariates_deviations_1)

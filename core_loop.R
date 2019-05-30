@@ -4,13 +4,13 @@ list.coefficients.final<-list()
 list.variograms<-list()
 list.residual.rasters<-list()
 list.residuals.full <- list()
-
+list.models <- list()
 
 #reduce columns in dataset to use
 
 head(rangeland_npp_covariates_deviations_1)
 rangeland_npp_covariates_deviations_reduced <-subset(rangeland_npp_covariates_deviations_1,select=c('x','y','year','npp.x',
-                                                                                                  'mm.y','mm.dev','region.x'))
+                                                                                                  'mm.y','mm.dev','npp.dev','mm.x','region.x'))
 head(rangeland_npp_covariates_deviations_reduced)
 
 #inspect autocorrelation
@@ -27,9 +27,10 @@ for(i in 1:1000)
 stratified_final<-merge(test.strat, rangeland_npp_covariates_deviations_reduced,by=c('x','y'))
 #print(stratified_final)
 
-stratified_final_lm<-lm(npp.x~mm.y*region.x*mm.dev
+stratified_final_lm<-lm(npp.x~mm.y*region.x*mm.x
                         ,stratified_final)
 
+list.models[[i]] <- stratified_final_lm
 newcoef1 <- stratified_final_lm$coefficients 
 df<-data.frame(newcoef1)
 df$id = i
@@ -59,6 +60,7 @@ list.variograms[[i]] <- variogram.plot
 list.variograms[1:50]
 
 #look at coefficients
+summary(stratified_final_lm)
 library(reshape2)
 library(tidyverse)
 df.coefficients <- do.call("rbind", list.coefficients.final)
@@ -75,30 +77,42 @@ df2<-reshape(df.coefficients.2, idvar = "run.id", timevar = "predictor", directi
 head(df2)
 summary(df2)
 
-#spatial slopes
+
+#temporal slopes
 
 #cold deserts
-df2$cold_deserts_spatial_slope <- df2$coefficient.mm.y + df2$coefficient.mm.y_region.xcold_deserts
+df2$cold_deserts_temporal_slope <- df2$coefficient.mm.x + df2$coefficient.region.xcold_deserts_mm.x 
 #hot_deserts
-df2$hot_deserts_spatial_slope <-  df2$coefficient.mm.y + df2$coefficient.mm.y_region.xhot_deserts
+df2$hot_deserts_temporal_slope <-  df2$coefficient.mm.x + df2$coefficient.region.xhot_deserts_mm.x 
 #northern mixed
-df2$northern_mixed_spatial_slope <- df2$coefficient.mm.y + df2$coefficient.mm.y_region.xnorthern_mixed_prairies
+df2$northern_mixed_temporal_slope <- df2$coefficient.mm.x + df2$coefficient.region.xnorthern_mixed_prairies_mm.x
 #sgs
-df2$sgs_spatial_slope <- df2$coefficient.mm.y  + df2$coefficient.mm.y_region.xsemi_arid_steppe
+df2$sgs_temporal_slope <- df2$coefficient.mm.x  + df2$coefficient.region.xsemi_arid_steppe_mm.x
 
-spatial_slopes<-subset(df2,select=c('sgs_spatial_slope','northern_mixed_spatial_slope','hot_deserts_spatial_slope','cold_deserts_spatial_slope',
-                                    'coefficient.mm.y','run.id'))
-head(spatial_slopes)
-data_long <- gather(spatial_slopes, site, slope, sgs_spatial_slope:coefficient.mm.y, factor_key=TRUE)
-head(data_long)
+temporal_slopes<-subset(df2,select=c('sgs_temporal_slope','northern_mixed_temporal_slope','hot_deserts_temporal_slope','cold_deserts_temporal_slope',
+                                     'coefficient.mm.x'))
+head(temporal_slopes)
+data_long_temporal <- gather(temporal_slopes, site, slope, factor_key=TRUE)
+head(data_long_temporal)
+summary(data_long_temporal)
 
+
+#temporal*spatial interaction (not really)
 #cold deserts
-spatial_slope_cd<-subset(coefficients_long,rownames(coefficients_df_wide) =='mm.y:region.xcold_deserts')
-hist(spatial_slope_cd$value)
-median(spatial_slope_cd$value)
+df2$cold_deserts_temporal_spatial <- df2$coefficient.mm.y_mm.x + df2$coefficient.mm.y_region.xcold_deserts_mm.x
+#hot_deserts
+df2$hot_deserts_temporal_spatial <-  df2$coefficient.mm.y_mm.x + df2$coefficient.mm.y_region.xhot_deserts_mm.x
+#northern mixed
+df2$northern_mixed_temporal_spatial <- df2$coefficient.mm.y_mm.x + df2$coefficient.mm.y_region.xnorthern_mixed_prairies_mm.x
+#sgs
+df2$sgs_temporal_spatial <- df2$coefficient.mm.y_mm.x  + df2$coefficient.mm.y_region.xsemi_arid_steppe_mm.x
 
-
-
+temporal_spatial_slopes<-subset(df2,select=c('hot_deserts_temporal_spatial','cold_deserts_temporal_spatial',
+                                    'coefficient.mm.y_mm.x','sgs_temporal_spatial','northern_mixed_temporal_spatial'))
+head(temporal_spatial_slopes)
+data_long_temporal_spatial <- gather(temporal_spatial_slopes, site, slope, factor_key=TRUE)
+head(data_long_temporal_spatial)
+summary(data_long_temporal_spatial)
 #########look at residuals#############
 
 df.residuals <- do.call("rbind", list.residuals.full)
@@ -150,51 +164,40 @@ for (i in 1:length(list.variograms)){
   jpeg(list.variograms[[i]], filename = 'outname.jpeg')
 }
 
+pred<-predict(stratified_final_lm[3],stratified_final)
+data.frame(pred)
+summary(list.models[1])
 summary(data_long)
 #ggplot
 library(ggplot2)
-ggplot(data_long,aes(data_long$slope,color=site)) +
+library(ggridges)
+devtools::install_github("cardiomoon/ggiraphExtra")
+library(ggiraphExtra)
+ggpredict(stratified_final_lm)
+
+#spatial coefficients plot
+ggplot(data_long,aes(x=slope,y=site,fill=site)) +
   #geom_point(alpha=.1) +
   #geom_histogram(binwidth = .01) +
-  #geom_density(color='black',size=.5,alpha=.7) +
-  geom_density(size=1.5,fill="grey",alpha=.25) +
+  #geom_histogram(color='black',size=.5,alpha=.7) +
+  geom_density_ridges(size=1,alpha=1) +
   xlab('Slope of spatial model') +
-  scale_y_continuous(expand=c(0,0),limits=c(0,15)) +
-  scale_colour_manual(values=c('coefficient.mm.y'='black','northern_mixed_spatial_slope'='orange',
-                             'hot_deserts_spatial_slope' = 'red','cold_deserts_spatial_slope'='blue',
-                             'sgs_spatial_slope'='darkgreen'),name="Vegetaton type",
+  #geom_point(size=.1,pch=19,alpha=.1) +
+  scale_y_discrete(limits=c('hot_deserts_spatial_slope','cold_deserts_spatial_slope',
+                            'sgs_spatial_slope','coefficient.mm.y','northern_mixed_spatial_slope'),
+  #scale_y_continuous(expand=c(0,0),limits=c(0,1)) +
+  #scale_colour_manual(values=c('coefficient.mm.y'='black','northern_mixed_spatial_slope'='orange',
+                            # 'hot_deserts_spatial_slope' = 'red','cold_deserts_spatial_slope'='blue',
+                             #'sgs_spatial_slope'='darkgreen'),name="Vegetaton type",
                     
-                    labels=c('coefficient.mm.y'='California annuals','northern_mixed_spatial_slope'='Mixed prairies',
+  labels=c('coefficient.mm.y'='California annuals','northern_mixed_spatial_slope'='Mixed prairies',
                              'hot_deserts_spatial_slope' = 'Hot deserts','cold_deserts_spatial_slope'='Cold deserts',
                              'sgs_spatial_slope'='Semi-arid steppe')) +
   
-  #geom_smooth(method = "lm", formula=y ~ poly(x, 2, raw=TRUE),se = FALSE,size=.5,color="red") +
+
+xlab(bquote('Spatial sensitivity ('*g/m^2/mm*')')) +
   
-  #stat_summary(geom="bar",fun.y="mean",size=.5,color="black",aes(fill=as.factor(Rainfall.pattern))) +
-  
-  #scale_fill_manual(values=c('Experimental'='blue','Observational'='red'),name="Rainfall pattern",
-  
-  #labels=c('Uniform'='Experimental','Ambient'='Observational')) + #change names
-  
-  #stat_summary(geom="bar",fun.y="mean",size=.5,color="black",fill="red") +
-  
-ylab("Density") +
-
-#xlab("Mean event size (mm)") +
-
-#ylab(bquote('ANPP ('*g/m^2*')')) +
-
-#scale_x_discrete(labels=c('Ambient'="Variable","Reduced"="Uniform")) +
-
-#xlab("Maximum event size (mm)") +
-
-#labs(x=expression(Excess~rainfall~-~R[">30"]~("% of GSP"))) +
-
-#ylab("Experimental event event size (mm)") +
-
-#xlab("May - August precipitation (mm)") +
-  
-  #ylab("") +
+  ylab("") +
   
   #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
   
@@ -214,7 +217,51 @@ ylab("Density") +
     
     legend.text = element_text(size=12),
     
-    legend.position = c(.6,.85),
+    legend.position = c('none'),
+    
+    panel.background = element_rect(fill=NA),
+    
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    
+    axis.line.x = element_line(colour = "black"),
+    
+    axis.line.y = element_line(colour = "black"))
+
+#temporalcoefficients plot
+summary(data_long_temporal)
+ggplot(data_long_temporal,aes(x=slope,y=site,fill=site)) +
+  geom_density_ridges(size=1,alpha=1) +
+  #xlab('Slope of spatial model') +
+  scale_y_discrete(limits=c('hot_deserts_temporal_slope','cold_deserts_temporal_slope',
+                            'sgs_temporal_slope','coefficient.mm.y_mm.x','northern_mixed_temporal_slope'),
+                   labels=c('coefficient.mm.y_mm.x'='California annuals','northern_mixed_temporal_slope'='Mixed prairies',
+                            'hot_deserts_temporal_slope' = 'Hot deserts','cold_deserts_temporal_slope'='Cold deserts',
+                            'sgs_temporal_slope'='Semi-arid steppe')) +
+  
+  
+  xlab(bquote('change in sensitivity per mm of MAP ('*g/m^2/'%mm change'*')')) +
+  xlab('change in sensitivity per mm of MAP') +
+  ylab("") +
+  geom_vline(xintercept=0,color='black',size=2) +
+  #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
+  
+  theme(
+    
+    axis.text.x = element_text(color='black',size=18), #angle=25,hjust=1),
+    
+    axis.text.y = element_text(color='black',size=20),
+    
+    axis.title = element_text(color='black',size=18),
+    
+    axis.ticks = element_line(color='black'),
+    
+    legend.key = element_blank(),
+    
+    #legend.title = element_blank(),
+    
+    legend.text = element_text(size=12),
+    
+    legend.position = c('none'),
     
     panel.background = element_rect(fill=NA),
     
