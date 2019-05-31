@@ -4,92 +4,102 @@ library(lattice)
 head(stratified_final)
 #hot deserts
 hot_deserts_surface<-subset(stratified_final,region.x=='hot_deserts')
-hot_deserts.loess<-lm(npp.dev~mm.dev*mm.y,data=hot_deserts_surface)
 summary(hot_deserts_surface)
-hot_deserts_fit<-expand.grid(list(mm.dev=seq(-100,300,25),mm.y=seq(80,650,25)))
+hot_deserts.loess<-lm(npp.x~mm.x*mm.y,data=hot_deserts_surface)
+summary(hot_deserts_surface)
+hot_deserts_fit<-expand.grid(list(mm.x=seq(5,900,50),mm.y=seq(100,500,50)))
 hot_deserts_fit[1:20,]
 z = predict(hot_deserts.loess,hot_deserts_fit)
 hot_deserts_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.dev*mm.y, data = hot_deserts_fit,
-          xlab = list("% Precipitation change",rot=-50,cex=1.4), zlab = list("% NPP change",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(npp ~ mm.x*mm.y, data = hot_deserts_fit,
+          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Hot deserts",
           drape = TRUE,
           colorkey = FALSE,
-          col.regions = colorRampPalette(c("orange", "green"))(100),
+          par.settings = list(axis.line = list(col = 'transparent')),
+          col.regions = colorRampPalette(c("red","orange", "green"))(900),
           screen = list(z = -60, x = -60)
 )
 
 #california
 cali_annuals_surface<-subset(stratified_final,region.x=='california_annuals')
-cali_annuals.loess<-lm(npp.dev~mm.dev*mm.y,data=cali_annuals_surface)
 summary(cali_annuals_surface)
-cali_annuals_fit<-expand.grid(list(mm.dev=seq(-75,325,25),mm.y=seq(175,825,25)))
+cali_annuals.loess<-lm(npp.x~mm.x*mm.y,data=cali_annuals_surface)
+summary(cali_annuals_surface)
+cali_annuals_fit<-expand.grid(list(mm.x=seq(25,1325,50),mm.y=seq(100,675,50)))
 cali_annuals_fit[1:20,]
 z = predict(cali_annuals.loess,cali_annuals_fit)
 cali_annuals_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.dev*mm.y, data = cali_annuals_fit,
-          xlab = list("% Precipitation change",rot=-50,cex=1.4), zlab = list("% NPP change",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(npp ~ mm.x*mm.y, data = cali_annuals_fit,
+          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "California annuals",
           drape = TRUE,
           colorkey = FALSE,
-          col.regions = colorRampPalette(c("orange", "green"))(100),
+          par.settings = list(axis.line = list(col = 'transparent')),
+          col.regions = colorRampPalette(c("red","orange", "green"))(1200),
           screen = list(z = -60, x = -60)
 )
 
 #cold deserts
 cold_deserts_surface<-subset(stratified_final,region.x=='cold_deserts')
-cold_deserts.loess<-lm(npp.dev~mm.dev*mm.y,data=cold_deserts_surface)
 summary(cold_deserts_surface)
-cold_deserts_fit<-expand.grid(list(mm.dev=seq(-75,200,25),mm.y=seq(100,825,25)))
+cold_deserts.loess<-lm(npp.x~mm.x*mm.y,data=cold_deserts_surface)
+summary(cold_deserts_surface)
+cold_deserts_fit<-expand.grid(list(mm.x=seq(25,1175,50),mm.y=seq(100,800,50)))
 cold_deserts_fit[1:20,]
 z = predict(cold_deserts.loess,cold_deserts_fit)
 cold_deserts_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.dev*mm.y, data = cold_deserts_fit,
-          xlab = list("% Precipitation change",rot=-50,cex=1.4), zlab = list("% NPP change",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(npp ~ mm.x*mm.y, data = cold_deserts_fit,
+          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Cold deserts",
           drape = TRUE,
           colorkey = FALSE,
-          col.regions = colorRampPalette(c("orange", "green"))(100),
+          par.settings = list(axis.line = list(col = 'transparent')),
+          col.regions = colorRampPalette(c("red","orange", "green"))(1100),
           screen = list(z = -60, x = -60)
 )
 
 
 #shortgrass steppe
 sgs_surface<-subset(stratified_final,region.x=='semi-arid_steppe')
-sgs.loess<-lm(npp.dev~mm.dev*mm.y,data=sgs_surface)
 summary(sgs_surface)
-sgs_fit<-expand.grid(list(mm.dev=seq(-75,100,25),mm.y=seq(275,650,25)))
+sgs.loess<-lm(npp.x~mm.x*mm.y,data=sgs_surface)
+summary(sgs_surface)
+sgs_fit<-expand.grid(list(mm.x=seq(25,900,50),mm.y=seq(275,650,50)))
 sgs_fit[1:20,]
 z = predict(sgs.loess,sgs_fit)
 sgs_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.dev*mm.y, data = sgs_fit,
-          xlab = list("% Precipitation change",rot=-50,cex=1.4), zlab = list("% NPP change",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(npp ~ mm.x*mm.y, data = sgs_fit,
+          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "shortgrass steppe",
           drape = TRUE,
           colorkey = FALSE,
-          col.regions = colorRampPalette(c("orange", "green"))(100),
+          par.settings = list(axis.line = list(col = 'transparent')),
+          col.regions = colorRampPalette(c("red","orange", "green"))(900),
           screen = list(z = -60, x = -60)
 )
 
 #northern mixed prairies
 northern_mixed_surface<-subset(stratified_final,region.x=='northern_mixed_prairies')
-northern_mixed.loess<-lm(npp.dev~mm.dev*mm.y,data=northern_mixed_surface)
 summary(northern_mixed_surface)
-northern_mixed_fit<-expand.grid(list(mm.dev=seq(-75,100,25),mm.y=seq(150,775,25)))
+northern_mixed.loess<-lm(npp.x~mm.x*mm.y,data=northern_mixed_surface)
+summary(northern_mixed_surface)
+northern_mixed_fit<-expand.grid(list(mm.x=seq(100,1025,50),mm.y=seq(175,700,50)))
 northern_mixed_fit[1:20,]
 z = predict(northern_mixed.loess,northern_mixed_fit)
 northern_mixed_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.dev*mm.y, data = northern_mixed_fit,
-          xlab = list("% Precipitation change",rot=-50,cex=1.4), zlab = list("% NPP change",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(npp ~ mm.x*mm.y, data = northern_mixed_fit,
+          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "northern mixed prairies",
           drape = TRUE,
           colorkey = FALSE,
-          col.regions = colorRampPalette(c("orange", "green"))(100),
+          par.settings = list(axis.line = list(col = 'transparent')),
+          col.regions = colorRampPalette(c("red","orange", "green"))(100),
           screen = list(z = -60, x = -60)
 )
 
@@ -161,7 +171,7 @@ spplot(sensitivity_raster,#scales = list(draw = TRUE),
        main="") +
   latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.1))
 
-######plottin temporal-map slopes and 95% CIs from model runs#######
+######plotting temporal-map slopes and 95% CIs from model runs#######
 
 error.95 <-function(x) {
   n = length(x)
@@ -174,7 +184,9 @@ ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
 mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
 mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
 
-ggplot(mean.ci.site.temporal.spatial.slope,aes(x=site,y=slope.y)) +
+ggplot(mean.site,aes(site,slope)) +
+  #geom_histogram() +
+#facet_wrap(~site,nrow=5)
   geom_errorbar(aes(ymin=slope.y-slope.x,ymax=slope.y+slope.x),width=.2,size=1) +
   stat_summary(geom='point',fun.y=mean,pch=21,fill=
                  'white',size=5) +
@@ -310,21 +322,28 @@ merge_mm_sensitivity$region.x <- factor(merge_mm_sensitivity$region.x, levels = 
 merge_mm_sensitivity$region.x <- factor(merge_mm_sensitivity$region.x, levels = c("hot_deserts", "cold_deserts", 
                                                                       "california_annuals","semi-arid_steppe", 
                                                                       "northern_mixed_prairies"))
+#
+cali_annuals_sensitivity<-subset(merge_mm_sensitivity,region.x=='california_annuals')
+hot_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='hot_deserts')
+cold_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='cold_deserts')
+sgs_sensitivity<-subset(merge_mm_sensitivity,region.x=='semi-arid_steppe')
+northern_mixed_sensitivity<-subset(merge_mm_sensitivity,region.x=='northern_mixed_prairies')
 
-ggplot(merge_mm_sensitivity,aes(mm.x,coef)) +
-  geom_point(size=.75,pch=1) +
-  facet_wrap(~region.x,nrow=1,scale='free') +
-  stat_smooth(method='lm',size=1,color='red') +
-  xlab('Slope of spatial model') +
-ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
+  geom_point(size=1,pch=1) +
+  #facet_wrap(~region.x,nrow=1,scale='free') +
+  #stat_smooth(method='lm',size=1,color='red') +
+  xlab('') +
+#ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
   
-  xlab("Mean annual precipitation (mm)") +
+  #xlab("Mean annual precipitation (mm)") +
+  ylab('') +
   
   theme(
     
-    axis.text.x = element_text(color='black',size=12), #angle=25,hjust=1),
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
     
-    axis.text.y = element_text(color='black',size=12),
+    axis.text.y = element_text(color='black',size=15),
     
     axis.title = element_text(color='black',size=20),
     
@@ -474,19 +493,111 @@ mm_max<- rangeland_npp_covariates_deviations_1 %>%
   dplyr::summarise(mm.x = max(mm.x))
 
 mm_max_final<-merge(mm_max,rangeland_npp_covariates_deviations_1,by=c('mm.x','y','x'),no.dups=TRUE)
+mm_max_final_reduced <-subset(mm_max_final,select=c('x','y','npp.x','mm.x','region.x'))
+mm_max_final_npp_raster<-rasterFromXYZ(mm_max_final_reduced)
+plot(mm_max_final_npp_raster)                                                                                               
+lm.dry<-lm(npp.x~mm.x,data=spatial_cali_min_final)
+plot(npp.x~mm.x,data=mm_max_final)
 
-plot(npp.x~mm.x,data=spatial_cali_max_final)
-lm.max<-lm(npp.x~mm.x,data=spatial_cali_max_final)
-summary(lm.max)
-  
 #driest year per pixel
 mm_min<- rangeland_npp_covariates_deviations_1  %>%
   group_by(x,y) %>%
   dplyr::summarise(mm.x = min(mm.x)) 
   
 mm_min_final<-merge(mm_min,rangeland_npp_covariates_deviations_1,by=c('mm.x','y','x'),no.dups=TRUE)
-plot(lm(npp.x~mm.x,data=spatial_cali_min_final))
-
+head(mm_min_final)
+plot(npp.x~mm.x,data=mm_min_final)
+mm_min_final_reduced <-subset(mm_min_final,select=c('x','y','npp.x','mm.x','region.x'))
+mm_min_final_npp_raster<-rasterFromXYZ(mm_min_final_reduced)
+plot(mm_min_final_npp_raster)                                                                                               
 lm.dry<-lm(npp.x~mm.x,data=spatial_cali_min_final)
 summary(lm.dry)
 
+#mean npp-precip
+spatial_npp_means<-aggregate(npp.x~ x + y + region.x,mean,data=rangeland_npp_covariates_deviations_1)
+spatial_mm_means<-aggregate(mm.x~x + y,mean,data=rangeland_npp_covariates_deviations_1)
+merge_npp_mm_means<-merge(spatial_npp_means,spatial_mm_means,by=c('x','y'))
+head(merge_npp_mm_means)
+
+summary(mm_min_final_reduced)
+#california
+california_mean<-subset(merge_npp_mm_means,region.x=='california_annuals')
+california_wet<-subset(mm_max_final_reduced,region.x=='california_annuals')
+
+#produce fit for wettest year per pixel
+lm_cal_spatial_max<-lm(npp.x~mm.x,data=california_wet)
+summary(lm_cal_spatial_max)
+f <- range(california_mean$mm.x)
+xNew <- seq(f[1],f[2])
+yNew <- predict(lm_cal_spatial_max,list(mm.x = xNew))
+predict.cali_spatial_max<-data.frame(xNew,yNew)
+
+#produce fit for driest year per pixel
+california_dry<-subset(mm_min_final_reduced,region.x=='california_annuals')
+lm_cal_spatial_min<-lm(npp.x~mm.x,data=california_dry)
+summary(lm_cal_spatial_min)
+f <- range(california_mean$mm.x)
+xNew <- seq(f[1],f[2])
+yNew <- predict(lm_cal_spatial_min,list(mm.x = xNew))
+predict.cali_spatial_min<-data.frame(xNew,yNew)
+
+ggplot(california_mean,aes(mm.x,npp.x)) +
+  geom_line(data=predict.cali_spatial_min,aes(xNew,yNew),size=1,,color='red',linetype='dashed') +
+  geom_line(data=predict.cali_spatial_max,aes(xNew,yNew),size=1,color='blue',linetype='dashed') +
+  stat_smooth(method='lm',size=2,se=FALSE,color='black') +
+  ylab(bquote('NPP ('*g/m^2/mm*')')) +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=23),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.text = element_text(size=10),
+    legend.position = c(.10,.1),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#hot deserts
+
+hot_deserts_mean<-subset(merge_npp_mm_means,region.x=='hot_deserts')
+hot_deserts_wet<-subset(mm_max_final_reduced,region.x=='hot_deserts')
+hot_deserts_dry<-subset(mm_min_final_reduced,region.x=='hot_deserts')
+#produce fit for wettest year per pixel
+lm_hot_deserts_spatial_max<-lm(npp.x~mm.x,data=hot_deserts_wet)
+summary(lm_hot_deserts_spatial_max)
+f <- range(hot_deserts_wet$mm.x)
+xNew <- seq(f[1],f[2])
+yNew <- predict(lm_hot_deserts_spatial_max,list(mm.x = xNew))
+predict.hot_deserts_spatial_max<-data.frame(xNew,yNew)
+
+#produce fit for driest year per pixel
+lm_hot_deserts_spatial_min<-lm(npp.x~mm.x,data=hot_deserts_dry)
+summary(lm_hot_deserts_spatial_min)
+f <- range(hot_deserts_dry$mm.x)
+xNew <- seq(f[1],f[2])
+yNew <- predict(lm_hot_deserts_spatial_min,list(mm.x = xNew))
+predict.hot_deserts_spatial_min<-data.frame(xNew,yNew)
+
+ggplot(hot_deserts_mean,aes(mm.x,npp.x)) +
+  geom_line(data=predict.hot_deserts_spatial_min,aes(xNew,yNew),size=1,,color='red',linetype='dashed') +
+  geom_line(data=predict.hot_deserts_spatial_max,aes(xNew,yNew),size=1,color='blue',linetype='dashed') +
+  stat_smooth(method='lm',size=2,se=FALSE,color='black') +
+  ylab(bquote('NPP ('*g/m^2/mm*')')) +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=23),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.text = element_text(size=10),
+    legend.position = c(.10,.1),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))

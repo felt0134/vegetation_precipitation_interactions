@@ -97,7 +97,7 @@ head(data_long_temporal)
 summary(data_long_temporal)
 
 
-#temporal*spatial interaction (not really)
+#temporal*spatial interaction 
 #cold deserts
 df2$cold_deserts_temporal_spatial <- df2$coefficient.mm.y_mm.x + df2$coefficient.mm.y_region.xcold_deserts_mm.x
 #hot_deserts
