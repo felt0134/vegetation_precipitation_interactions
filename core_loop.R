@@ -82,7 +82,7 @@ summary(df2)
 #cold deserts
 df2$cold_deserts_spatial_slope <- df2$coefficient.mm.y + df2$coefficient.region.xcold_deserts_mm.y
 #hot_deserts
-df2$hot_deserts_spatial_slope <-  df2$coefficient.mm.y + df2$coefficient.mm.dev_region.xhot_deserts_mm.y
+df2$hot_deserts_spatial_slope <-  df2$coefficient.mm.y + df2$coefficient.region.xhot_deserts_mm.y
 #northern mixed
 df2$northern_mixed_spatial_slope <- df2$coefficient.mm.y  + df2$coefficient.region.xnorthern_mixed_prairies_mm.y
 #sgs
