@@ -183,10 +183,10 @@ error.95 <-function(x) {
 ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
 mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
 mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
-
-ggplot(mean.site,aes(site,slope)) +
-  #geom_histogram() +
-#facet_wrap(~site,nrow=5)
+library(ggplot2)
+ggplot(data_long,aes(x=slope)) +
+  geom_histogram(binwidth = .01,fill='white',color='black') +
+facet_wrap(~site,nrow=5)
   geom_errorbar(aes(ymin=slope.y-slope.x,ymax=slope.y+slope.x),width=.2,size=1) +
   stat_summary(geom='point',fun.y=mean,pch=21,fill=
                  'white',size=5) +

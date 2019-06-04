@@ -27,7 +27,7 @@ for(i in 1:1000)
 stratified_final<-merge(test.strat, rangeland_npp_covariates_deviations_reduced,by=c('x','y'))
 #print(stratified_final)
 
-stratified_final_lm<-lm(npp.x~mm.y*region.x*mm.x
+stratified_final_lm<-lm(npp.x~mm.dev*region.x*mm.y
                         ,stratified_final)
 
 list.models[[i]] <- stratified_final_lm
@@ -77,20 +77,37 @@ df2<-reshape(df.coefficients.2, idvar = "run.id", timevar = "predictor", directi
 head(df2)
 summary(df2)
 
+#spatial slopes
+
+#cold deserts
+df2$cold_deserts_spatial_slope <- df2$coefficient.mm.y + df2$coefficient.region.xcold_deserts_mm.y
+#hot_deserts
+df2$hot_deserts_spatial_slope <-  df2$coefficient.mm.y + df2$coefficient.mm.dev_region.xhot_deserts_mm.y
+#northern mixed
+df2$northern_mixed_spatial_slope <- df2$coefficient.mm.y  + df2$coefficient.region.xnorthern_mixed_prairies_mm.y
+#sgs
+df2$sgs_spatial_slope <- df2$coefficient.mm.y + df2$coefficient.region.xsemi_arid_steppe_mm.y 
+
+spatial_slopes<-subset(df2,select=c('sgs_spatial_slope','northern_mixed_spatial_slope','hot_deserts_spatial_slope','cold_deserts_spatial_slope',
+                                         'coefficient.mm.y'))
+head(spatial_slopes)
+data_long <- gather(spatial_slopes, site, slope, factor_key=TRUE)
+head(data_long)
+summary(data_long)
 
 #temporal slopes
 
 #cold deserts
-df2$cold_deserts_temporal_slope <- df2$coefficient.mm.x + df2$coefficient.region.xcold_deserts_mm.x 
+df2$cold_deserts_temporal_slope <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xcold_deserts 
 #hot_deserts
-df2$hot_deserts_temporal_slope <-  df2$coefficient.mm.x + df2$coefficient.region.xhot_deserts_mm.x 
+df2$hot_deserts_temporal_slope <-  df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xhot_deserts 
 #northern mixed
-df2$northern_mixed_temporal_slope <- df2$coefficient.mm.x + df2$coefficient.region.xnorthern_mixed_prairies_mm.x
+df2$northern_mixed_temporal_slope <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies
 #sgs
-df2$sgs_temporal_slope <- df2$coefficient.mm.x  + df2$coefficient.region.xsemi_arid_steppe_mm.x
+df2$sgs_temporal_slope <- df2$coefficient.mm.dev  + df2$coefficient.mm.dev_region.xsemi_arid_steppe
 
 temporal_slopes<-subset(df2,select=c('sgs_temporal_slope','northern_mixed_temporal_slope','hot_deserts_temporal_slope','cold_deserts_temporal_slope',
-                                     'coefficient.mm.x'))
+                                     'coefficient.mm.dev'))
 head(temporal_slopes)
 data_long_temporal <- gather(temporal_slopes, site, slope, factor_key=TRUE)
 head(data_long_temporal)
@@ -99,16 +116,16 @@ summary(data_long_temporal)
 
 #temporal*spatial interaction 
 #cold deserts
-df2$cold_deserts_temporal_spatial <- df2$coefficient.mm.y_mm.x + df2$coefficient.mm.y_region.xcold_deserts_mm.x
+df2$cold_deserts_temporal_spatial <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xcold_deserts_mm.y
 #hot_deserts
-df2$hot_deserts_temporal_spatial <-  df2$coefficient.mm.y_mm.x + df2$coefficient.mm.y_region.xhot_deserts_mm.x
+df2$hot_deserts_temporal_spatial <-  df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xhot_deserts_mm.y
 #northern mixed
-df2$northern_mixed_temporal_spatial <- df2$coefficient.mm.y_mm.x + df2$coefficient.mm.y_region.xnorthern_mixed_prairies_mm.x
+df2$northern_mixed_temporal_spatial <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies_mm.y
 #sgs
-df2$sgs_temporal_spatial <- df2$coefficient.mm.y_mm.x  + df2$coefficient.mm.y_region.xsemi_arid_steppe_mm.x
+df2$sgs_temporal_spatial <- df2$coefficient.mm.dev_mm.y  + df2$coefficient.mm.dev_region.xsemi_arid_steppe_mm.y
 
 temporal_spatial_slopes<-subset(df2,select=c('hot_deserts_temporal_spatial','cold_deserts_temporal_spatial',
-                                    'coefficient.mm.y_mm.x','sgs_temporal_spatial','northern_mixed_temporal_spatial'))
+                                    'coefficient.mm.dev_mm.y','sgs_temporal_spatial','northern_mixed_temporal_spatial'))
 head(temporal_spatial_slopes)
 data_long_temporal_spatial <- gather(temporal_spatial_slopes, site, slope, factor_key=TRUE)
 head(data_long_temporal_spatial)
