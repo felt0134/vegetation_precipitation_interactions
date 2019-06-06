@@ -5,14 +5,14 @@ head(stratified_final)
 #hot deserts
 hot_deserts_surface<-subset(stratified_final,region.x=='hot_deserts')
 summary(hot_deserts_surface)
-hot_deserts.loess<-lm(npp.x~mm.x*mm.y,data=hot_deserts_surface)
+hot_deserts.loess<-lm(npp.x~mm.dev*mm.y,data=hot_deserts_surface)
 summary(hot_deserts_surface)
-hot_deserts_fit<-expand.grid(list(mm.x=seq(5,900,50),mm.y=seq(100,500,50)))
+hot_deserts_fit<-expand.grid(list(mm.dev=seq(-100,200,50),mm.y=seq(100,500,50)))
 hot_deserts_fit[1:20,]
 z = predict(hot_deserts.loess,hot_deserts_fit)
 hot_deserts_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.x*mm.y, data = hot_deserts_fit,
+wireframe(npp ~ mm.dev*mm.y, data = hot_deserts_fit,
           xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Hot deserts",
           drape = TRUE,
@@ -104,6 +104,63 @@ wireframe(npp ~ mm.x*mm.y, data = northern_mixed_fit,
 )
 
 
+######shapefiles#######
+library(rgdal)
+
+#mojave sonoran
+mojave.sonoran.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/MojaveSonoran",layer="MojaveSonoran")
+plot(mojave.sonoran.shape)
+mojave.sonoran.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(mojave.sonoran.shape)
+#step 2:
+mojave.sonoran.shape.2 <- sp::spTransform(mojave.sonoran.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(mojave.sonoran.shape.2)
+
+#chihuahan
+ChihuahuanDesert.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ChihuahuanDesert",layer="ChihuahuanDesert")
+plot(ChihuahuanDesert.shape)
+ChihuahuanDesert.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(ChihuahuanDesert.shape)
+#step 2:
+ChihuahuanDesert.shape.2 <- sp::spTransform(ChihuahuanDesert.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(ChihuahuanDesert.shape.2)
+
+#california annuals
+CaliforniaAnnual.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/CaliforniaAnnual",layer="CaliforniaAnnual")
+plot(CaliforniaAnnual.shape)
+CaliforniaAnnual.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(CaliforniaAnnual.shape)
+#step 2:
+CaliforniaAnnual.shape.2 <- sp::spTransform(CaliforniaAnnual.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(CaliforniaAnnual.shape.2)
+
+#cold deserts
+ColdDeserts.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ColdDeserts",layer="ColdDeserts")
+plot(CaliforniaAnnual.shape)
+ColdDeserts.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(ColdDeserts.shape)
+#step 2:
+ColdDeserts.shape.2 <- sp::spTransform(ColdDeserts.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(ColdDeserts.shape.2)
+
+#shortgrass steppe
+SGS.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/SGS",layer="SGS")
+plot(SGS.shape)
+SGS.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(SGS.shape)
+#step 2:
+SGS.shape.2 <- sp::spTransform(SGS.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(SGS.shape.2)
+
+#northernmixed
+NorthernMixedSubset.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/NorthernMixedSubset",layer="NorthernMixedSubset")
+plot(NorthernMixedSubset.shape)
+NorthernMixedSubset.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(NorthernMixedSubset.shape)
+#step 2:
+NorthernMixedSubset.shape.2 <- sp::spTransform(NorthernMixedSubset.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(NorthernMixedSubset.shape.2)
+crop(NorthernMixedSubset.shape.2,mean_production_raster)
 ######maps########
 library(colorspace)
 library(latticeExtra)
@@ -131,7 +188,12 @@ spplot(mean_production_raster,#scales = list(draw = TRUE),
        col.regions = 
          rev(terrain.colors(length(break_mean_npp)-1)),
        main="") +
-  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.1))
+  latticeExtra::layer(sp.polygons(NorthernMixedSubset.shape.2, lwd = 1)) +
+  latticeExtra::layer(sp.polygons(SGS.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(CaliforniaAnnual.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(ChihuahuanDesert.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(ColdDeserts.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2, lwd = 0.1)) +
 
 ######mean precipitation graph code##########
 head(rangeland_npp_covariates_deviations_1)
@@ -143,11 +205,16 @@ break_mean_mm<-mean_mm$mm.x
 
 spplot(mean_mm_raster,#scales = list(draw = TRUE),
        at=break_mean_mm,
-       asp=1,
+       asp=.1,
        col.regions =
          rev(topo.colors(length(break_mean_mm)-1)),
        main="") +
-  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.1))
+  latticeExtra::layer(sp.polygons(NorthernMixedSubset.shape.2, lwd = 1)) +
+  latticeExtra::layer(sp.polygons(SGS.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(CaliforniaAnnual.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(ChihuahuanDesert.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(ColdDeserts.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2, lwd = 0.1)) +
 
 #######sensitivity to precipitation map########
 sensitivity_conus <- rangeland_npp_covariates_deviations_1 %>% group_by(x, y) %>%
@@ -184,9 +251,10 @@ ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
 mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
 mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
 library(ggplot2)
-ggplot(data_long,aes(x=slope)) +
-  geom_histogram(binwidth = .01,fill='white',color='black') +
-facet_wrap(~site,nrow=5)
+ggplot(data_long_temporal_spatial,aes(x=slope)) +
+  geom_histogram(binwidth = .000005,fill='white',color='black') +
+facet_wrap(~site,nrow=5) +
+geom_vline(xintercept = 0,color='red')
   geom_errorbar(aes(ymin=slope.y-slope.x,ymax=slope.y+slope.x),width=.2,size=1) +
   stat_summary(geom='point',fun.y=mean,pch=21,fill=
                  'white',size=5) +
@@ -234,7 +302,7 @@ facet_wrap(~site,nrow=5)
 #########temporal slope with histograms#########
 #rename the vegetation types
 rename_sites<- c(hot_deserts_temporal_slope="Hot deserts", cold_deserts_temporal_slope="Cold deserts",
-                 sgs_temporal_slope="Shortgrass steppe", coefficient.mm.x="California annuals", 
+                 sgs_temporal_slope="Shortgrass steppe", coefficient.mm.dev="California annuals", 
                  northern_mixed_temporal_slope="Northern mixed prairies")
 
 data_long_temporal$site <- as.character(rename_sites[data_long_temporal$site])
@@ -244,13 +312,13 @@ data_long_temporal$site <- factor(data_long_temporal$site, levels = c("Hot deser
                                                     "Shortgrass steppe", "Northern mixed prairies"))
 
 data_long_temporal$site <- factor(data_long_temporal$site, levels = c("hot_deserts_temporal_slope", "cold_deserts_temporal_slope", 
-                                                    "coefficient.mm.x","sgs_temporal_slope", 
+                                                    "california_temporal_slope","sgs_temporal_slope", 
                                                     "northern_mixed_temporal_slope"))
 ggplot(data_long_temporal,aes(x=slope)) +
   geom_histogram(binwidth = .01,fill='white',color='black') +
   #geom_density() +
   facet_wrap(~site,nrow=5,scales='free_y') +
-  geom_vline(xintercept=0,color='red') +
+  #geom_vline(xintercept=0,color='red') +
   #geom_histogram(color='black',size=.5,alpha=.7) +
   #geom_density_ridges(size=1,alpha=0.5,color='black',calc_ecdf = TRUE) +
   #scale_fill_viridis(name = "Tail probability", direction = -1)
@@ -329,15 +397,16 @@ cold_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='cold_deserts')
 sgs_sensitivity<-subset(merge_mm_sensitivity,region.x=='semi-arid_steppe')
 northern_mixed_sensitivity<-subset(merge_mm_sensitivity,region.x=='northern_mixed_prairies')
 
-ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
-  geom_point(size=1,pch=1) +
+ggplot(cali_annuals_sensitivity,aes(mm.x,coef)) +
+  geom_point(size=0.5,pch=1) +
   #facet_wrap(~region.x,nrow=1,scale='free') +
   #stat_smooth(method='lm',size=1,color='red') +
+  geom_line(data=predict.cali.slope,aes(xNew,yNew),color='red',size=1) +
   xlab('') +
-#ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+  ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
   
-  #xlab("Mean annual precipitation (mm)") +
-  ylab('') +
+  xlab("Mean annual precipitation (mm)") +
+  #ylab('') +
   
   theme(
     

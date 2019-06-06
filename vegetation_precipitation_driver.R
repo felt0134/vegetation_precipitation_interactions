@@ -79,7 +79,7 @@ rangeland_npp_covariates_deviations_1<-merge(rangeland_npp_covariates,mm_product
 head(rangeland_npp_covariates_deviations_1)
 
 #add percent mm and percent npp deviations to relatavize
-rangeland_npp_covariates_deviations_1$npp.dev<-((rangeland_npp_covariates_deviations_1$npp.x - rangeland_npp_covariates_deviations_1$npp.y)/ rangeland_npp_covariates_deviations_1$npp.y)*100
-rangeland_npp_covariates_deviations_1$mm.dev<-((rangeland_npp_covariates_deviations_1$mm.x - rangeland_npp_covariates_deviations_1$mm.y)/rangeland_npp_covariates_deviations_1$mm.y)*100
+rangeland_npp_covariates_deviations_1$npp.dev<-rangeland_npp_covariates_deviations_1$npp.x - rangeland_npp_covariates_deviations_1$npp.y
+rangeland_npp_covariates_deviations_1$mm.dev<-rangeland_npp_covariates_deviations_1$mm.x - rangeland_npp_covariates_deviations_1$mm.y
 summary(rangeland_npp_covariates_deviations_1)
 head(rangeland_npp_covariates_deviations_1)

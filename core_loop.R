@@ -73,6 +73,10 @@ df.coefficients.2$predictor<-gsub('[[:digit:]]+', '', df.coefficients.2$predicto
 df.coefficients.2$predictor<-gsub(':', '_', df.coefficients.2$predictor)
 df.coefficients.2$predictor<-gsub('-', '_', df.coefficients.2$predictor)
 
+
+df.coefficients.2$predictor<-gsub('(', '_', df.coefficients.2$predictor)
+df.coefficients.2$predictor<-gsub(')', '_', df.coefficients.2$predictor)
+
 df2<-reshape(df.coefficients.2, idvar = "run.id", timevar = "predictor", direction = "wide")
 head(df2)
 summary(df2)
@@ -97,6 +101,8 @@ summary(data_long)
 
 #temporal slopes
 
+#california annuals
+df2$california_temporal_slope <- df2$coefficient.mm.dev
 #cold deserts
 df2$cold_deserts_temporal_slope <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xcold_deserts 
 #hot_deserts
@@ -107,7 +113,7 @@ df2$northern_mixed_temporal_slope <- df2$coefficient.mm.dev + df2$coefficient.mm
 df2$sgs_temporal_slope <- df2$coefficient.mm.dev  + df2$coefficient.mm.dev_region.xsemi_arid_steppe
 
 temporal_slopes<-subset(df2,select=c('sgs_temporal_slope','northern_mixed_temporal_slope','hot_deserts_temporal_slope','cold_deserts_temporal_slope',
-                                     'coefficient.mm.dev'))
+                                     'california_temporal_slope'))
 head(temporal_slopes)
 data_long_temporal <- gather(temporal_slopes, site, slope, factor_key=TRUE)
 head(data_long_temporal)
@@ -115,6 +121,8 @@ summary(data_long_temporal)
 
 
 #temporal*spatial interaction 
+#california annuals
+df2$california_temporal_spatial<- df2$coefficient.mm.dev_mm.y
 #cold deserts
 df2$cold_deserts_temporal_spatial <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xcold_deserts_mm.y
 #hot_deserts
@@ -125,7 +133,7 @@ df2$northern_mixed_temporal_spatial <- df2$coefficient.mm.dev_mm.y + df2$coeffic
 df2$sgs_temporal_spatial <- df2$coefficient.mm.dev_mm.y  + df2$coefficient.mm.dev_region.xsemi_arid_steppe_mm.y
 
 temporal_spatial_slopes<-subset(df2,select=c('hot_deserts_temporal_spatial','cold_deserts_temporal_spatial',
-                                    'coefficient.mm.dev_mm.y','sgs_temporal_spatial','northern_mixed_temporal_spatial'))
+                                    'california_temporal_spatial','sgs_temporal_spatial','northern_mixed_temporal_spatial'))
 head(temporal_spatial_slopes)
 data_long_temporal_spatial <- gather(temporal_spatial_slopes, site, slope, factor_key=TRUE)
 head(data_long_temporal_spatial)
