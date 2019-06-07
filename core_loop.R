@@ -72,70 +72,73 @@ colnames(df.coefficients.2)  <- c("predictor","coefficient","run.id")
 df.coefficients.2$predictor<-gsub('[[:digit:]]+', '', df.coefficients.2$predictor)
 df.coefficients.2$predictor<-gsub(':', '_', df.coefficients.2$predictor)
 df.coefficients.2$predictor<-gsub('-', '_', df.coefficients.2$predictor)
-
-
-df.coefficients.2$predictor<-gsub('(', '_', df.coefficients.2$predictor)
-df.coefficients.2$predictor<-gsub(')', '_', df.coefficients.2$predictor)
-
 df2<-reshape(df.coefficients.2, idvar = "run.id", timevar = "predictor", direction = "wide")
 head(df2)
 summary(df2)
 
 #spatial slopes
 
+#california
+df2$california_slope <- df2$coefficient.mm.y
 #cold deserts
-df2$cold_deserts_spatial_slope <- df2$coefficient.mm.y + df2$coefficient.region.xcold_deserts_mm.y
+df2$cold_deserts_slope <- df2$coefficient.mm.y + df2$coefficient.region.xcold_deserts_mm.y
 #hot_deserts
-df2$hot_deserts_spatial_slope <-  df2$coefficient.mm.y + df2$coefficient.region.xhot_deserts_mm.y
+df2$hot_deserts_slope <-  df2$coefficient.mm.y + df2$coefficient.region.xhot_deserts_mm.y
 #northern mixed
-df2$northern_mixed_spatial_slope <- df2$coefficient.mm.y  + df2$coefficient.region.xnorthern_mixed_prairies_mm.y
+df2$northern_mixed_slope <- df2$coefficient.mm.y  + df2$coefficient.region.xnorthern_mixed_prairies_mm.y
 #sgs
-df2$sgs_spatial_slope <- df2$coefficient.mm.y + df2$coefficient.region.xsemi_arid_steppe_mm.y 
+df2$sgs_slope <- df2$coefficient.mm.y + df2$coefficient.region.xsemi_arid_steppe_mm.y 
 
-spatial_slopes<-subset(df2,select=c('sgs_spatial_slope','northern_mixed_spatial_slope','hot_deserts_spatial_slope','cold_deserts_spatial_slope',
-                                         'coefficient.mm.y'))
+spatial_slopes<-subset(df2,select=c('sgs_slope','northern_mixed_slope','hot_deserts_slope','cold_deserts_slope',
+                                         'california_slope','run.id'))
 head(spatial_slopes)
-data_long <- gather(spatial_slopes, site, slope, factor_key=TRUE)
-head(data_long)
+data_long_spatial <- gather(spatial_slopes, site, slope,-run.id, factor_key=TRUE)
+head(data_long_spatial)
+data_long_spatial$model<-'Spatial'
 summary(data_long)
-
+?gather
 #temporal slopes
 
 #california annuals
-df2$california_temporal_slope <- df2$coefficient.mm.dev
+df2$california_slope <- df2$coefficient.mm.dev
 #cold deserts
-df2$cold_deserts_temporal_slope <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xcold_deserts 
+df2$cold_deserts_slope <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xcold_deserts 
 #hot_deserts
-df2$hot_deserts_temporal_slope <-  df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xhot_deserts 
+df2$hot_deserts_slope <-  df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xhot_deserts 
 #northern mixed
-df2$northern_mixed_temporal_slope <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies
+df2$northern_mixed_slope <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies
 #sgs
-df2$sgs_temporal_slope <- df2$coefficient.mm.dev  + df2$coefficient.mm.dev_region.xsemi_arid_steppe
+df2$sgs_slope <- df2$coefficient.mm.dev  + df2$coefficient.mm.dev_region.xsemi_arid_steppe
 
-temporal_slopes<-subset(df2,select=c('sgs_temporal_slope','northern_mixed_temporal_slope','hot_deserts_temporal_slope','cold_deserts_temporal_slope',
-                                     'california_temporal_slope'))
+temporal_slopes<-subset(df2,select=c('sgs_slope','northern_mixed_slope','hot_deserts_slope','cold_deserts_slope',
+                                     'california_slope','run.id'))
 head(temporal_slopes)
-data_long_temporal <- gather(temporal_slopes, site, slope, factor_key=TRUE)
+data_long_temporal <- gather(temporal_slopes, site, slope,-run.id, factor_key=TRUE)
+data_long_temporal$model<-'Temporal'
 head(data_long_temporal)
 summary(data_long_temporal)
 
-
+#merge the spatial and temporal coefficient dataframes
+rbind_spatial_temporal<-rbind(data_long_spatial,data_long_temporal)
+head(rbind_spatial_temporal)
+summary(rbind_spatial_temporal)
 #temporal*spatial interaction 
 #california annuals
-df2$california_temporal_spatial<- df2$coefficient.mm.dev_mm.y
+df2$california_slope<- df2$coefficient.mm.dev_mm.y
 #cold deserts
-df2$cold_deserts_temporal_spatial <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xcold_deserts_mm.y
+df2$cold_deserts_slope <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xcold_deserts_mm.y
 #hot_deserts
-df2$hot_deserts_temporal_spatial <-  df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xhot_deserts_mm.y
+df2$hot_deserts_slope <-  df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xhot_deserts_mm.y
 #northern mixed
-df2$northern_mixed_temporal_spatial <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies_mm.y
+df2$northern_mixed_slope <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies_mm.y
 #sgs
-df2$sgs_temporal_spatial <- df2$coefficient.mm.dev_mm.y  + df2$coefficient.mm.dev_region.xsemi_arid_steppe_mm.y
+df2$sgs_slope <- df2$coefficient.mm.dev_mm.y  + df2$coefficient.mm.dev_region.xsemi_arid_steppe_mm.y
 
-temporal_spatial_slopes<-subset(df2,select=c('hot_deserts_temporal_spatial','cold_deserts_temporal_spatial',
-                                    'california_temporal_spatial','sgs_temporal_spatial','northern_mixed_temporal_spatial'))
+temporal_spatial_slopes<-subset(df2,select=c('hot_deserts_slope','cold_deserts_slope',
+                                    'california_slope','sgs_slope','northern_mixed_slope'))
 head(temporal_spatial_slopes)
 data_long_temporal_spatial <- gather(temporal_spatial_slopes, site, slope, factor_key=TRUE)
+data_long_temporal_spatial$model<-'Spatiotemporal'
 head(data_long_temporal_spatial)
 summary(data_long_temporal_spatial)
 #########look at residuals#############

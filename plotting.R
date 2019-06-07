@@ -125,6 +125,15 @@ plot(ChihuahuanDesert.shape)
 ChihuahuanDesert.shape.2 <- sp::spTransform(ChihuahuanDesert.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(ChihuahuanDesert.shape.2)
 
+#grama galleta steppe
+Grama.Galleta.Steppe.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/GramaGalletaSteppe",layer="GramaGalletaSteppe")
+plot(Grama.Galleta.Steppe.shape)
+Grama.Galleta.Steppe.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(Grama.Galleta.Steppe.shape)
+#step 2:
+Grama.Galleta.Steppe.shape.2 <- sp::spTransform(Grama.Galleta.Steppe.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(Grama.Galleta.Steppe.shape.2)
+
 #california annuals
 CaliforniaAnnual.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/CaliforniaAnnual",layer="CaliforniaAnnual")
 plot(CaliforniaAnnual.shape)
@@ -141,7 +150,7 @@ ColdDeserts.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(ColdDeserts.shape)
 #step 2:
 ColdDeserts.shape.2 <- sp::spTransform(ColdDeserts.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-plot(ColdDeserts.shape.2)
+plot(ColdDeserts.shape.2,col='blue')
 
 #shortgrass steppe
 SGS.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/SGS",layer="SGS")
@@ -173,6 +182,25 @@ states_all_sites <- us[us$NAME_1 %in% c('California','New Mexico','Arizona','Uta
                                         'Idaho','Oregon','Idaho','Montana','Texas',
                                         'North Dakota','South Dakota','Nebraska',
                                         'Oklahoma','Kansas'),]
+plot(states_all_sites)
+extend(states_all_sites)
+crop.test<-extend(mean_production_raster,extent(states_all_sites))
+mean_raster_2<-extent(mean_production_raster)
+spplot(crop.test,#scales = list(draw = TRUE),
+       at=break_mean_npp,
+       par.settings = list(axis.line = list(col = 'transparent')), 
+       asp=0.6,
+       colorkey=FALSE,
+       col.regions = FALSE) +
+  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.5)) +
+  latticeExtra::layer(sp.polygons(NorthernMixedSubset.shape.2,fill='steelblue2', lwd = .1)) +
+  latticeExtra::layer(sp.polygons(SGS.shape.2, lwd = 0.1,fill='green4')) +
+  latticeExtra::layer(sp.polygons(CaliforniaAnnual.shape.2,fill='grey', lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(ChihuahuanDesert.shape.2, fill='firebrick3', lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(ColdDeserts.shape.2, fill='gold', lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2,fill='firebrick3', lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(Grama.Galleta.Steppe.shape.2, fill='firebrick3', lwd = 0.1)) +
+
 ######mean npp graph#######
 mean_production<-aggregate(npp.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
 mean_production_raster<-rasterFromXYZ(mean_production)
@@ -184,16 +212,13 @@ plot(us)
 
 spplot(mean_production_raster,#scales = list(draw = TRUE),
        at=break_mean_npp,
-       asp=0.001,
+       #par.settings = list(axis.line = list(col = 'transparent')),
+       asp=0.01,
        col.regions = 
          rev(terrain.colors(length(break_mean_npp)-1)),
        main="") +
-  latticeExtra::layer(sp.polygons(NorthernMixedSubset.shape.2, lwd = 1)) +
-  latticeExtra::layer(sp.polygons(SGS.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(CaliforniaAnnual.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(ChihuahuanDesert.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(ColdDeserts.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 1))
+
 
 ######mean precipitation graph code##########
 head(rangeland_npp_covariates_deviations_1)
@@ -202,19 +227,15 @@ mean_mm_raster<-rasterFromXYZ(mean_mm)
 plot(mean_mm_raster)
 break_mean_mm<-quantile(mean_mm$mm.x,seq(from=0.01, to = .99,by=0.01),na.rm=TRUE)
 break_mean_mm<-mean_mm$mm.x
-
+mm.cropped<-extend(mean_mm_raster,extent(states_all_sites))
 spplot(mean_mm_raster,#scales = list(draw = TRUE),
        at=break_mean_mm,
        asp=.1,
+       #par.settings = list(axis.line = list(col = 'transparent')),
        col.regions =
          rev(topo.colors(length(break_mean_mm)-1)),
        main="") +
-  latticeExtra::layer(sp.polygons(NorthernMixedSubset.shape.2, lwd = 1)) +
-  latticeExtra::layer(sp.polygons(SGS.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(CaliforniaAnnual.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(ChihuahuanDesert.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(ColdDeserts.shape.2, lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2, lwd = 0.1)) +
+  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 1))
 
 #######sensitivity to precipitation map########
 sensitivity_conus <- rangeland_npp_covariates_deviations_1 %>% group_by(x, y) %>%
@@ -251,45 +272,52 @@ ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
 mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
 mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
 library(ggplot2)
+rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",
+                 sgs_slope="Shortgrass steppe", california_slope="California annuals", 
+                 northern_mixed_slope="Northern mixed prairies")
+
+data_long_temporal_spatial$site <- as.character(rename_sites[data_long_temporal_spatial$site])
+
+#change the order
+data_long_temporal_spatial$site <- factor(data_long_temporal_spatial$site, levels = c("Hot deserts", "Cold deserts", "California annuals",
+                                                                              "Shortgrass steppe", "Northern mixed prairies"))
+
+data_long_temporal_spatial$site <- factor(data_long_temporal_spatial$site, levels = c("hot_deserts_slope", "cold_deserts_slope", 
+                                                                              "california_slope","sgs_slope", 
+                                                                              "northern_mixed_slope"))
+summary(rbind_spatial_temporal)
+head(data_long_temporal_spatial)
+
 ggplot(data_long_temporal_spatial,aes(x=slope)) +
-  geom_histogram(binwidth = .000005,fill='white',color='black') +
-facet_wrap(~site,nrow=5) +
-geom_vline(xintercept = 0,color='red')
-  geom_errorbar(aes(ymin=slope.y-slope.x,ymax=slope.y+slope.x),width=.2,size=1) +
-  stat_summary(geom='point',fun.y=mean,pch=21,fill=
-                 'white',size=5) +
-  scale_x_discrete(limits=c('hot_deserts_temporal_spatial','cold_deserts_temporal_spatial',
-                            'coefficient.mm.y_mm.x','sgs_temporal_spatial','northern_mixed_temporal_spatial'),
-                   labels=c('coefficient.mm.y_mm.x'='California annuals','northern_mixed_temporal_spatial'='Northern mixed prairies',
-                            'hot_deserts_temporal_spatial' = 'Hot deserts','cold_deserts_temporal_spatial'='Cold deserts',
-                            'sgs_temporal_spatial'='Shortgrass steppe')) +
+  geom_histogram(binwidth = .000005,color='black',fill='white') +
+  geom_vline(xintercept=0,size=1,color='red') +
+  facet_wrap(~site,nrow=5,scales='free_y') +
+  xlab('Change in sensitivity per mm of MAP') +
   
-  #coord_flip() +        
-  #ylab(bquote('Change in sensitivity per mm of MAP ('*g/m^2/mm/MAP*')')) +
-  ylab('Change in sensitivity per mm of MAP') +
-  
-  xlab("") +
-    geom_hline(yintercept=0) +
+  ylab("") +
   
   #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
   
   theme(
     
-    axis.text.x = element_text(color='black',size=15, angle=25,hjust=1),
+    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     
-    axis.text.y = element_text(color='black',size=11),
+    axis.text.y = element_text(color='black',size=12),
     
-    axis.title = element_text(color='black',size=18),
+    axis.title = element_text(color='black',size=15),
     
     axis.ticks = element_line(color='black'),
     
     legend.key = element_blank(),
     
-    #legend.title = element_blank(),
+    legend.title = element_blank(),
     
-    legend.text = element_text(size=12),
+    legend.text = element_text(size=17),
     
-    legend.position = c('none'),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    
+    legend.position = c(0.8,0.93),
     
     panel.background = element_rect(fill=NA),
     
@@ -301,44 +329,31 @@ geom_vline(xintercept = 0,color='red')
 
 #########temporal slope with histograms#########
 #rename the vegetation types
-rename_sites<- c(hot_deserts_temporal_slope="Hot deserts", cold_deserts_temporal_slope="Cold deserts",
-                 sgs_temporal_slope="Shortgrass steppe", coefficient.mm.dev="California annuals", 
-                 northern_mixed_temporal_slope="Northern mixed prairies")
+rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",
+                 sgs_slope="Shortgrass steppe", california_slope="California annuals", 
+                 northern_mixed_slope="Northern mixed prairies")
 
-data_long_temporal$site <- as.character(rename_sites[data_long_temporal$site])
+  rbind_spatial_temporal$site <- as.character(rename_sites[rbind_spatial_temporal$site])
 
 #change the order
-data_long_temporal$site <- factor(data_long_temporal$site, levels = c("Hot deserts", "Cold deserts", "California annuals",
+rbind_spatial_temporal$site <- factor(rbind_spatial_temporal$site, levels = c("Hot deserts", "Cold deserts", "California annuals",
                                                     "Shortgrass steppe", "Northern mixed prairies"))
 
-data_long_temporal$site <- factor(data_long_temporal$site, levels = c("hot_deserts_temporal_slope", "cold_deserts_temporal_slope", 
-                                                    "california_temporal_slope","sgs_temporal_slope", 
-                                                    "northern_mixed_temporal_slope"))
-ggplot(data_long_temporal,aes(x=slope)) +
-  geom_histogram(binwidth = .01,fill='white',color='black') +
+rbind_spatial_temporal$site <- factor(rbind_spatial_temporal$site, levels = c("hot_deserts_slope", "cold_deserts_slope", 
+                                                    "california_slope","sgs_slope", 
+                                                    "northern_mixed_slope"))
+summary(rbind_spatial_temporal)
+head(rbind_spatial_temporal)
+ggplot(rbind_spatial_temporal,aes(x=slope,fill=model)) +
+  geom_histogram(binwidth = .01,color='black') +
   #geom_density() +
   facet_wrap(~site,nrow=5,scales='free_y') +
-  #geom_vline(xintercept=0,color='red') +
-  #geom_histogram(color='black',size=.5,alpha=.7) +
-  #geom_density_ridges(size=1,alpha=0.5,color='black',calc_ecdf = TRUE) +
-  #scale_fill_viridis(name = "Tail probability", direction = -1)
-  #geom_density_ridges_gradient(stat = "binline", binwidth = 0.01,color='black',fill='white')
-  xlab('Slope of spatial model') +
-  #geom_point(size=.1,pch=19,alpha=.1) +
-  #scale_y_discrete(limits=c('hot_deserts_spatial_slope','cold_deserts_spatial_slope',
-  #   'sgs_spatial_slope','coefficient.mm','northern_mixed_spatial_slope'),
-  #labels=c('coefficient.mm'='California annuals','northern_mixed_spatial_slope'='Mixed prairies',
-  #   'hot_deserts_spatial_slope' = 'Hot deserts','cold_deserts_spatial_slope'='Cold deserts',
-  #  'sgs_spatial_slope'='Semi-arid steppe')) +
-  
-  #scale_fill_manual(values=c('coefficient.mm'='gray28','northern_mixed_spatial_slope'='dodgerblue',
-  #'hot_deserts_spatial_slope' = 'tomato3','cold_deserts_spatial_slope'='gold',
-  #'sgs_spatial_slope'='green3')) +
-  
+  scale_fill_manual(values=c('Temporal'='red','Spatial'='lightblue')) +
 
-xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+
+xlab(bquote('Sensitivity ('*g/m^2/mm*')')) +
   
-  ylab("") +
+  ylab("Count") +
   
   #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
   
@@ -348,18 +363,20 @@ xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
     
     axis.text.y = element_text(color='black',size=12),
     
-    axis.title = element_text(color='black',size=23),
+    axis.title = element_text(color='black',size=20),
     
     axis.ticks = element_line(color='black'),
     
     legend.key = element_blank(),
     
-    #legend.title = element_blank(),
+    legend.title = element_blank(),
+    
+    legend.text = element_text(size=17),
     
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
     
-    legend.position = c('none'),
+    legend.position = c(0.8,0.93),
     
     panel.background = element_rect(fill=NA),
     

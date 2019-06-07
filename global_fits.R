@@ -1,15 +1,6 @@
 #Extracting coeffcieints from the boostrapped, 'global' model
-The intercept term: Beta_I
 
-The spatial slope: Beta_S
-
-The temporal slope: Beta_T
-
-The interaction term: Beta_SxT
-
-NPP = Beta_I + Beta_S*MAP_at_X + Beta_T*Dev + Beta_SxT*MAP_at_X*Devs
-
-#For california
+######For california############
 head(df2)
 colnames(df2)[colnames(df2)=="coefficient.(Intercept)"] <- "intercept"
 California.model.terms<-subset(df2,select = c('intercept','coefficient.mm.dev','coefficient.mm.y','coefficient.mm.dev_mm.y'))
@@ -20,11 +11,9 @@ beta_s_cali <- mean(California.model.terms$coefficient.mm.y)
 beta_t_cali <- mean(California.model.terms$coefficient.mm.dev)
 beta_sxt_cali <- mean(California.model.terms$coefficient.mm.dev_mm.y)
 
-cali_fit<-expand.grid(list(mm.dev=seq(-100,200,50),map=seq(100,500,50)))
+cali_fit<-expand.grid(list(mm.dev=seq(-100,200,50),map=seq(200,800,50)))
 cali_fit$ID <- seq.int(nrow(cali_fit))
 
-beta_t_cali + beta_sxt_cali*100
-         
 npp.cali.list<-list()
 slope.cali.list<-list()
 for(i in 1:nrow(cali_fit)){
