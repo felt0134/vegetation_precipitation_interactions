@@ -1,3 +1,5 @@
+library(reshape2)
+library(tidyverse)
 
 #make lists to put looped fles into
 list.coefficients.final<-list()
@@ -10,7 +12,7 @@ list.models <- list()
 
 head(rangeland_npp_covariates_deviations_1)
 rangeland_npp_covariates_deviations_reduced <-subset(rangeland_npp_covariates_deviations_1,select=c('x','y','year','npp.x',
-                                                                                                  'mm.y','mm.dev','npp.dev','mm.x','region.x'))
+                                                                                                  'mm.y','mm.dev','region.x'))
 head(rangeland_npp_covariates_deviations_reduced)
 
 #inspect autocorrelation
@@ -25,7 +27,6 @@ for(i in 1:1000)
                     test.strat.semiarid_steppe, test.strat.hot_deserts)
  
 stratified_final<-merge(test.strat, rangeland_npp_covariates_deviations_reduced,by=c('x','y'))
-#print(stratified_final)
 
 stratified_final_lm<-lm(npp.x~mm.dev*region.x*mm.y
                         ,stratified_final)
@@ -61,8 +62,6 @@ list.variograms[1:50]
 
 #look at coefficients
 summary(stratified_final_lm)
-library(reshape2)
-library(tidyverse)
 df.coefficients <- do.call("rbind", list.coefficients.final)
 head(df.coefficients)
 df.coefficients.2 <- cbind(rownames(df.coefficients), data.frame(df.coefficients, row.names=NULL))
@@ -122,6 +121,7 @@ summary(data_long_temporal)
 rbind_spatial_temporal<-rbind(data_long_spatial,data_long_temporal)
 head(rbind_spatial_temporal)
 summary(rbind_spatial_temporal)
+
 #temporal*spatial interaction 
 #california annuals
 df2$california_slope<- df2$coefficient.mm.dev_mm.y
@@ -135,12 +135,35 @@ df2$northern_mixed_slope <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev
 df2$sgs_slope <- df2$coefficient.mm.dev_mm.y  + df2$coefficient.mm.dev_region.xsemi_arid_steppe_mm.y
 
 temporal_spatial_slopes<-subset(df2,select=c('hot_deserts_slope','cold_deserts_slope',
-                                    'california_slope','sgs_slope','northern_mixed_slope'))
+                                    'california_slope','sgs_slope','northern_mixed_slope','run.id'))
 head(temporal_spatial_slopes)
-data_long_temporal_spatial <- gather(temporal_spatial_slopes, site, slope, factor_key=TRUE)
+data_long_temporal_spatial <- gather(temporal_spatial_slopes, site, slope,-run.id, factor_key=TRUE)
 data_long_temporal_spatial$model<-'Spatiotemporal'
 head(data_long_temporal_spatial)
 summary(data_long_temporal_spatial)
+
+#intercepts by veg types
+colnames(df2)[colnames(df2)=="coefficient.(Intercept)"] <- "intercept"
+head(df2)
+#california annuals
+df2$california_intercept <- df2$intercept
+#cold deserts
+df2$cold_deserts_intercept <- df2$intercept + df2$coefficient.region.xcold_deserts
+#hot_deserts
+df2$hot_deserts_intercept <-  df2$intercept  + df2$coefficient.region.xhot_deserts
+#northern mixed
+df2$northern_mixed_intercept <- df2$intercept  + df2$coefficient.region.xnorthern_mixed_prairies
+#sgs
+df2$sgs_intercept<- df2$intercept + df2$coefficient.region.xsemi_arid_steppe
+
+vegetation_intercepts<-subset(df2,select=c('hot_deserts_intercept','cold_deserts_intercept',
+                                             'california_intercept','sgs_intercept','northern_mixed_intercept','run.id'))
+head(vegetation_intercepts)
+data_long_vegetation_intercepts <- gather(vegetation_intercepts, site, slope,-run.id, factor_key=TRUE)
+data_long_vegetation_intercepts$model<-'Intercept'
+head(data_long_vegetation_intercepts)
+summary(data_long_vegetation_intercepts)
+
 #########look at residuals#############
 
 df.residuals <- do.call("rbind", list.residuals.full)

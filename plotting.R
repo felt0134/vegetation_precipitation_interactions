@@ -1,19 +1,12 @@
+library(ggplot2)
+library(lattice)
 ####3d plotting#########
 
-library(lattice)
 head(stratified_final)
 #hot deserts
-hot_deserts_surface<-subset(stratified_final,region.x=='hot_deserts')
-summary(hot_deserts_surface)
-hot_deserts.loess<-lm(npp.x~mm.dev*mm.y,data=hot_deserts_surface)
-summary(hot_deserts_surface)
-hot_deserts_fit<-expand.grid(list(mm.dev=seq(-100,200,50),mm.y=seq(100,500,50)))
-hot_deserts_fit[1:20,]
-z = predict(hot_deserts.loess,hot_deserts_fit)
-hot_deserts_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.dev*mm.y, data = hot_deserts_fit,
-          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(NPP.hot_deserts ~ mm.dev*map, data = merge.hot_deserts.predict,
+          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Hot deserts",
           drape = TRUE,
           colorkey = FALSE,
@@ -23,17 +16,9 @@ wireframe(npp ~ mm.dev*mm.y, data = hot_deserts_fit,
 )
 
 #california
-cali_annuals_surface<-subset(stratified_final,region.x=='california_annuals')
-summary(cali_annuals_surface)
-cali_annuals.loess<-lm(npp.x~mm.x*mm.y,data=cali_annuals_surface)
-summary(cali_annuals_surface)
-cali_annuals_fit<-expand.grid(list(mm.x=seq(25,1325,50),mm.y=seq(100,675,50)))
-cali_annuals_fit[1:20,]
-z = predict(cali_annuals.loess,cali_annuals_fit)
-cali_annuals_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.x*mm.y, data = cali_annuals_fit,
-          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(NPP.cali ~ mm.dev*map, data = merge.cali.predict,
+          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "California annuals",
           drape = TRUE,
           colorkey = FALSE,
@@ -52,8 +37,8 @@ cold_deserts_fit[1:20,]
 z = predict(cold_deserts.loess,cold_deserts_fit)
 cold_deserts_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.x*mm.y, data = cold_deserts_fit,
-          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(NPP.cold_deserts ~ mm.dev*map, data = merge.cold_deserts.predict,
+          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Cold deserts",
           drape = TRUE,
           colorkey = FALSE,
@@ -73,8 +58,8 @@ sgs_fit[1:20,]
 z = predict(sgs.loess,sgs_fit)
 sgs_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.x*mm.y, data = sgs_fit,
-          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(NPP.sgs ~ mm.dev*map, data = merge.sgs.predict,
+          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "shortgrass steppe",
           drape = TRUE,
           colorkey = FALSE,
@@ -93,8 +78,8 @@ northern_mixed_fit[1:20,]
 z = predict(northern_mixed.loess,northern_mixed_fit)
 northern_mixed_fit$npp <- as.numeric(z)
 
-wireframe(npp ~ mm.x*mm.y, data = northern_mixed_fit,
-          xlab = list("Annual precipitation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
+wireframe(NPP.northern_mixed ~ mm.dev*map, data = merge.northern_mixed.predict,
+          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "northern mixed prairies",
           drape = TRUE,
           colorkey = FALSE,
@@ -272,8 +257,8 @@ ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
 mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
 mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
 library(ggplot2)
-rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",
-                 sgs_slope="Shortgrass steppe", california_slope="California annuals", 
+rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",california_slope="California annuals", 
+                 sgs_slope="Shortgrass steppe",
                  northern_mixed_slope="Northern mixed prairies")
 
 data_long_temporal_spatial$site <- as.character(rename_sites[data_long_temporal_spatial$site])
@@ -329,8 +314,8 @@ ggplot(data_long_temporal_spatial,aes(x=slope)) +
 
 #########temporal slope with histograms#########
 #rename the vegetation types
-rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",
-                 sgs_slope="Shortgrass steppe", california_slope="California annuals", 
+rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",california_slope="California annuals", 
+                 sgs_slope="Shortgrass steppe", 
                  northern_mixed_slope="Northern mixed prairies")
 
   rbind_spatial_temporal$site <- as.character(rename_sites[rbind_spatial_temporal$site])
@@ -388,42 +373,37 @@ xlab(bquote('Sensitivity ('*g/m^2/mm*')')) +
 
 #######change in sensitivity per mm of map all points###########
 head(rangeland_npp_covariates_deviations_1)
+
+#create a mean annual precip subset for each veg type and each coordinate
 mean_mm_veg<-aggregate(mm.x~ x + y + region.x,mean,data=rangeland_npp_covariates_deviations_1)
 head(mean_mm_veg)
+
+#merge this with the sensitivity dataset created from 'sensitivity to precipitation map' section
 merge_mm_sensitivity<-merge(mean_mm_veg,sensitivity_conus_coef_only,by=c('x','y'))
 head(merge_mm_sensitivity)
 summary(merge_mm_sensitivity)
-
-rename_sites<- c(hot_deserts="Hot deserts", cold_deserts="Cold deserts",
-                 semi-arid_steppe ="Shortgrass steppe", california_annuals="California annuals", 
-                 northern_mixed_prairies="Northern mixed prairies")
-
-merge_mm_sensitivity$region.x <- as.character(rename_sites[merge_mm_sensitivity$region.x])
-
-#change the order
-merge_mm_sensitivity$region.x <- factor(merge_mm_sensitivity$region.x, levels = c("Hot deserts", "Cold deserts", "California annuals",
-                                                                      "Shortgrass steppe", "Northern mixed prairies"))
-
-merge_mm_sensitivity$region.x <- factor(merge_mm_sensitivity$region.x, levels = c("hot_deserts", "cold_deserts", 
-                                                                      "california_annuals","semi-arid_steppe", 
-                                                                      "northern_mixed_prairies"))
-#
+#dimenson: 600 by 500
+#subset by site
 cali_annuals_sensitivity<-subset(merge_mm_sensitivity,region.x=='california_annuals')
 hot_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='hot_deserts')
 cold_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='cold_deserts')
 sgs_sensitivity<-subset(merge_mm_sensitivity,region.x=='semi-arid_steppe')
 northern_mixed_sensitivity<-subset(merge_mm_sensitivity,region.x=='northern_mixed_prairies')
 
-ggplot(cali_annuals_sensitivity,aes(mm.x,coef)) +
-  geom_point(size=0.5,pch=1) +
+ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
+  geom_point(size=1,pch=1) +
   #facet_wrap(~region.x,nrow=1,scale='free') +
   #stat_smooth(method='lm',size=1,color='red') +
-  geom_line(data=predict.cali.slope,aes(xNew,yNew),color='red',size=1) +
+  #geom_line(data=predict.cali.slope,aes(xNew,yNew),color='red',size=1.5) +
+  #geom_line(data=predict.hot_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
+  #geom_line(data=predict.cold_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
+  #geom_line(data=predict.sgs.slope,aes(xNew,yNew),color='red',size=1.5) +
+  geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('') +
-  ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+  #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
   
-  xlab("Mean annual precipitation (mm)") +
-  #ylab('') +
+  #xlab("Mean annual precipitation (mm)") +
+  ylab('') +
   
   theme(
     
