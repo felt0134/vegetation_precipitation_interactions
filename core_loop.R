@@ -14,8 +14,9 @@ head(rangeland_npp_covariates_deviations_1)
 rangeland_npp_covariates_deviations_reduced <-subset(rangeland_npp_covariates_deviations_1,select=c('x','y','year','npp.x',
                                                                                                   'mm.y','mm.dev','region.x'))
 head(rangeland_npp_covariates_deviations_reduced)
+summary(rangeland_npp_covariates_deviations_reduced)
 
-#inspect autocorrelation
+#run the loop
 for(i in 1:1000)
   {
   test.strat.northern_mixed<-stratified(northern_mixed_prairies_above_below, c("map"), 0.01)
@@ -56,6 +57,9 @@ variogram.plot<-plot(TheVariogram_mean,main='per-pixel mean')
 list.variograms[[i]] <- variogram.plot
 
 }
+
+#test
+
 
 #inspect variograms of mean residuals for each run
 list.variograms[1:50]

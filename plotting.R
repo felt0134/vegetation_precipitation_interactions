@@ -389,9 +389,10 @@ hot_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='hot_deserts')
 cold_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='cold_deserts')
 sgs_sensitivity<-subset(merge_mm_sensitivity,region.x=='semi-arid_steppe')
 northern_mixed_sensitivity<-subset(merge_mm_sensitivity,region.x=='northern_mixed_prairies')
-
+summary(cali_annuals_sensitivity)
 ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
   geom_point(size=1,pch=1) +
+  scale_x_continuous(limit=c(50,1100))
   #facet_wrap(~region.x,nrow=1,scale='free') +
   #stat_smooth(method='lm',size=1,color='red') +
   #geom_line(data=predict.cali.slope,aes(xNew,yNew),color='red',size=1.5) +

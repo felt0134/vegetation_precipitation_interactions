@@ -8,7 +8,7 @@ library(gstat)
 
 #load initial dataframe
 
-test_wd<-"C:/Users/A02296270/Desktop/My Drive/CONUS_rangelands_NPP_Sensitivity/Processing NPP Data/NPP Data processing/"
+test_wd<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/Processing NPP Data/NPP Data processing"
 rangeland_npp_covariates<-readRDS(file.path(test_wd, "npp_climate_rangelands_final.rds")) #loads file and name it annualSWA_OctDec I guess
 as.data.frame(rangeland_npp_covariates)
 summary(rangeland_npp_covariates)

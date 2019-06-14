@@ -11,7 +11,7 @@ beta_s_cali <- mean(California.model.terms$coefficient.mm.y)
 beta_t_cali <- mean(California.model.terms$coefficient.mm.dev)
 beta_sxt_cali <- mean(California.model.terms$coefficient.mm.dev_mm.y)
 
-cali_fit<-expand.grid(list(mm.dev=seq(-100,200,50),map=seq(200,800,50)))
+cali_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(200,800,50)))
 cali_fit$ID <- seq.int(nrow(cali_fit))
 
 npp.cali.list<-list()
@@ -52,7 +52,7 @@ beta_s_hot_deserts<- mean(spatial_slopes$hot_deserts_slope)
 beta_t_hot_deserts <- mean(temporal_slopes$hot_deserts_slope)
 beta_sxt_hot_deserts <- mean(temporal_spatial_slopes$hot_deserts_slope)
 
-hot_deserts_fit<-expand.grid(list(mm.dev=seq(-100,200,50),map=seq(100,500,50)))
+hot_deserts_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(100,500,50)))
 hot_deserts_fit$ID <- seq.int(nrow(hot_deserts_fit))
 
 npp.hot_deserts.list<-list()
@@ -96,7 +96,7 @@ beta_sxt_cold_deserts <- mean(temporal_spatial_slopes$cold_deserts_slope)
 
 cold_deserts_subset<-subset(rangeland_npp_covariates_deviations_reduced,region.x=='cold_deserts')
 summary(cold_deserts_subset)
-cold_deserts_fit<-expand.grid(list(mm.dev=seq(-100,200,50),map=seq(100,800,50)))
+cold_deserts_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(100,800,50)))
 cold_deserts_fit$ID <- seq.int(nrow(cold_deserts_fit))
 
 npp.cold_deserts.list<-list()
@@ -140,7 +140,7 @@ beta_sxt_sgs <- mean(temporal_spatial_slopes$sgs_slope)
 
 sgs_subset<-subset(rangeland_npp_covariates_deviations_reduced,region.x=='semi-arid_steppe')
 summary(sgs_subset)
-sgs_fit<-expand.grid(list(mm.dev=seq(-100,200,50),map=seq(250,700,50)))
+sgs_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(250,700,50)))
 sgs_fit$ID <- seq.int(nrow(sgs_fit))
 
 npp.sgs.list<-list()
@@ -184,7 +184,7 @@ beta_sxt_northern_mixed <- mean(temporal_spatial_slopes$northern_mixed_slope)
 
 northern_mixed_subset<-subset(rangeland_npp_covariates_deviations_reduced,region.x=='northern_mixed_prairies')
 summary(northern_mixed_subset)
-northern_mixed_fit<-expand.grid(list(mm.dev=seq(-100,200,50),map=seq(150,900,50)))
+northern_mixed_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(150,900,50)))
 northern_mixed_fit$ID <- seq.int(nrow(northern_mixed_fit))
 
 npp.northern_mixed.list<-list()
