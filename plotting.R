@@ -329,8 +329,8 @@ rbind_spatial_temporal$site <- factor(rbind_spatial_temporal$site, levels = c("h
                                                     "northern_mixed_slope"))
 summary(rbind_spatial_temporal)
 head(rbind_spatial_temporal)
-ggplot(rbind_spatial_temporal,aes(x=slope,fill=model)) +
-  geom_histogram(binwidth = .01,color='black') +
+ggplot(temporal_spatial_slopes_rbind,aes(x=slope,fill=model)) +
+  geom_histogram(binwidth = .01,color='black',aes(y = ..density..)) +
   #geom_density() +
   facet_wrap(~site,nrow=5,scales='free_y') +
   scale_fill_manual(values=c('Temporal'='red','Spatial'='lightblue')) +
@@ -361,7 +361,7 @@ xlab(bquote('Sensitivity ('*g/m^2/mm*')')) +
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
     
-    legend.position = c(0.8,0.93),
+    legend.position = c(0.8,0.1),
     
     panel.background = element_rect(fill=NA),
     
