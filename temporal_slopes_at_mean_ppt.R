@@ -15,8 +15,10 @@ cali_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(403.9,403.9)))
 cali_fit$ID <- seq.int(nrow(cali_fit))
 
 npp.cali.list.temporal<-list()
-slope.cali.list.temporal<-list()
-
+#slope.cali.list.temporal<-list()
+#SIMPLIFY THIS FOR THE OTHER SITES
+npp.cali.temporal <- slope<-beta_t_cali + beta_sxt_cali*403.9
+as.data.frame(npp.cali.temporal)
 for(i in 1:nrow(California.model.terms)){
   
   slope<-beta_t_cali[i] + beta_sxt_cali[i]*403.9

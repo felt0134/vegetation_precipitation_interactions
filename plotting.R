@@ -11,7 +11,8 @@ wireframe(NPP.hot_deserts ~ mm.dev*map, data = merge.hot_deserts.predict,
           drape = TRUE,
           colorkey = FALSE,
           par.settings = list(axis.line = list(col = 'transparent')),
-          col.regions = colorRampPalette(c("red","orange", "green"))(900),
+          col.regions = colorRampPalette(c("red","orange", "green"))(600),
+          scales = list(z.ticks=1, arrows=FALSE),
           screen = list(z = -60, x = -60)
 )
 
@@ -23,7 +24,8 @@ wireframe(NPP.cali ~ mm.dev*map, data = merge.cali.predict,
           drape = TRUE,
           colorkey = FALSE,
           par.settings = list(axis.line = list(col = 'transparent')),
-          col.regions = colorRampPalette(c("red","orange", "green"))(1200),
+          col.regions = colorRampPalette(c("red","orange", "green"))(800),
+          scales = list(z.ticks=1, arrows=FALSE),
           screen = list(z = -60, x = -60)
 )
 
@@ -44,6 +46,7 @@ wireframe(NPP.cold_deserts ~ mm.dev*map, data = merge.cold_deserts.predict,
           colorkey = FALSE,
           par.settings = list(axis.line = list(col = 'transparent')),
           col.regions = colorRampPalette(c("red","orange", "green"))(1100),
+          scales = list(z.ticks=1, arrows=FALSE),
           screen = list(z = -60, x = -60)
 )
 
@@ -65,6 +68,7 @@ wireframe(NPP.sgs ~ mm.dev*map, data = merge.sgs.predict,
           colorkey = FALSE,
           par.settings = list(axis.line = list(col = 'transparent')),
           col.regions = colorRampPalette(c("red","orange", "green"))(900),
+          scales = list(z.ticks=1, arrows=FALSE),
           screen = list(z = -60, x = -60)
 )
 
@@ -85,6 +89,7 @@ wireframe(NPP.northern_mixed ~ mm.dev*map, data = merge.northern_mixed.predict,
           colorkey = FALSE,
           par.settings = list(axis.line = list(col = 'transparent')),
           col.regions = colorRampPalette(c("red","orange", "green"))(100),
+          scales = list(z.ticks=1, arrows=FALSE),
           screen = list(z = -60, x = -60)
 )
 
@@ -390,16 +395,17 @@ cold_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='cold_deserts')
 sgs_sensitivity<-subset(merge_mm_sensitivity,region.x=='semi-arid_steppe')
 northern_mixed_sensitivity<-subset(merge_mm_sensitivity,region.x=='northern_mixed_prairies')
 summary(cali_annuals_sensitivity)
-ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
+
+ggplot(cold_deserts_sensitivity,aes(mm.x,coef)) +
   geom_point(size=1,pch=1) +
-  scale_x_continuous(limit=c(50,1100))
+  scale_x_continuous(limit=c(50,1100)) +
   #facet_wrap(~region.x,nrow=1,scale='free') +
   #stat_smooth(method='lm',size=1,color='red') +
   #geom_line(data=predict.cali.slope,aes(xNew,yNew),color='red',size=1.5) +
   #geom_line(data=predict.hot_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
-  #geom_line(data=predict.cold_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
+  geom_line(data=predict.cold_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
   #geom_line(data=predict.sgs.slope,aes(xNew,yNew),color='red',size=1.5) +
-  geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
+  #geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('') +
   #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
   
