@@ -13,6 +13,11 @@ rangeland_npp_covariates<-readRDS(file.path(test_wd, "npp_climate_rangelands_fin
 as.data.frame(rangeland_npp_covariates)
 summary(rangeland_npp_covariates)
 
+
+#small touch up to get rid of the dash in the 'semi-arid_steppe'
+rangeland_npp_covariates$region<-gsub('-', '_', rangeland_npp_covariates$region)
+unique(rangeland_npp_covariates$region)
+
 #get mean annual precip
 mean_mm_site<-aggregate(mm~x+y+region,mean,data=rangeland_npp_covariates)
 head(mean_mm_site)
@@ -50,7 +55,7 @@ california_annuals_above$map <- 'above'
 california_annuals_above_below <- rbind(california_annuals_above,california_annuals_below)
 
 #shortgrass steppe
-semiarid_steppe_1 <-subset(mean_mm_site,region=="semi-arid_steppe")
+semiarid_steppe_1 <-subset(mean_mm_site,region=="semi_arid_steppe")
 summary(semiarid_steppe_1)
 semiarid_steppe_below <-semiarid_steppe_1 %>% dplyr::filter(mm < 417.1)
 semiarid_steppe_below$map <- 'below'

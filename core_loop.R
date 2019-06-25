@@ -58,13 +58,11 @@ list.variograms[[i]] <- variogram.plot
 
 }
 
-#test
-
 
 #inspect variograms of mean residuals for each run
 list.variograms[1:50]
 
-#look at coefficients
+#get coefficients into a usable dataframe 
 summary(stratified_final_lm)
 df.coefficients <- do.call("rbind", list.coefficients.final)
 head(df.coefficients)
@@ -74,7 +72,6 @@ colnames(df.coefficients.2)  <- c("predictor","coefficient","run.id")
 
 df.coefficients.2$predictor<-gsub('[[:digit:]]+', '', df.coefficients.2$predictor)
 df.coefficients.2$predictor<-gsub(':', '_', df.coefficients.2$predictor)
-df.coefficients.2$predictor<-gsub('-', '_', df.coefficients.2$predictor)
 df2<-reshape(df.coefficients.2, idvar = "run.id", timevar = "predictor", direction = "wide")
 head(df2)
 summary(df2)
@@ -174,154 +171,3 @@ df.residuals <- do.call("rbind", list.residuals.full)
 head(df.residuals)
 
 
-###scrap code###########
-
-list.results<-list()
-
-#inspect plots of residuals
-list.residual.rasters[1:50]
-colnames <- c("x","y","resids") 
-extent.all<-extent(-121.75, -97.5625, 29.3125, 48.9375)
-conus_split_3<-lapply(list.residual.rasters, setNames, colnames)
-conus_split_4<-lapply(conus_split_3, rasterFromXYZ) #change each year into its own raster
-conus_split_5<-lapply(conus_split_4, resample)
-conus_npp_procossed_stack <-stack(conus_split_4,quick=TRUE) #stack each raster
-plot(conus_npp_procossed_stack)
-extent.all<-extent(-121.75, -97.5625, 29.3125, 48.9375)
-
-for(i in 1:length(conus_split_4)) {
-  #extent.all<-extent(-121.75, -97.5625, 29.3125, 48.9375)
-  r <-conus_split_4[[i]] # raster(files[i])
-  rc <- crop(r, extent.all)
-  list.results[[i]] <- rc
-  env_data<- stack(list.results)}
-if(sum(as.matrix(extent(rc))!=as.matrix(extent.all)) == 0){ # edited
-  # You can't mask with extent, only with a Raster layer, RStack or RBrick
-}
-
-list.results[[i]] <- rc
-env_data<- stack(list.results)
-
-}
-
-plot(list.residual.rasters[10])
-plot(rc)
-plot(residual.raster)
-?rasterFromXYZ
-plot(list.residual.rasters[5]$x,list.residual.rasters[5]$y,list.residual.rasters[5]$resids)
-
-list.variograms[1:50]
-filenames_plan <- names(list.variograms)
-
-
-for (i in 1:length(list.variograms)){
-  #outname <- paste("C:/Users/A02296270/Desktop/variogram_test/", list.variograms[i], "_.jpeg",sep='')
-  jpeg(list.variograms[[i]], filename = 'outname.jpeg')
-}
-
-pred<-predict(stratified_final_lm[3],stratified_final)
-data.frame(pred)
-summary(list.models[1])
-summary(data_long)
-#ggplot
-library(ggplot2)
-library(ggridges)
-devtools::install_github("cardiomoon/ggiraphExtra")
-library(ggiraphExtra)
-ggpredict(stratified_final_lm)
-
-#spatial coefficients plot
-ggplot(data_long,aes(x=slope,y=site,fill=site)) +
-  #geom_point(alpha=.1) +
-  #geom_histogram(binwidth = .01) +
-  #geom_histogram(color='black',size=.5,alpha=.7) +
-  geom_density_ridges(size=1,alpha=1) +
-  xlab('Slope of spatial model') +
-  #geom_point(size=.1,pch=19,alpha=.1) +
-  scale_y_discrete(limits=c('hot_deserts_spatial_slope','cold_deserts_spatial_slope',
-                            'sgs_spatial_slope','coefficient.mm.y','northern_mixed_spatial_slope'),
-  #scale_y_continuous(expand=c(0,0),limits=c(0,1)) +
-  #scale_colour_manual(values=c('coefficient.mm.y'='black','northern_mixed_spatial_slope'='orange',
-                            # 'hot_deserts_spatial_slope' = 'red','cold_deserts_spatial_slope'='blue',
-                             #'sgs_spatial_slope'='darkgreen'),name="Vegetaton type",
-                    
-  labels=c('coefficient.mm.y'='California annuals','northern_mixed_spatial_slope'='Mixed prairies',
-                             'hot_deserts_spatial_slope' = 'Hot deserts','cold_deserts_spatial_slope'='Cold deserts',
-                             'sgs_spatial_slope'='Semi-arid steppe')) +
-  
-
-xlab(bquote('Spatial sensitivity ('*g/m^2/mm*')')) +
-  
-  ylab("") +
-  
-  #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
-  
-  theme(
-    
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    
-    axis.text.y = element_text(color='black',size=20),
-    
-    axis.title = element_text(color='black',size=23),
-    
-    axis.ticks = element_line(color='black'),
-    
-    legend.key = element_blank(),
-    
-    #legend.title = element_blank(),
-    
-    legend.text = element_text(size=12),
-    
-    legend.position = c('none'),
-    
-    panel.background = element_rect(fill=NA),
-    
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    
-    axis.line.x = element_line(colour = "black"),
-    
-    axis.line.y = element_line(colour = "black"))
-
-#temporalcoefficients plot
-summary(data_long_temporal)
-ggplot(data_long_temporal,aes(x=slope,y=site,fill=site)) +
-  geom_density_ridges(size=1,alpha=1) +
-  #xlab('Slope of spatial model') +
-  scale_y_discrete(limits=c('hot_deserts_temporal_slope','cold_deserts_temporal_slope',
-                            'sgs_temporal_slope','coefficient.mm.y_mm.x','northern_mixed_temporal_slope'),
-                   labels=c('coefficient.mm.y_mm.x'='California annuals','northern_mixed_temporal_slope'='Mixed prairies',
-                            'hot_deserts_temporal_slope' = 'Hot deserts','cold_deserts_temporal_slope'='Cold deserts',
-                            'sgs_temporal_slope'='Semi-arid steppe')) +
-  
-  
-  xlab(bquote('change in sensitivity per mm of MAP ('*g/m^2/'%mm change'*')')) +
-  xlab('change in sensitivity per mm of MAP') +
-  ylab("") +
-  geom_vline(xintercept=0,color='black',size=2) +
-  #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
-  
-  theme(
-    
-    axis.text.x = element_text(color='black',size=18), #angle=25,hjust=1),
-    
-    axis.text.y = element_text(color='black',size=20),
-    
-    axis.title = element_text(color='black',size=18),
-    
-    axis.ticks = element_line(color='black'),
-    
-    legend.key = element_blank(),
-    
-    #legend.title = element_blank(),
-    
-    legend.text = element_text(size=12),
-    
-    legend.position = c('none'),
-    
-    panel.background = element_rect(fill=NA),
-    
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    
-    axis.line.x = element_line(colour = "black"),
-    
-    axis.line.y = element_line(colour = "black"))
