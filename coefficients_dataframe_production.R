@@ -115,9 +115,9 @@ head(coefficients_full)
 coefficients_wide<- spread(coefficients_full, model, coefficient)
 head(coefficients_wide)
 
-#map for each region dataframe
-site<-c('hot_deserts','cold_deserts','california_annuals','northern_mixed_prairies','semi_arid_steppe')
-map<-c(286.14,288.1,403.9,404.3,417.1)
+
+site<-c('semi_arid_steppe','northern_mixed_prairies','california_annuals','cold_deserts','hot_deserts')
+map<-c(417.1,404.3,403.9,288.1,286.14)
 site_map<-data.frame(site,map)
 
 coefficients_wide_map<-merge(coefficients_wide,site_map,by=c('site'))
@@ -126,3 +126,15 @@ head(coefficients_wide_map)
 #temporal slope at MAP for each vegetation type
 coefficients_wide_map$temporal_sensitivity <-
   coefficients_wide_map$Temporal + coefficients_wide_map$Spatiotemporal*coefficients_wide_map$map
+
+#check 95% CI
+error.95 <-function(x) {
+  n = length(x)
+  std.error = sd(x)/sqrt(n)
+  error <- qnorm(0.975)*se(x)
+  return(error)
+}
+
+ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
+mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
+mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')

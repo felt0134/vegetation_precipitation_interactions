@@ -2,21 +2,29 @@
 
 ######For california############
 
+beta_i_cali <- mean(california_coefficients$Intercept)
+beta_s_cali <- mean(california_coefficients$Spatial)
+beta_t_cali <- mean(california_coefficients$Temporal)
+beta_sxt_cali <- mean(california_coefficients$Spatiotemporal)
+
 cali_overview <- subset(rangeland_npp_covariates_deviations_reduced,region.x=='california_annuals')
 summary(cali_overview)
 hist(cali_overview$mm.dev)
 california_coefficients<-subset(coefficients_wide_map,site=='california_annuals')
 cali_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(200,900,50)))
 
+head(california_coefficients)
+
+cali_new<-colMeans(california_coefficients[sapply(california_coefficients, is.numeric)])
+data.frame(cali_new)
+
 # slopes and NPP predictions from global model
   
-  cali_fit$temporal_slope <- mean(california_coefficients$Temporal) + 
-    (mean(california_coefficients$Spatiotemporal))*cali_fit$map
+  cali_fit$temporal_slope <- beta_t_cali + 
+    beta_sxt_cali*cali_fit$map
 
-  cali_fit$NPP = (mean(california_coefficients$Intercept)) + (mean(california_coefficients$Spatial)*cali_fit$map) + 
-    (mean(california_coefficients$Temporal)) + (mean(california_coefficients$Spatiotemporal)*cali_fit$map*cali_fit$mm.dev)
+  cali_fit$NPP= (beta_i_cali + beta_s_cali*cali_fit$map) + (beta_t_cali + beta_sxt_cali*cali_fit$map)*cali_fit$mm.dev
 
-  
 #prep for plotting
 mean.slope<-aggregate(cali_temporal_slope~map,mean,data=merge.cali.predict.2)
 plot(temporal_slope~map,data=cali_fit)
@@ -28,6 +36,7 @@ predict.cali.slope<-data.frame(xNew,yNew)
 
 
 #######hot deserts#########
+
 hot_deserts_coefficients<-subset(coefficients_wide_map,site=='hot_deserts')
 hot_deserts_overview <- subset(rangeland_npp_covariates_deviations_reduced,region.x=='hot_deserts')
 summary(hot_deserts_overview)
@@ -35,15 +44,18 @@ hist(hot_deserts_overview$mm.dev)
 hot_deserts_fit<-expand.grid(list(mm.dev=seq(-100,200,25),map=seq(100,600,50)))
 hot_deserts_fit$ID <- seq.int(nrow(hot_deserts_fit))
 
-hot_deserts_fit$temporal_slope <- mean(hot_deserts_coefficients$Temporal) + 
-  (mean(hot_deserts_coefficients$Spatiotemporal))*hot_deserts_fit$map
+beta_i_hot_deserts <- mean(hot_deserts_coefficients$Intercept)
+beta_s_hot_deserts <- mean(hot_deserts_coefficients$Spatial)
+beta_t_hot_deserts <- mean(hot_deserts_coefficients$Temporal)
+beta_sxt_hot_deserts <- mean(hot_deserts_coefficients$Spatiotemporal)
 
-hot_deserts_fit$NPP = (mean(hot_deserts_coefficients$Intercept)) + (mean(hot_deserts_coefficients$Spatial)*hot_deserts_fit$map) + 
-  (mean(hot_deserts_coefficients$Temporal)) + (mean(hot_deserts_coefficients$Spatiotemporal)*hot_deserts_fit$map*hot_deserts_fit$mm.dev)
+hot_deserts_fit$temporal_slope <- beta_t_hot_deserts + 
+  beta_sxt_hot_deserts*hot_deserts_fit$map
 
+hot_deserts_fit$NPP= (beta_i_hot_deserts + beta_s_hot_deserts*hot_deserts_fit$map) + 
+  (beta_t_hot_deserts + beta_sxt_hot_deserts*hot_deserts_fit$map)*hot_deserts_fit$mm.dev
 
 #prep for plotting
-
 plot(temporal_slope~map,data=hot_deserts_fit)
 hot_deserts_slope_model<-lm(temporal_slope~map,data=hot_deserts_fit)
 f <- range(hot_deserts_fit$map)
@@ -59,11 +71,17 @@ hist(cold_deserts_subset$mm.dev)
 cold_deserts_fit<-expand.grid(list(mm.dev=seq(-100,200,25),map=seq(100,900,50)))
 cold_deserts_fit$ID <- seq.int(nrow(cold_deserts_fit))
 
-cold_deserts_fit$temporal_slope <- mean(cold_deserts_coefficients$Temporal) + 
-  (mean(cold_deserts_coefficients$Spatiotemporal))*cold_deserts_fit$map
+beta_i_cold_deserts <- mean(cold_deserts_coefficients$Intercept)
+beta_s_cold_deserts <- mean(cold_deserts_coefficients$Spatial)
+beta_t_cold_deserts <- mean(cold_deserts_coefficients$Temporal)
+beta_sxt_cold_deserts <- mean(cold_deserts_coefficients$Spatiotemporal)
 
-cold_deserts_fit$NPP = (mean(cold_deserts_coefficients$Intercept)) + (mean(cold_deserts_coefficients$Spatial)*cold_deserts_fit$map) + 
-  (mean(cold_deserts_coefficients$Temporal)) + (mean(cold_deserts_coefficients$Spatiotemporal)*cold_deserts_fit$map*cold_deserts_fit$mm.dev)
+cold_deserts_fit$temporal_slope <- beta_t_cold_deserts + 
+  beta_sxt_cold_deserts*cold_deserts_fit$map
+
+cold_deserts_fit$NPP= (beta_i_cold_deserts + beta_s_cold_deserts*cold_deserts_fit$map) + 
+  (beta_t_cold_deserts + beta_sxt_cold_deserts*cold_deserts_fit$map)*cold_deserts_fit$mm.dev
+
 
 #prep for plotting
 plot(temporal_slope~map,data=cold_deserts_fit)
@@ -81,11 +99,16 @@ hist(sgs_subset$mm.dev)
 sgs_fit<-expand.grid(list(mm.dev=seq(-200,200,50),map=seq(275,675,50)))
 sgs_fit$ID <- seq.int(nrow(sgs_fit))
 
-sgs_fit$temporal_slope <- mean(sgs_coefficients$Temporal) + 
-  (mean(sgs_coefficients$Spatiotemporal))*sgs_fit$map
+beta_i_sgs <- mean(sgs_coefficients$Intercept)
+beta_s_sgs <- mean(sgs_coefficients$Spatial)
+beta_t_sgs <- mean(sgs_coefficients$Temporal)
+beta_sxt_sgs <- mean(sgs_coefficients$Spatiotemporal)
 
-sgs_fit$NPP = (mean(sgs_coefficients$Intercept)) + (mean(sgs_coefficients$Spatial)*sgs_fit$map) + 
-  (mean(sgs_coefficients$Temporal)) + (mean(sgs_coefficients$Spatiotemporal)*sgs_fit$map*sgs_fit$mm.dev)
+sgs_fit$temporal_slope <- beta_t_sgs + 
+  beta_sxt_sgs*sgs_fit$map
+
+sgs_fit$NPP= (beta_i_sgs + beta_s_sgs*sgs_fit$map) + 
+  (beta_t_sgs + beta_sxt_sgs*sgs_fit$map)*sgs_fit$mm.dev
 
 #prep for plotting
 
@@ -104,12 +127,16 @@ hist(northern_mixed_subset$mm.y)
 northern_mixed_fit<-expand.grid(list(mm.dev=seq(-200,200,50),map=seq(150,900,50)))
 northern_mixed_fit$ID <- seq.int(nrow(northern_mixed_fit))
 
-northern_mixed_fit$temporal_slope <- mean(northern_mixed_coefficients$Temporal) + 
-  (mean(northern_mixed_coefficients$Spatiotemporal))*northern_mixed_fit$map
+beta_i_northern_mixed <- mean(northern_mixed_coefficients$Intercept)
+beta_s_northern_mixed <- mean(northern_mixed_coefficients$Spatial)
+beta_t_northern_mixed <- mean(northern_mixed_coefficients$Temporal)
+beta_sxt_northern_mixed <- mean(northern_mixed_coefficients$Spatiotemporal)
 
-northern_mixed_fit$NPP = (mean(northern_mixed_coefficients$Intercept)) + (mean(northern_mixed_coefficients$Spatial)*northern_mixed_fit$map) + 
-  (mean(northern_mixed_coefficients$Temporal)) + (mean(northern_mixed_coefficients$Spatiotemporal)*northern_mixed_fit$map*northern_mixed_fit$mm.dev)
+northern_mixed_fit$temporal_slope <- beta_t_northern_mixed + 
+  beta_sxt_northern_mixed*northern_mixed_fit$map
 
+northern_mixed_fit$NPP= (beta_i_northern_mixed + beta_s_northern_mixed*northern_mixed_fit$map) + 
+  (beta_t_northern_mixed + beta_sxt_northern_mixed*northern_mixed_fit$map)*northern_mixed_fit$mm.dev
 
 #prep for plotting
 plot(temporal_slope~map,data=northern_mixed_fit)

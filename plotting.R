@@ -1,11 +1,26 @@
 library(ggplot2)
 library(lattice)
-####3d plotting#########
+
+#function to reference for facet plots
+veg_names <- c(
+  `hot_deserts` = "Hot deserts",
+  `cold_deserts` = "Cold deserts",
+  'northern_mixed_prairies' = "Northern mixed prairies",
+  `semi_arid_steppe` = "Shortgrass steppe",
+  `california_annuals` = "California annuals"
+)
+
+neworder <- c("semi_arid_steppe","northern_mixed_prairies","california_annuals","cold_deserts","hot_deserts")
+coefficients_wide_map_ordered <- arrange(mutate(coefficients_wide_map,
+                           site=factor(site,levels=neworder)),site)
+
+#### Figure 3a; surface plots #########
 
 head(stratified_final)
+
 #hot deserts
 
-wireframe(NPP.hot_deserts ~ mm.dev*map, data = merge.hot_deserts.predict,
+wireframe(NPP ~ mm.dev*map, data = hot_deserts_fit,
           xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Hot deserts",
           drape = TRUE,
@@ -18,7 +33,7 @@ wireframe(NPP.hot_deserts ~ mm.dev*map, data = merge.hot_deserts.predict,
 
 #california
 
-wireframe(NPP.cali ~ mm.dev*map, data = merge.cali.predict,
+wireframe(NPP ~ mm.dev*map, data = cali_fit,
           xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "California annuals",
           drape = TRUE,
@@ -30,16 +45,8 @@ wireframe(NPP.cali ~ mm.dev*map, data = merge.cali.predict,
 )
 
 #cold deserts
-cold_deserts_surface<-subset(stratified_final,region.x=='cold_deserts')
-summary(cold_deserts_surface)
-cold_deserts.loess<-lm(npp.x~mm.x*mm.y,data=cold_deserts_surface)
-summary(cold_deserts_surface)
-cold_deserts_fit<-expand.grid(list(mm.x=seq(25,1175,50),mm.y=seq(100,800,50)))
-cold_deserts_fit[1:20,]
-z = predict(cold_deserts.loess,cold_deserts_fit)
-cold_deserts_fit$npp <- as.numeric(z)
 
-wireframe(NPP.cold_deserts ~ mm.dev*map, data = merge.cold_deserts.predict,
+wireframe(NPP ~ mm.dev*map, data = cold_deserts_fit,
           xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "Cold deserts",
           drape = TRUE,
@@ -52,16 +59,9 @@ wireframe(NPP.cold_deserts ~ mm.dev*map, data = merge.cold_deserts.predict,
 
 
 #shortgrass steppe
-sgs_surface<-subset(stratified_final,region.x=='semi-arid_steppe')
-summary(sgs_surface)
-sgs.loess<-lm(npp.x~mm.x*mm.y,data=sgs_surface)
-summary(sgs_surface)
-sgs_fit<-expand.grid(list(mm.x=seq(25,900,50),mm.y=seq(275,650,50)))
-sgs_fit[1:20,]
-z = predict(sgs.loess,sgs_fit)
-sgs_fit$npp <- as.numeric(z)
 
-wireframe(NPP.sgs ~ mm.dev*map, data = merge.sgs.predict,
+
+wireframe(NPP ~ mm.dev*map, data = sgs_fit,
           xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "shortgrass steppe",
           drape = TRUE,
@@ -73,16 +73,8 @@ wireframe(NPP.sgs ~ mm.dev*map, data = merge.sgs.predict,
 )
 
 #northern mixed prairies
-northern_mixed_surface<-subset(stratified_final,region.x=='northern_mixed_prairies')
-summary(northern_mixed_surface)
-northern_mixed.loess<-lm(npp.x~mm.x*mm.y,data=northern_mixed_surface)
-summary(northern_mixed_surface)
-northern_mixed_fit<-expand.grid(list(mm.x=seq(100,1025,50),mm.y=seq(175,700,50)))
-northern_mixed_fit[1:20,]
-z = predict(northern_mixed.loess,northern_mixed_fit)
-northern_mixed_fit$npp <- as.numeric(z)
 
-wireframe(NPP.northern_mixed ~ mm.dev*map, data = merge.northern_mixed.predict,
+wireframe(NPP ~ mm.dev*map, data = northern_mixed_fit,
           xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
           main = "northern mixed prairies",
           drape = TRUE,
@@ -94,7 +86,7 @@ wireframe(NPP.northern_mixed ~ mm.dev*map, data = merge.northern_mixed.predict,
 )
 
 
-######shapefiles#######
+###### Figure 1a: shapefiles#######
 library(rgdal)
 
 #mojave sonoran
@@ -160,7 +152,7 @@ plot(NorthernMixedSubset.shape)
 NorthernMixedSubset.shape.2 <- sp::spTransform(NorthernMixedSubset.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(NorthernMixedSubset.shape.2)
 crop(NorthernMixedSubset.shape.2,mean_production_raster)
-######maps########
+###### maps prep ########
 library(colorspace)
 library(latticeExtra)
 library(sp)
@@ -191,7 +183,7 @@ spplot(crop.test,#scales = list(draw = TRUE),
   latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2,fill='firebrick3', lwd = 0.1)) +
   latticeExtra::layer(sp.polygons(Grama.Galleta.Steppe.shape.2, fill='firebrick3', lwd = 0.1)) +
 
-######mean npp graph#######
+###### Figure 1c: mean npp graph#######
 mean_production<-aggregate(npp.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
 mean_production_raster<-rasterFromXYZ(mean_production)
 plot(mean_production_raster)
@@ -210,7 +202,7 @@ spplot(mean_production_raster,#scales = list(draw = TRUE),
   latticeExtra::layer(sp.polygons(states_all_sites, lwd = 1))
 
 
-######mean precipitation graph code##########
+###### Figuree 1b: mean precipitation map##########
 head(rangeland_npp_covariates_deviations_1)
 mean_mm<-aggregate(mm.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
 mean_mm_raster<-rasterFromXYZ(mean_mm)
@@ -227,7 +219,7 @@ spplot(mean_mm_raster,#scales = list(draw = TRUE),
        main="") +
   latticeExtra::layer(sp.polygons(states_all_sites, lwd = 1))
 
-#######sensitivity to precipitation map########
+####### Figure 1d: NPP sensitivity to precipitation map########
 sensitivity_conus <- rangeland_npp_covariates_deviations_1 %>% group_by(x, y) %>%
   dplyr::do(model = lm(npp.x~mm.x, data = .)) %>%
   dplyr::mutate(coef=coef(model)[2])
@@ -249,132 +241,60 @@ spplot(sensitivity_raster,#scales = list(draw = TRUE),
        main="") +
   latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.1))
 
-######plotting temporal-map slopes and 95% CIs from model runs#######
+######Figure 2a: plotting spatial and temporal slopes historgram#######
+head(coefficients_wide_map_ordered)
+spatial_temporal<-coefficients_wide_map_ordered[-c(2,3,5,6,7)]
+head(spatial_temporal)
+data_long_spatial_temporal <- gather(spatial_temporal,model,coefficient,-site, factor_key=TRUE)
+head(data_long_spatial_temporal)
 
-error.95 <-function(x) {
-  n = length(x)
-  std.error = sd(x)/sqrt(n)
-  error <- qnorm(0.975)*se(x)
-  return(error)
-}
+ggplot(data_long_spatial_temporal,aes(x=coefficient,fill=model)) +
+  geom_histogram(binwidth = .005,color='black') +
+  facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  scale_fill_manual(values=c('temporal_sensitivity'='red','Spatial'='lightblue'),
+                    labels=c('temporal_sensitivity'='Temporal','Spatial'='Spatial')) +
+  xlab(bquote('Sensitivity ('*g/m^2/mm*')')) +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=12),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    legend.position = c(0.82,0.95),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
 
-ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
-mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
-mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
-library(ggplot2)
-rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",california_slope="California annuals", 
-                 sgs_slope="Shortgrass steppe",
-                 northern_mixed_slope="Northern mixed prairies")
 
-data_long_temporal_spatial$site <- as.character(rename_sites[data_long_temporal_spatial$site])
+######plotting spatiotemporal slopes historgram#######
 
-#change the order
-data_long_temporal_spatial$site <- factor(data_long_temporal_spatial$site, levels = c("Hot deserts", "Cold deserts", "California annuals",
-                                                                              "Shortgrass steppe", "Northern mixed prairies"))
-
-data_long_temporal_spatial$site <- factor(data_long_temporal_spatial$site, levels = c("hot_deserts_slope", "cold_deserts_slope", 
-                                                                              "california_slope","sgs_slope", 
-                                                                              "northern_mixed_slope"))
-summary(rbind_spatial_temporal)
-head(data_long_temporal_spatial)
-
-ggplot(data_long_temporal_spatial,aes(x=slope)) +
+ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal)) +
   geom_histogram(binwidth = .000005,color='black',fill='white') +
   geom_vline(xintercept=0,size=1,color='red') +
-  facet_wrap(~site,nrow=5,scales='free_y') +
+  facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
   xlab('Change in sensitivity per mm of MAP') +
-  
   ylab("") +
-  
-  #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
-  
   theme(
-    
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
-    
     axis.text.y = element_text(color='black',size=12),
-    
     axis.title = element_text(color='black',size=15),
-    
     axis.ticks = element_line(color='black'),
-    
     legend.key = element_blank(),
-    
     legend.title = element_blank(),
-    
     legend.text = element_text(size=17),
-    
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
-    
-    legend.position = c(0.8,0.93),
-    
     panel.background = element_rect(fill=NA),
-    
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    
     axis.line.x = element_line(colour = "black"),
-    
     axis.line.y = element_line(colour = "black"))
 
-#########temporal slope with histograms#########
-#rename the vegetation types
-rename_sites<- c(hot_deserts_slope="Hot deserts", cold_deserts_slope="Cold deserts",california_slope="California annuals", 
-                 sgs_slope="Shortgrass steppe", 
-                 northern_mixed_slope="Northern mixed prairies")
-
-  rbind_spatial_temporal$site <- as.character(rename_sites[rbind_spatial_temporal$site])
-
-#change the order
-rbind_spatial_temporal$site <- factor(rbind_spatial_temporal$site, levels = c("Hot deserts", "Cold deserts", "California annuals",
-                                                    "Shortgrass steppe", "Northern mixed prairies"))
-
-rbind_spatial_temporal$site <- factor(rbind_spatial_temporal$site, levels = c("hot_deserts_slope", "cold_deserts_slope", 
-                                                    "california_slope","sgs_slope", 
-                                                    "northern_mixed_slope"))
-summary(rbind_spatial_temporal)
-head(rbind_spatial_temporal)
-ggplot(coefficients_wide_map,aes(x=temporal_sensitivity)) +
-  geom_histogram(binwidth = .001,color='black',aes(y = ..density..)) +
-  #geom_density() +
-  facet_wrap(~site,nrow=5,scales='free_y') +
-  scale_fill_manual(values=c('Temporal'='red','Spatial'='lightblue')) +
-
-
-xlab(bquote('Sensitivity ('*g/m^2/mm*')')) +
-  
-  ylab("Count") +
-  
-  #ggtitle("SD event size = 33.53, PUE= .78, 2003") +
-  
-  theme(
-    
-    axis.text.x = element_text(color='black',size=12), #angle=25,hjust=1),
-    
-    axis.text.y = element_text(color='black',size=12),
-    
-    axis.title = element_text(color='black',size=20),
-    
-    axis.ticks = element_line(color='black'),
-    
-    legend.key = element_blank(),
-    
-    legend.title = element_blank(),
-    
-    legend.text = element_text(size=17),
-    
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    
-    legend.position = c(0.8,0.1),
-    
-    panel.background = element_rect(fill=NA),
-    
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    
-    axis.line.x = element_line(colour = "black"),
-    
-    axis.line.y = element_line(colour = "black"))
 
 #######change in sensitivity per mm of map all points###########
 head(rangeland_npp_covariates_deviations_1)
@@ -392,15 +312,14 @@ summary(merge_mm_sensitivity)
 cali_annuals_sensitivity<-subset(merge_mm_sensitivity,region.x=='california_annuals')
 hot_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='hot_deserts')
 cold_deserts_sensitivity<-subset(merge_mm_sensitivity,region.x=='cold_deserts')
-sgs_sensitivity<-subset(merge_mm_sensitivity,region.x=='semi-arid_steppe')
+sgs_sensitivity<-subset(merge_mm_sensitivity,region.x=='semi_arid_steppe')
 northern_mixed_sensitivity<-subset(merge_mm_sensitivity,region.x=='northern_mixed_prairies')
 summary(cali_annuals_sensitivity)
 
+#califonia
 ggplot(cali_annuals_sensitivity,aes(mm.x,coef)) +
   geom_point(size=1,pch=1) +
   scale_x_continuous(limit=c(50,1100)) +
-  #facet_wrap(~region.x,nrow=1,scale='free') +
-  #stat_smooth(method='lm',size=1,color='red') +
   geom_line(data=predict.cali.slope,aes(xNew,yNew),color='red',size=1.5) +
   #geom_line(data=predict.hot_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
   #geom_line(data=predict.cold_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
@@ -408,35 +327,107 @@ ggplot(cali_annuals_sensitivity,aes(mm.x,coef)) +
   #geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('') +
   #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  
   #xlab("Mean annual precipitation (mm)") +
   ylab('') +
-  
   theme(
-    
     axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    
     axis.text.y = element_text(color='black',size=15),
-    
     axis.title = element_text(color='black',size=20),
-    
     axis.ticks = element_line(color='black'),
-    
     legend.key = element_blank(),
-    
-    #legend.title = element_blank(),
-    
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
-    
     legend.position = c('none'),
-    
     panel.background = element_rect(fill=NA),
-    
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    
     axis.line.x = element_line(colour = "black"),
-    
+    axis.line.y = element_line(colour = "black"))
+
+#hot deserts
+ggplot(hot_deserts_sensitivity,aes(mm.x,coef)) +
+  geom_point(size=1,pch=1) +
+  scale_x_continuous(limit=c(50,1100)) +
+  geom_line(data=predict.hot_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
+  xlab('') +
+  ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+  #xlab("Mean annual precipitation (mm)") +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+
+#cold_deserts
+ggplot(cold_deserts_sensitivity,aes(mm.x,coef)) +
+  geom_point(size=1,pch=1) +
+  scale_x_continuous(limit=c(50,1100)) +
+  geom_line(data=predict.cold_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#shortgrass steppe
+
+ggplot(sgs_sensitivity,aes(mm.x,coef)) +
+  geom_point(size=1,pch=1) +
+  scale_x_continuous(limit=c(50,1100)) +
+  geom_line(data=predict.sgs.slope,aes(xNew,yNew),color='red',size=1.5) +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#northern mixed
+ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
+  geom_point(size=1,pch=1) +
+  scale_x_continuous(limit=c(50,1100)) +
+  geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
 #####other#########
