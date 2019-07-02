@@ -14,7 +14,7 @@ colnames(df2)[colnames(df2)=="coefficient.(Intercept)"] <- "intercept"
 head(df2)
 summary(df2)
 
-#spatial slopes
+####spatial slopes#####
 
 #california
 df2$california_annuals <- df2$coefficient.mm.y

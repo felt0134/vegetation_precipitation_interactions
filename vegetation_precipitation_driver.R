@@ -68,7 +68,7 @@ northern_mixed_prairies_1 <-subset(mean_mm_site,region=="northern_mixed_prairies
 summary(northern_mixed_prairies_1)
 northern_mixed_prairies_below <-northern_mixed_prairies_1 %>% dplyr::filter(mm < 404.3)
 northern_mixed_prairies_below$map <- 'below'
-northern_mixed_prairies_above  <-northern_mixed_prairies_1 %>%  dplyr::filter(mm > 403.3)
+northern_mixed_prairies_above  <-northern_mixed_prairies_1 %>%  dplyr::filter(mm > 404.3)
 northern_mixed_prairies_above$map <- 'above'
 northern_mixed_prairies_above_below <- rbind(northern_mixed_prairies_above,northern_mixed_prairies_below)
 
