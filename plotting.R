@@ -202,7 +202,7 @@ spplot(mean_production_raster,#scales = list(draw = TRUE),
   latticeExtra::layer(sp.polygons(states_all_sites, lwd = 1))
 
 
-###### Figuree 1b: mean precipitation map##########
+###### Figure 1b: mean precipitation map##########
 head(rangeland_npp_covariates_deviations_1)
 mean_mm<-aggregate(mm.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
 mean_mm_raster<-rasterFromXYZ(mean_mm)
@@ -241,7 +241,7 @@ spplot(sensitivity_raster,#scales = list(draw = TRUE),
        main="") +
   latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.1))
 
-######Figure 2a: plotting spatial and temporal slopes historgram#######
+######Figure 2a: plotting spatial and temporal slopes histogram#######
 head(coefficients_wide_map_ordered)
 spatial_temporal<-coefficients_wide_map_ordered[-c(2,3,5,6,7)]
 head(spatial_temporal)
@@ -321,13 +321,7 @@ ggplot(cali_annuals_sensitivity,aes(mm.x,coef)) +
   geom_point(size=1,pch=1) +
   scale_x_continuous(limit=c(50,1100)) +
   geom_line(data=predict.cali.slope,aes(xNew,yNew),color='red',size=1.5) +
-  #geom_line(data=predict.hot_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
-  #geom_line(data=predict.cold_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
-  #geom_line(data=predict.sgs.slope,aes(xNew,yNew),color='red',size=1.5) +
-  #geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('') +
-  #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  #xlab("Mean annual precipitation (mm)") +
   ylab('') +
   theme(
     axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
