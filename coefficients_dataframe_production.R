@@ -138,3 +138,20 @@ error.95 <-function(x) {
 ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
 mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
 mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
+#####coefficient of determination#########
+
+#veg
+r.square.veg.binded <- do.call("rbind", list.r.square.veg)
+head(r.square.veg.binded)
+colnames(r.square.veg.binded)  <- c("r.square","run.id")
+r.square.veg.binded$model <- 'veg'
+
+#no veg
+r.square.noveg.binded <- do.call("rbind", list.r.square.noveg)
+head(r.square.noveg.binded)
+colnames(r.square.noveg.binded)  <- c("r.square","run.id")
+r.square.noveg.binded$model <- 'no.veg'
+
+bind.veg.noveg<-rbind(r.square.noveg.binded,r.square.veg.binded)
+head(bind.veg.noveg)
+bind.veg.noveg$var <- bind.veg.noveg$r.square*100

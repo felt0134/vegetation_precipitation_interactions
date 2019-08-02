@@ -7,7 +7,8 @@ list.variograms<-list()
 list.residual.rasters<-list()
 list.residuals.full <- list()
 list.models <- list()
-
+list.r.square.veg<-list()
+list.r.square.noveg <-list()
 #reduce columns in dataset to use
 
 head(rangeland_npp_covariates_deviations_1)
@@ -30,6 +31,9 @@ for(i in 1:1000)
 stratified_final<-merge(test.strat, rangeland_npp_covariates_deviations_reduced,by=c('x','y'))
 
 stratified_final_lm<-lm(npp.x~mm.dev*region.x*mm.y
+                        ,stratified_final)
+#without vegetation
+stratified_final_lm_noveg<-lm(npp.x~mm.dev*mm.y
                         ,stratified_final)
 
 list.models[[i]] <- stratified_final_lm
@@ -56,9 +60,22 @@ TheVariogram_mean=variogram(resids~1, data=mean.resids)
 variogram.plot<-plot(TheVariogram_mean,main='per-pixel mean')
 list.variograms[[i]] <- variogram.plot
 
+#import r-squareds to list
+#veg
+r.square.veg<-summary(stratified_final_lm)$r.squared
+r.square.veg.df<-data.frame(r.square.veg)
+r.square.veg.df$id <- i
+list.r.square.veg[[i]] <- data.frame(r.square.veg.df)
+
+#noveg
+r.square.noveg<-summary(stratified_final_lm_noveg)$r.squared
+r.square.noveg.df<-data.frame(r.square.noveg)
+r.square.noveg.df$id <- i
+list.r.square.noveg[[i]] <- data.frame(r.square.noveg.df)
 }
 
-
+list.r.square.noveg[50]
+list.r.square.veg[50]
 #inspect variograms of mean residuals for each run
 list.variograms[1:50]
 

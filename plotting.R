@@ -247,14 +247,16 @@ spatial_temporal<-coefficients_wide_map_ordered[-c(2,3,5,6,7)]
 head(spatial_temporal)
 data_long_spatial_temporal <- gather(spatial_temporal,model,coefficient,-site, factor_key=TRUE)
 head(data_long_spatial_temporal)
-
-ggplot(data_long_spatial_temporal,aes(x=coefficient,fill=model)) +
+data_spatial<-subset(data_long_spatial_temporal,model=='Spatial')
+ggplot(data_long_spatial_temporal ,aes(x=coefficient,fill=model)) +
   geom_histogram(binwidth = .005,color='black') +
   facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
   scale_fill_manual(values=c('temporal_sensitivity'='red','Spatial'='lightblue'),
                     labels=c('temporal_sensitivity'='Temporal','Spatial'='Spatial')) +
   xlab(bquote('Sensitivity ('*g/m^2/mm*')')) +
   ylab('') +
+  scale_x_continuous(expand = c(0,0),limits=c(0,0.85)) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,400)) +
   theme(
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=12),
@@ -340,7 +342,7 @@ ggplot(cali_annuals_sensitivity,aes(mm.x,coef)) +
 #hot deserts
 ggplot(hot_deserts_sensitivity,aes(mm.x,coef)) +
   geom_point(size=1,pch=1) +
-  scale_x_continuous(limit=c(50,1100)) +
+  #scale_x_continuous(limit=c(50,1100)) +
   geom_line(data=predict.hot_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('') +
   ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
@@ -424,97 +426,61 @@ ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
+#####variance explained##########
+ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
+  geom_histogram(binwidth = 0.5,color='black') +
+  scale_fill_manual(name = 'Spatiotemporal model',values=c('veg'='red','no.veg'='lightblue'),
+                    labels=c('veg'='With vegetation','no.veg'='Without vegetation')) +
+  xlab('Variation in NPP explained') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=12),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.75),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
 #####other#########
 #plot
-library(plotly)
-packageVersion('plotly')
-devtools::install_github("r-lib/later")
-head(volcano)
-summary(data)
-data <- read.csv('https://raw.githubusercontent.com/plotly/datasets/master/3d-line1.csv')
-data$color <- as.factor(data$color)
-p <- plot_ly(data, x = ~x, y = ~y, z = ~z, type = 'scatter3d', mode = 'lines',
-             opacity = 1, line = list(width = 6, color = ~color, reverscale = FALSE))
-#test
-head(rangeland_npp_covariates_deviations_1)
-summary(rangeland_npp_covariates_deviations_1)
-str(data)
-rangeland_npp_covariates_deviations_1$region.x <-as.factor(rangeland_npp_covariates_deviations_1$region.x)
-sd(rangeland_npp_covariates_deviations_1$npp.dev)
 
-p_test <- plot_ly(rangeland_npp_covariates_deviations_1, x = ~mm.dev, y = ~mm.y,z  = ~npp.dev, 
-                  type = 'scatter3d',mode='lines',
-                  opacity = 1, line = list(width = 6, color= ~region.x, reverscale = FALSE))
-plot(p_test)
+#bivariate versions of 3d plot figure 3a.
+library(dplyr)
+#hot deserts
+hot_deserts_fit_wet_dry<-hot_deserts_fit %>% filter(mm.dev %in% c('-100','200'))
+hot_deserts_fit_wet_dry_2<-hot_deserts_fit %>% filter(map %in% c('100','600'))
 
-effect_plot(cali_model,pred=mm.dev*mm.y)
 #ggplot
-spatial.hot.deserts<-subset(rangeland_npp_covariates_deviations_1 ,region.x=='hot_deserts')
-head(spatial.hot.deserts)
-plot.lm<-lm(npp.x~mm.y,spatial.hot.deserts)
-summary(plot.lm)
-plot.lm<-lm(npp.x~mm.dev,spatial.cali)
-head(spatial.cali)
-spatial.cali<-subset(rangeland_npp_covariates_deviations_1 ,region.x=='california_annuals')
-summary(spatial.cali)
-cali_model<-lm(npp.x~mm.dev*mm.y,data=spatial.cali)
-summary(cali_model)
-library(interplot)
-interplot(m = cali_model, var1 = "mm.y", var2 = "mm.dev:mm.y")
+
 #mean
-spatial_mean_cali<-aggregate(npp.x~mm.y + x + y,mean,data=spatial.cali)
-lm_cal_spatial_mean<-lm(npp.x~mm.y,data=spatial_mean_cali)
-summary(lm_cal_spatial_mean)
-f <- range(spatial_mean_cali$mm.y)
-xNew <- seq(f[1],f[2])
-yNew <- predict(lm_cal_spatial_mean,list(mm.y = xNew))
-predict.cali_spatial<-data.frame(xNew,yNew)
-lines(xNew,yNew)
-
-#driest
-lm_cal_spatial_min<-lm(npp.x~mm.x,data=spatial_cali_min_final)
-summary(lm_cal_spatial_min)
-f <- range(spatial_mean_cali$mm.y)
-xNew <- seq(f[1],f[2])
-yNew <- predict(lm_cal_spatial_min,list(mm.x = xNew))
-predict.cali_spatial_min<-data.frame(xNew,yNew)
-lines(xNew,yNew)
-
-#wettest
-lm_cal_spatial_max<-lm(npp.x~mm.x,data=spatial_cali_max_final)
-summary(lm_cal_spatial_max)
-f <- range(spatial_mean_cali$mm.y)
-xNew <- seq(f[1],f[2])
-yNew <- predict(lm_cal_spatial_max,list(mm.x = xNew))
-predict.cali_spatial_max<-data.frame(xNew,yNew)
-lines(xNew,yNew)
 
 library(ggplot2)
-ggplot(spatial.cali,aes(mm.x,npp.x)) +
-  #geom_point(alpha=.1,size=.2,fill='grey',pch=21) +
-  #geom_line(data=predict.cali_spatial,aes(xNew,yNew),size=1,color='black') +
-  #geom_line(data=predict.cali_spatial_min,aes(xNew,yNew),size=1,,color='red') +
-  #geom_line(data=predict.cali_spatial_max,aes(xNew,yNew),size=1,color='blue') +
-  stat_smooth(method='lm',se=TRUE,size=.1) +
-  facet_wrap(~region.x)
+ggplot(hot_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
+  #scale_colour_manual(values=c('-100'='red','200'='blue'),
+                    #labels=c('-100'='Dry year','200'='wet year')) +
+  scale_colour_manual(values=c('100'='red','600'='blue'),
+                      labels=c('100'='Dry site','600'='wet site')) +
+  stat_smooth(method='lm',se=TRUE,size=1) +
+  ggtitle('hot deserts') +
   theme(
-    axis.text.x = element_text(color='black',size=12),#angle=45,hjust=1),
+    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=12),
-    axis.title.x = element_text(color='black',size=22),
-    axis.title.y = element_text(color='black',size=25),
+    axis.title = element_text(color='black',size=15),
     axis.ticks = element_line(color='black'),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    strip.background = element_blank(),
-    #panel.border = element_rect(fill=NA,colour = "black"),
-    #legend.title = element_text(size=15),
-    #legend.text = element_text(size=12),
-    #legend.position = c(.7,.7),
-    #legend.position="none",
-    #legend.background=element_blank(),
-    #legend.key=element_blank(),
-    #legend.position = c(.8,.8),
-    panel.background = element_rect(fill=NA,colour = 'black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.85),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
