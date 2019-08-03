@@ -426,7 +426,7 @@ ggplot(northern_mixed_sensitivity,aes(mm.x,coef)) +
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
-#####variance explained##########
+#####variance explained: veg versus no veg figure 2d##########
 ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
   geom_histogram(binwidth = 0.5,color='black') +
   scale_fill_manual(name = 'Spatiotemporal model',values=c('veg'='red','no.veg'='lightblue'),
@@ -451,24 +451,181 @@ ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
 #####other#########
 #plot
 
-#bivariate versions of 3d plot figure 3a.
+#####bivariate versions of 3d plot figure 3a######
 library(dplyr)
+
 #hot deserts
-hot_deserts_fit_wet_dry<-hot_deserts_fit %>% filter(mm.dev %in% c('-100','200'))
-hot_deserts_fit_wet_dry_2<-hot_deserts_fit %>% filter(map %in% c('100','600'))
-
-#ggplot
-
-#mean
-
+hot_deserts_fit_wet_dry<-hot_deserts_fit %>% filter(mm.dev %in% c('-100','0','200'))
+hot_deserts_fit_wet_dry_2<-hot_deserts_fit %>% filter(map %in% c('100','300','600'))
 library(ggplot2)
 ggplot(hot_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  #scale_colour_manual(values=c('-100'='red','200'='blue'),
-                    #labels=c('-100'='Dry year','200'='wet year')) +
-  scale_colour_manual(values=c('100'='red','600'='blue'),
-                      labels=c('100'='Dry site','600'='wet site')) +
+  #scale_colour_manual(values=c('-100'='red','0'='black','200'='blue'),name='Precipitation deviation',
+                    #labels=c('-100'='-100 mm','0'='0 mm','200'='+200 mm')) +
+  scale_colour_manual(values=c('100'='red','300' = 'black','600'='blue'),name='Mean annual precipitation',
+                      labels=c('100'='100 mm','300'= '300 mm','600'='600 mm')) +
   stat_smooth(method='lm',se=TRUE,size=1) +
-  ggtitle('hot deserts') +
+  #ggtitle('hot deserts') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.87),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+
+#cold deserts
+summary(cold_deserts_fit)
+cold_deserts_fit_wet_dry<-cold_deserts_fit %>% filter(mm.dev %in% c('-100','0','200'))
+cold_deserts_fit_wet_dry_2<-cold_deserts_fit %>% filter(map %in% c('100','300','900'))
+library(ggplot2)
+ggplot(cold_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
+  scale_colour_manual(values=c('-100'='red','0'='black','200'='blue'),name='Precipitation deviation',
+  labels=c('-100'='-100 mm','0'='0 mm','200'='+200 mm')) +
+  #scale_colour_manual(values=c('100'='red','300' = 'black','900'='blue'),name='Mean annual precipitation',
+                      #labels=c('100'='100 mm','300'= '300 mm','900'='900 mm')) +
+  stat_smooth(method='lm',se=TRUE,size=1) +
+  #ggtitle('hot deserts') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.77),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#california annuals
+summary(cali_fit)
+cali_fit_wet_dry<-cali_fit %>% filter(mm.dev %in% c('-200','0','400'))
+cali_fit_wet_dry_2<-cali_fit %>% filter(map %in% c('200','400','900'))
+library(ggplot2)
+ggplot(cali_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
+  #scale_colour_manual(values=c('-200'='red','0'='black','400'='blue'),name='Precipitation deviation',
+                      #labels=c('-200'='-200 mm','0'='0 mm','400'='+400 mm')) +
+  scale_colour_manual(values=c('200'='red','400' = 'black','900'='blue'),name='Mean annual precipitation',
+  labels=c('200'='200 mm','400'= '400 mm','900'='900 mm')) +
+  stat_smooth(method='lm',se=TRUE,size=1) +
+  #ggtitle('hot deserts') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.77),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#northern mixed
+summary(northern_mixed_fit)
+northern_mixed_fit_wet_dry<-northern_mixed_fit %>% filter(mm.dev %in% c('-200','0','200'))
+northern_mixed_fit_wet_dry_2<-northern_mixed_fit %>% filter(map %in% c('150','400','900'))
+library(ggplot2)
+ggplot(northern_mixed_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
+  scale_colour_manual(values=c('-200'='red','0'='black','200'='blue'),name='Precipitation deviation',
+  labels=c('-200'='-200 mm','0'='0 mm','200'='+200 mm')) +
+  #scale_colour_manual(values=c('150'='red','400' = 'black','900'='blue'),name='Mean annual precipitation',
+                   #   labels=c('150'='150 mm','400'= '400 mm','900'='900 mm')) +
+  stat_smooth(method='lm',se=TRUE,size=1) +
+  #ggtitle('hot deserts') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.67),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#shortgrass steppe
+summary(sgs_fit)
+sgs_fit_wet_dry<-sgs_fit %>% filter(mm.dev %in% c('-200','0','200'))
+sgs_fit_wet_dry_2<-sgs_fit %>% filter(map %in% c('275','425','675'))
+
+ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
+  #scale_colour_manual(values=c('-200'='red','0'='black','200'='blue'),name='Precipitation deviation',
+                     # labels=c('-200'='-200 mm','0'='0 mm','200'='+200 mm')) +
+  scale_colour_manual(values=c('275'='red','425' = 'black','675'='blue'),name='Mean annual precipitation',
+     labels=c('275'='275 mm','425'= '425 mm','675'='675 mm')) +
+  stat_smooth(method='lm',se=TRUE,size=1) +
+  #ggtitle('hot deserts') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.9),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+
+#### spatial and temporal slopes by veg types #########
+ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal)) +
+  geom_histogram(binwidth = .00001,color='black',fill='white') +
+  geom_vline(xintercept=0,color='red',size=1.5) +
+  #geom_density(color='black',alpha=0.75) +
+  facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  #scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
+                            # california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
+                   # labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
+                           #  california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
+  #xlab(bquote('Spatial sensitivity ('*g/m^2/mm*')')) +
+  #xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+  xlab('Change in sensitivity per mm of MAP') +
+  ylab('') +
+  #scale_x_continuous(expand = c(0,0),limits=c(0,0.85)) +
+  #scale_y_continuous(expand = c(0,0),limits=c(0,400)) +
   theme(
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=12),
@@ -477,150 +634,11 @@ ggplot(hot_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
     legend.key = element_blank(),
     legend.title = element_blank(),
     legend.text = element_text(size=17),
-    legend.position = c(0.22,0.85),
+    #legend.position = c(0.82,0.95),
+    legend.position = c(0.82,0.85),
+    #legend.position = "none",
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
-install.packages("multcomp")
-install.packages("sjPlot")
-library(sjPlot)
-interaction.plot()
-summary(stratified_final_lm)
-plot_model(stratified_final_lm,type='int')
-plot_model(stratified_final_lm,type='int',terms = c('mm.dev'))
-interaction.plot()
-library(jtools)
-interact_plot(stratified_final_lm, pred = "mm.y", modx = "region.x",x.label = 'Mean annual precipitation',y.label = "Mean net primary production")
-
-library(gmodels)
-library(snakecase)
-library(dplyr)
-head(spatial.cali)
-
-rangeland_npp_covariates_min_max <-subset(rangeland_npp_covariates_deviations_1,select=c('x','y','year','npp.x',
-                                                                                                    'mm.y','mm.x','region.x'))
-
-spatial.cali<-subset(rangeland_npp_covariates_min_max,region.x=='california_annuals')
-spatial.cali$ID <- seq.int(nrow(spatial.cali))
-head(spatial.cali)
-
-
-#identifying the direst and wettest year per pixel
-
-#wettest year per pixel
-mm_max<- rangeland_npp_covariates_deviations_1 %>%
-  group_by(x,y) %>%
-  dplyr::summarise(mm.x = max(mm.x))
-
-mm_max_final<-merge(mm_max,rangeland_npp_covariates_deviations_1,by=c('mm.x','y','x'),no.dups=TRUE)
-mm_max_final_reduced <-subset(mm_max_final,select=c('x','y','npp.x','mm.x','region.x'))
-mm_max_final_npp_raster<-rasterFromXYZ(mm_max_final_reduced)
-plot(mm_max_final_npp_raster)                                                                                               
-lm.dry<-lm(npp.x~mm.x,data=spatial_cali_min_final)
-plot(npp.x~mm.x,data=mm_max_final)
-
-#driest year per pixel
-mm_min<- rangeland_npp_covariates_deviations_1  %>%
-  group_by(x,y) %>%
-  dplyr::summarise(mm.x = min(mm.x)) 
-  
-mm_min_final<-merge(mm_min,rangeland_npp_covariates_deviations_1,by=c('mm.x','y','x'),no.dups=TRUE)
-head(mm_min_final)
-plot(npp.x~mm.x,data=mm_min_final)
-mm_min_final_reduced <-subset(mm_min_final,select=c('x','y','npp.x','mm.x','region.x'))
-mm_min_final_npp_raster<-rasterFromXYZ(mm_min_final_reduced)
-plot(mm_min_final_npp_raster)                                                                                               
-lm.dry<-lm(npp.x~mm.x,data=spatial_cali_min_final)
-summary(lm.dry)
-
-#mean npp-precip
-spatial_npp_means<-aggregate(npp.x~ x + y + region.x,mean,data=rangeland_npp_covariates_deviations_1)
-spatial_mm_means<-aggregate(mm.x~x + y,mean,data=rangeland_npp_covariates_deviations_1)
-merge_npp_mm_means<-merge(spatial_npp_means,spatial_mm_means,by=c('x','y'))
-head(merge_npp_mm_means)
-
-summary(mm_min_final_reduced)
-#california
-california_mean<-subset(merge_npp_mm_means,region.x=='california_annuals')
-california_wet<-subset(mm_max_final_reduced,region.x=='california_annuals')
-
-#produce fit for wettest year per pixel
-lm_cal_spatial_max<-lm(npp.x~mm.x,data=california_wet)
-summary(lm_cal_spatial_max)
-f <- range(california_mean$mm.x)
-xNew <- seq(f[1],f[2])
-yNew <- predict(lm_cal_spatial_max,list(mm.x = xNew))
-predict.cali_spatial_max<-data.frame(xNew,yNew)
-
-#produce fit for driest year per pixel
-california_dry<-subset(mm_min_final_reduced,region.x=='california_annuals')
-lm_cal_spatial_min<-lm(npp.x~mm.x,data=california_dry)
-summary(lm_cal_spatial_min)
-f <- range(california_mean$mm.x)
-xNew <- seq(f[1],f[2])
-yNew <- predict(lm_cal_spatial_min,list(mm.x = xNew))
-predict.cali_spatial_min<-data.frame(xNew,yNew)
-
-ggplot(california_mean,aes(mm.x,npp.x)) +
-  geom_line(data=predict.cali_spatial_min,aes(xNew,yNew),size=1,,color='red',linetype='dashed') +
-  geom_line(data=predict.cali_spatial_max,aes(xNew,yNew),size=1,color='blue',linetype='dashed') +
-  stat_smooth(method='lm',size=2,se=FALSE,color='black') +
-  ylab(bquote('NPP ('*g/m^2/mm*')')) +
-  xlab('') +
-  theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=23),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    #legend.title = element_blank(),
-    legend.text = element_text(size=10),
-    legend.position = c(.10,.1),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
-#hot deserts
-
-hot_deserts_mean<-subset(merge_npp_mm_means,region.x=='hot_deserts')
-hot_deserts_wet<-subset(mm_max_final_reduced,region.x=='hot_deserts')
-hot_deserts_dry<-subset(mm_min_final_reduced,region.x=='hot_deserts')
-#produce fit for wettest year per pixel
-lm_hot_deserts_spatial_max<-lm(npp.x~mm.x,data=hot_deserts_wet)
-summary(lm_hot_deserts_spatial_max)
-f <- range(hot_deserts_wet$mm.x)
-xNew <- seq(f[1],f[2])
-yNew <- predict(lm_hot_deserts_spatial_max,list(mm.x = xNew))
-predict.hot_deserts_spatial_max<-data.frame(xNew,yNew)
-
-#produce fit for driest year per pixel
-lm_hot_deserts_spatial_min<-lm(npp.x~mm.x,data=hot_deserts_dry)
-summary(lm_hot_deserts_spatial_min)
-f <- range(hot_deserts_dry$mm.x)
-xNew <- seq(f[1],f[2])
-yNew <- predict(lm_hot_deserts_spatial_min,list(mm.x = xNew))
-predict.hot_deserts_spatial_min<-data.frame(xNew,yNew)
-
-ggplot(hot_deserts_mean,aes(mm.x,npp.x)) +
-  geom_line(data=predict.hot_deserts_spatial_min,aes(xNew,yNew),size=1,,color='red',linetype='dashed') +
-  geom_line(data=predict.hot_deserts_spatial_max,aes(xNew,yNew),size=1,color='blue',linetype='dashed') +
-  stat_smooth(method='lm',size=2,se=FALSE,color='black') +
-  ylab(bquote('NPP ('*g/m^2/mm*')')) +
-  xlab('') +
-  theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=23),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    #legend.title = element_blank(),
-    legend.text = element_text(size=10),
-    legend.position = c(.10,.1),
     panel.background = element_rect(fill=NA),
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
