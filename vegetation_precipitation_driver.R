@@ -5,6 +5,7 @@ library(spdep)
 library(splitstackshape)
 library(raster)
 library(gstat)
+library(rgdal)
 
 #load initial dataframe
 

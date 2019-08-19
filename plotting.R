@@ -94,10 +94,11 @@ mojave.sonoran.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area
 plot(mojave.sonoran.shape)
 mojave.sonoran.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(mojave.sonoran.shape)
+
 #step 2:
 mojave.sonoran.shape.2 <- sp::spTransform(mojave.sonoran.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(mojave.sonoran.shape.2)
-
+writeOGR(mojave.sonoran.shape, ".", "test", driver="ESRI Shapefile") 
 #chihuahan
 ChihuahuanDesert.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ChihuahuanDesert",layer="ChihuahuanDesert")
 plot(ChihuahuanDesert.shape)
@@ -199,7 +200,7 @@ spplot(mean_production_raster,#scales = list(draw = TRUE),
        col.regions = 
          rev(terrain.colors(length(break_mean_npp)-1)),
        main="") +
-  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 1))
+  latticeExtra::layer(sp.polygons(dat.poly, lwd = 1))
 
 
 ###### Figure 1b: mean precipitation map##########
@@ -611,18 +612,18 @@ ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
 
 
 #### spatial and temporal slopes by veg types #########
-ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal)) +
-  geom_histogram(binwidth = .00001,color='black',fill='white') +
-  geom_vline(xintercept=0,color='red',size=1.5) +
-  #geom_density(color='black',alpha=0.75) +
-  facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
-  #scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
-                            # california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
-                   # labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
-                           #  california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
+ggplot(coefficients_wide_map_ordered,aes(x=temporal_sensitivity,fill=site)) +
+  #geom_histogram(binwidth = .001,color='black') +
+  #geom_vline(xintercept=0,color='red',size=1.5) +
+  geom_density(color='black',alpha=0.75) +
+  #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
+                             california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
+                    labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
+                            california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
   #xlab(bquote('Spatial sensitivity ('*g/m^2/mm*')')) +
-  #xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  xlab('Change in sensitivity per mm of MAP') +
+  xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+  #xlab('Change in sensitivity per mm of MAP') +
   ylab('') +
   #scale_x_continuous(expand = c(0,0),limits=c(0,0.85)) +
   #scale_y_continuous(expand = c(0,0),limits=c(0,400)) +
@@ -635,8 +636,35 @@ ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal)) +
     legend.title = element_blank(),
     legend.text = element_text(size=17),
     #legend.position = c(0.82,0.95),
-    legend.position = c(0.82,0.85),
-    #legend.position = "none",
+    #legend.position = c(0.82,0.85),
+    legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+###########temporal variation in vegetation cover among veg types
+
+ggplot(hot_deserts_cover,aes(Year,Annual.forb...grass.cover,color=as.factor(region))) +
+  #scale_colour_manual(values=c('-100'='red','0'='black','200'='blue'),name='Precipitation deviation',
+  #labels=c('-100'='-100 mm','0'='0 mm','200'='+200 mm')) +
+  #scale_colour_manual(values=c('100'='red','300' = 'black','600'='blue'),name='Mean annual precipitation',
+                      #labels=c('100'='100 mm','300'= '300 mm','600'='600 mm')) +
+  stat_summary(geom='line',fun.y='mean')
+  #ggtitle('hot deserts') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=17),
+    legend.position = c(0.22,0.87),
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
     panel.background = element_rect(fill=NA),
