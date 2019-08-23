@@ -99,6 +99,7 @@ plot(mojave.sonoran.shape)
 mojave.sonoran.shape.2 <- sp::spTransform(mojave.sonoran.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(mojave.sonoran.shape.2)
 writeOGR(mojave.sonoran.shape, ".", "test", driver="ESRI Shapefile") 
+
 #chihuahan
 ChihuahuanDesert.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ChihuahuanDesert",layer="ChihuahuanDesert")
 plot(ChihuahuanDesert.shape)
@@ -644,29 +645,210 @@ ggplot(coefficients_wide_map_ordered,aes(x=temporal_sensitivity,fill=site)) +
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
-###########temporal variation in vegetation cover among veg types
 
-ggplot(hot_deserts_cover,aes(Year,Annual.forb...grass.cover,color=as.factor(region))) +
-  #scale_colour_manual(values=c('-100'='red','0'='black','200'='blue'),name='Precipitation deviation',
-  #labels=c('-100'='-100 mm','0'='0 mm','200'='+200 mm')) +
-  #scale_colour_manual(values=c('100'='red','300' = 'black','600'='blue'),name='Mean annual precipitation',
-                      #labels=c('100'='100 mm','300'= '300 mm','600'='600 mm')) +
-  stat_summary(geom='line',fun.y='mean')
-  #ggtitle('hot deserts') +
+###########temporal variation in vegetation cover among veg types #########
+
+
+#hot deserts
+head(hot_deserts_cover)
+hot_deserts_cover_2<-hot_deserts_cover[-c(6,7,8,9)]
+head(hot_deserts_cover_2)
+hot_deserts_cover_3<- gather(hot_deserts_cover_2, group, Cover,-Year, factor_key=TRUE)
+head(hot_deserts_cover_3)
+
+ggplot(hot_deserts_cover_3,aes(Year,Cover,color=as.factor(group))) +
+  scale_colour_manual(values=c('Perennial.forb...grass.cover'='darkgreen','Bare.ground.cover' = 'black','Shrub.cover'='blue',
+                               'Annual.forb...grass.cover'='red'),name='Cover type',
+                      labels=c('Perennial.forb...grass.cover'='Perrenial grass and forb','Bare.ground.cover'= 'Bare ground',
+                               'Shrub.cover'='Shrub','Annual.forb...grass.cover'='Annual grass and forb')) +
+  stat_summary(geom='line',fun.y='mean',size=1) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,65)) +
+  #ggtitle('Hot deserts') +
+  ylab('Average % Cover') +
   xlab('') +
-  ylab('') +
   theme(
     axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=15),
-    axis.title = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=25),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.position = c(0.2,0.85),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=15),
+    #legend.position = 'none',
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#cold deserts
+head(cold_deserts_cover)
+cold_deserts_cover_2<-cold_deserts_cover[-c(6,7,8,9)]
+head(cold_deserts_cover_2)
+cold_deserts_cover_3<- gather(cold_deserts_cover_2, group, Cover,-Year, factor_key=TRUE)
+head(cold_deserts_cover_3)
+
+ggplot(cold_deserts_cover_3,aes(Year,Cover,color=as.factor(group))) +
+  scale_colour_manual(values=c('Perennial.forb...grass.cover'='darkgreen','Bare.ground.cover' = 'black','Shrub.cover'='blue',
+                               'Annual.forb...grass.cover'='red'),name='Cover type',
+                      labels=c('Perennial.forb...grass.cover'='Perrenial grass and forb','Bare.ground.cover'= 'Bare ground',
+                               'Shrub.cover'='Shrub','Annual.forb...grass.cover'='Annual grass and forb')) +
+  stat_summary(geom='line',fun.y='mean',size=1) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,65)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=25),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
     legend.title = element_text(size=17),
-    legend.text = element_text(size=17),
-    legend.position = c(0.22,0.87),
+    legend.text = element_text(size=15),
+    legend.position = 'none',
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#california annuals
+head(cali_cover)
+cali_cover_2<-cali_cover[-c(6,7,8,9)]
+head(cali_cover_2)
+cali_cover_3<- gather(cali_cover_2, group, Cover,-Year, factor_key=TRUE)
+head(cali_cover_3)
+
+ggplot(cali_cover_3,aes(Year,Cover,color=as.factor(group))) +
+  scale_colour_manual(values=c('Perennial.forb...grass.cover'='darkgreen','Bare.ground.cover' = 'black','Shrub.cover'='blue',
+                               'Annual.forb...grass.cover'='red'),name='Cover type',
+                      labels=c('Perennial.forb...grass.cover'='Perrenial grass and forb','Bare.ground.cover'= 'Bare ground',
+                               'Shrub.cover'='Shrub','Annual.forb...grass.cover'='Annual grass and forb')) +
+  stat_summary(geom='line',fun.y='mean',size=1) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,65)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=25),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=15),
+    legend.position = 'none',
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#northern mixed prairies
+head(northern_mixed_cover)
+northern_mixed_cover_2<-northern_mixed_cover[-c(6,7,8,9)]
+head(northern_mixed_cover_2)
+northern_mixed_cover_3<- gather(northern_mixed_cover_2, group, Cover,-Year, factor_key=TRUE)
+head(northern_mixed_cover_3)
+
+ggplot(northern_mixed_cover_3,aes(Year,Cover,color=as.factor(group))) +
+  scale_colour_manual(values=c('Perennial.forb...grass.cover'='darkgreen','Bare.ground.cover' = 'black','Shrub.cover'='blue',
+                               'Annual.forb...grass.cover'='red'),name='Cover type',
+                      labels=c('Perennial.forb...grass.cover'='Perrenial grass and forb','Bare.ground.cover'= 'Bare ground',
+                               'Shrub.cover'='Shrub','Annual.forb...grass.cover'='Annual grass and forb')) +
+  stat_summary(geom='line',fun.y='mean',size=1) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,65)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=25),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=15),
+    legend.position = 'none',
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#shortgrass steppe
+sgs_cover_2<-sgs_cover[-c(6,7,8,9)]
+head(sgs_cover_2)
+sgs_cover_3<- gather(sgs_cover_2, group, Cover,-Year, factor_key=TRUE)
+head(sgs_cover_3)
+
+ggplot(sgs_cover_3,aes(Year,Cover,color=as.factor(group))) +
+  scale_colour_manual(values=c('Perennial.forb...grass.cover'='darkgreen','Bare.ground.cover' = 'black','Shrub.cover'='blue',
+                               'Annual.forb...grass.cover'='red'),name='Cover type',
+                      labels=c('Perennial.forb...grass.cover'='Perrenial grass and forb','Bare.ground.cover'= 'Bare ground',
+                               'Shrub.cover'='Shrub','Annual.forb...grass.cover'='Annual grass and forb')) +
+  stat_summary(geom='line',fun.y='mean',size=1) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,65)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=25),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=17),
+    legend.text = element_text(size=15),
+    legend.position = 'none',
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+
+#test with color ramps
+break_cali_npp_test<-quantile(cali_test$mm.dev,seq(from=0.10, to = .90,by=0.1),na.rm=TRUE)
+cali_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="california_annuals")
+
+cali_test_2 <- dplyr::filter(cali_test,mm.dev > -201, mm.dev < 401)
+hist(cali_test_2$mm.dev)
+summary(cali_test_2)
+cali_test_2 = cali_test %>% filter(mm.dev == quantile(cali_test$mm.dev,0.90))
+
+cali_test$dry <- cali_test$mm.dev < -200
+head(cali_test)
+ggplot(cali_test_2,aes(mm.y,npp.x,color=mm.dev)) +
+  #geom_point(aes(colour = mm.dev),alpha=0.5,size=1) +
+  #scale_y_continuous(breaks=quantiles)
+  geom_point(aes(color = mm.dev),alpha=0.25,size=1) + 
+  scale_colour_gradient2(midpoint=0,low = "red", mid='grey', high = "royalblue3") +
+  #scale_colour_gradientn(colours = heat.colors(3))
+  #geom_point(aes(fill = mm.dev)) + 
+  #scale_fill_gradientn(colours=c("black","yellow","red"), 
+                 #      breaks=c(-200,0,400), labels=format(c("-200","0","400")))
+  #scale_x_continuous(limit=c(50,1100)) +
+  #geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
+  xlab('Mean annual precip') +
+  ylab('NPP') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    #legend.position = c('none'),
     panel.background = element_rect(fill=NA),
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),

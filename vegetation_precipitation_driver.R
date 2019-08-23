@@ -6,6 +6,7 @@ library(splitstackshape)
 library(raster)
 library(gstat)
 library(rgdal)
+library(tidyr)
 
 #load initial dataframe
 

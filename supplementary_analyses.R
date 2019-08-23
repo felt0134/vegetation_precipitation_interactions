@@ -1,5 +1,6 @@
 #supplmentary analyses and graphs
-
+library(rgeos)
+library(maptools)
 #####see how sd of PPT and MAP varies according to vegetation type#########
 sd_map_veg<-aggregate(mm.x~ x)
 
@@ -69,6 +70,8 @@ test<-fread("http://rangeland.ntsg.umt.edu/data/rap/rap-vegetation-cover/v1/vege
 
 #need to re-save certain shapefiles so compatiable with range-cover application 
 writeOGR(mojave.sonoran.shape, ".", "mojave_sonoran", driver="ESRI Shapefile") 
+
+#combing separate desert files into one shapefile
 summary(Grama.Galleta.Steppe.shape.2)
 summary(mojave.sonoran.shape)
 test.2<-bind(mojave.sonoran.shape.2,ChihuahuanDesert.shape.2)
@@ -79,7 +82,7 @@ plot(test.3)
 #full hot deserts shapefile
 writeOGR(test.3, ".", "hot_deserts", driver="ESRI Shapefile") 
 
-
+#make directory for cover files extracted from online range-cover application
 wd_cover_means<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/vegetation_precipitation_interactions/Cover_Means"
 
 #Cali annuals
@@ -100,7 +103,7 @@ sgs_cover<-read.csv(file.path(wd_cover_means, "sgs_cover.csv"))
 sgs_cover$region <- 'sgs'
 head(sgs_cover)
 
-
+#hot deserts
 hot_deserts_cover<-read.csv(file.path(wd_cover_means, "hot_deserts_combined_cover.csv"))
 hot_deserts_cover$region <- 'hot_deserts'
 head(hot_deserts_cover)
@@ -110,8 +113,9 @@ merge_1<- rbind(cali_cover,cold_deserts_cover)
 merge_2<- rbind(merge_1,northern_mixed_cover)
 merge_3<- rbind(merge_2,sgs_cover)
 merge_4<- rbind(merge_3,hot_deserts_cover)
+summary(merge_4)
 
-#aggregatet to get cover means
+#aggregate to get cover means
 annuals_mean<-aggregate(Annual.forb...grass.cover~region,mean,data=merge_4)
 perrenials_mean<-aggregate(Perennial.forb...grass.cover~region,mean,data=merge_4)
 shrubs_mean<-aggregate(Shrub.cover~region,mean,data=merge_4)
@@ -120,9 +124,34 @@ precip_mean<-aggregate(Annual.precip~region,mean,data=merge_4)
 
 
 #splitting hot deserts ecoregion by specific deserts
+
+#cropping sonoran out of mojave-sonoran shapefile
+
+sonoran.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/SonoranDesert",layer="SonoranDesert")
+plot(sonoran.shape)
+sonoran.shape@bbox <- as.matrix(extent(mean_production_raster))
+plot(sonoran.shape)
+#step 2:
+sonoran.shape.2 <- sp::spTransform(sonoran.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+plot(sonoran.shape.2)
+
+Clipped_polys = subset(mojave.sonoran.shape.2,sonoran.shape.2)
+plot(Clipped_polys)
+?gIntersection
+str(mojave.sonoran.shape.2)
+
 #sonoran Desert
 sonoran_cover<-read.csv(file.path(wd_cover_means, "Sonoran_Cover.csv"))
 sonoran_cover$region <- 'sonoran'
+summary(sonoran_cover)
+
+#chihuahuan desert
+chi_cover<-read.csv(file.path(wd_cover_means, "Chihuahuan_Cover.csv"))
+chi_cover$region <- 'chihuahuan'
+summary(chi_cover)
+
+rbind_chihuahuan_sonoran <-rbind(chi_cover,sonoran_cover)
+perrenial_grass_deserts<-
 
 #grama gallette desert
 grama_gallette_cover<-read.csv(file.path(wd_cover_means, "grama_gallette_Cover.csv"))
