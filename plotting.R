@@ -523,15 +523,21 @@ summary(cali_fit)
 cali_fit_wet_dry<-cali_fit %>% filter(mm.dev %in% c('-200','0','400'))
 cali_fit_wet_dry_2<-cali_fit %>% filter(map %in% c('200','400','900'))
 library(ggplot2)
+
 ggplot(cali_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
+  #geom_point(data=cali_test_3,aes(x=mm.dev,y=npp.x),color='red',size=.1) +
+  geom_point(data=cali_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=1,alpha=0.3) +
+  geom_point(data=cali_mean_map,aes(x=mm.dev,y=npp.x),color='black',size=1,alpha=0.3) +
+  geom_point(data=cali_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=1,alpha=.3) +
   #scale_colour_manual(values=c('-200'='red','0'='black','400'='blue'),name='Precipitation deviation',
-                      #labels=c('-200'='-200 mm','0'='0 mm','400'='+400 mm')) +
+                     # labels=c('-200'='-200 mm','0'='0 mm','400'='+400 mm')) +
   scale_colour_manual(values=c('200'='red','400' = 'black','900'='blue'),name='Mean annual precipitation',
   labels=c('200'='200 mm','400'= '400 mm','900'='900 mm')) +
-  stat_smooth(method='lm',se=TRUE,size=1) +
+  stat_smooth(method='lm',se=TRUE,size=2) +
+  xlim(-199,401) +
   #ggtitle('hot deserts') +
-  xlab('') +
-  ylab('') +
+  xlab('ppt dev') +
+  ylab('npp') +
   theme(
     axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=15),
@@ -541,7 +547,7 @@ ggplot(cali_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
     #legend.title = element_blank(),
     legend.title = element_text(size=17),
     legend.text = element_text(size=17),
-    legend.position = c(0.22,0.77),
+    legend.position = c(0.75,0.1),
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
     panel.background = element_rect(fill=NA),
@@ -816,17 +822,31 @@ ggplot(sgs_cover_3,aes(Year,Cover,color=as.factor(group))) +
     axis.line.y = element_line(colour = "black"))
 
 
-#test with color ramps
+########test with color ramps############
 break_cali_npp_test<-quantile(cali_test$mm.dev,seq(from=0.10, to = .90,by=0.1),na.rm=TRUE)
 cali_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="california_annuals")
 
-cali_test_2 <- dplyr::filter(cali_test,mm.dev > -201, mm.dev < 401)
+hist(cali_test$mm.y)
+
+cali_test_2 <- cali_test %>% dplyr::filter(mm.dev > -201, mm.dev < 401) %>%
+              dplyr::filter(mm.y > 100, mm.y < 1000)
+
+cali_dry_map <- cali_test %>% dplyr::filter(mm.y > 189, mm.y < 211) 
+  summary(cali_dry_map)
+  
+  
+cali_mean_map <- cali_test %>% dplyr::filter(mm.y > 389, mm.y < 411) 
+  summary(cali_mean_map)
+  
+cali_wet_map <- cali_test %>% dplyr::filter(mm.y > 775, mm.y < 825) 
+  summary(cali_wet_map)
+  
 hist(cali_test_2$mm.dev)
 summary(cali_test_2)
 cali_test_2 = cali_test %>% filter(mm.dev == quantile(cali_test$mm.dev,0.90))
 
 cali_test$dry <- cali_test$mm.dev < -200
-head(cali_test)
+head(cali_test_2)
 ggplot(cali_test_2,aes(mm.y,npp.x,color=mm.dev)) +
   #geom_point(aes(colour = mm.dev),alpha=0.5,size=1) +
   #scale_y_continuous(breaks=quantiles)
@@ -838,6 +858,7 @@ ggplot(cali_test_2,aes(mm.y,npp.x,color=mm.dev)) +
                  #      breaks=c(-200,0,400), labels=format(c("-200","0","400")))
   #scale_x_continuous(limit=c(50,1100)) +
   #geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
+  geom_line(data=cali_fit_wet_dry_2, aes(x=map,y=NPP))
   xlab('Mean annual precip') +
   ylab('NPP') +
   theme(

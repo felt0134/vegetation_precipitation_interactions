@@ -2,17 +2,18 @@
 
 ######For california############
 
-beta_i_cali <- mean(california_coefficients$Intercept)
-beta_s_cali <- mean(california_coefficients$Spatial)
-beta_t_cali <- mean(california_coefficients$Temporal)
-beta_sxt_cali <- mean(california_coefficients$Spatiotemporal)
-
 cali_overview <- subset(rangeland_npp_covariates_deviations_reduced,region.x=='california_annuals')
 summary(cali_overview)
 hist(cali_overview$mm.dev)
 california_coefficients<-subset(coefficients_wide_map,site=='california_annuals')
 cali_fit<-expand.grid(list(mm.dev=seq(-200,400,50),map=seq(200,900,50)))
 
+#get means of the coefficients
+
+beta_i_cali <- mean(california_coefficients$Intercept)
+beta_s_cali <- mean(california_coefficients$Spatial)
+beta_t_cali <- mean(california_coefficients$Temporal)
+beta_sxt_cali <- mean(california_coefficients$Spatiotemporal)
 head(california_coefficients)
 
 cali_new<-colMeans(california_coefficients[sapply(california_coefficients, is.numeric)])
@@ -34,6 +35,7 @@ xNew <- seq(f[1],f[2])
 yNew <- predict(cali_slope_model,list(map = xNew))
 predict.cali.slope<-data.frame(xNew,yNew)
 
+#
 
 #######hot deserts#########
 
