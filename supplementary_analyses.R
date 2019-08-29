@@ -35,7 +35,7 @@ ggplot(merge_sd_map,aes(x=mm,y=st.dev)) +
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
-####look at differences in cover/bare ground#######
+####look at differences in cover/bare ground from kuchlar shapefile#######
 
 rawHTML <- paste(readLines("C:/Users/A02296270/Desktop/rangeland_cover/vegetation-cover-v1-1988.tif"), collapse="\n")
 summary(rawHTML)
@@ -121,7 +121,7 @@ perrenials_mean<-aggregate(Perennial.forb...grass.cover~region,mean,data=merge_4
 shrubs_mean<-aggregate(Shrub.cover~region,mean,data=merge_4)
 bare_ground_mean<-aggregate(Bare.ground.cover~region,mean,data=merge_4)
 precip_mean<-aggregate(Annual.precip~region,mean,data=merge_4)
-
+ fro kuchlar shapefile
 
 #splitting hot deserts ecoregion by specific deserts
 
@@ -158,7 +158,7 @@ grama_gallette_cover<-read.csv(file.path(wd_cover_means, "grama_gallette_Cover.c
 grama_gallette_cover$region <- 'grama_gallette'
 
 
-###attempting to create shapefile of NPP regions###########
+### create shapefile of NPP regions fro cleaned raster product###########
 
 library(maptools)
 library(rgdal)
@@ -233,10 +233,58 @@ head(sgs_shape)
 sgs_shape_2<-sgs_shape[-3]
 sgs_shape_raster<-rasterFromXYZ(sgs_shape_2)
 plot(sgs_shape_raster)
-n <- sgs_shape_raster> -Inf
+s <- sgs_shape_raster> -Inf
 
-sgs_shp<-rasterToPolygons(n, dissolve=TRUE)
+sgs_shp<-rasterToPolygons(s, dissolve=TRUE)
 plot(sgs_shp)
 crs(sgs_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 writeOGR(sgs_shp, dsn=getwd(),layer="sgs_shp",driver="ESRI Shapefile")
+
+
+#hot deserts region above and below MAP
+
+hot_deserts_shape_below <-hot_deserts_shape_2 %>% dplyr::filter(mm.x < 286.14)
+
+
+
+hot_deserts_shape_below_raster<-rasterFromXYZ(hot_deserts_shape_below)
+plot(hot_deserts_shape_below_raster)
+hb <- hot_deserts_shape_below_raster > -Inf
+
+hot_deserts_shape_below_shp<-rasterToPolygons(hb, dissolve=TRUE)
+plot(hot_deserts_shape_below_shp)
+crs(hot_deserts_shape_below_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(hot_deserts_shape_below_shp, dsn=getwd(),layer="hot_deserts_shape_below_shp",driver="ESRI Shapefile")
+
+
+#above regional average
+hot_deserts_shape_above  <-hot_deserts_shape_2 %>%  dplyr::filter(mm.x > 286.14)
+hot_deserts_shape_above_raster<-rasterFromXYZ(hot_deserts_shape_above)
+plot(hot_deserts_shape_above_raster)
+ha <- hot_deserts_shape_above_raster > -Inf
+
+hot_deserts_shape_above_shp<-rasterToPolygons(ha, dissolve=TRUE)
+plot(hot_deserts_shape_above_shp)
+crs(hot_deserts_shape_above_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(hot_deserts_shape_above_shp, dsn=getwd(),layer="hot_deserts_shape_above_shp",driver="ESRI Shapefile")
+
+#compare cover
+#make directory for cover files extracted from online range-cover application
+wd_cover_means<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/vegetation_precipitation_interactions/Cover_Means/From Cleaned NPP Raster to Shapefiles"
+#Cali annuals
+
+#below regiona map
+hd_below_map<-read.csv(file.path(wd_cover_means, "hot_deserts_below_map_cover_cleaned.csv"))
+hd_below_map$map<-'below'
+summary(hd_below_map)
+#above regional map
+hd_above_map<-read.csv(file.path(wd_cover_means, "hot_deserts_above_map_.csv"))
+hd_above_map$map<-'above'
+summary(hd_above_map)
+
+hot_deserts_cover_a_b<-rbind(hd_below_map,hd_above_map)
+mean_bare_ground<-aggregate(Bare.ground.cover~map,mean,data=hot_deserts_cover_a_b)
+mean_perrenial<-aggregate(Perennial.forb...grass.cover~map,mean,data=hot_deserts_cover_a_b)
