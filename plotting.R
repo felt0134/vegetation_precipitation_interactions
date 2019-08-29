@@ -520,7 +520,31 @@ ggplot(cold_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
 
 #california annuals
 summary(cali_fit)
+#subset and get slopes and intercepts
 cali_fit_wet_dry<-cali_fit %>% filter(mm.dev %in% c('-200','0','400'))
+
+#minus 200 slope and intercept
+cali_fit_wet_dry_minus_200<-cali_fit %>% filter(mm.dev %in% c('-200'))
+cali_fit_wet_dry_minus_200_lm<-lm(NPP~map,cali_fit_wet_dry_minus_200)
+summary(cali_fit_wet_dry_minus_200_lm)
+#slope: 0.53
+#intercept: 71.91
+
+#average year: zero deviation
+cali_fit_wet_dry_minus_0<-cali_fit %>% filter(mm.dev %in% c('0'))
+cali_fit_wet_dry_minus_0_lm<-lm(NPP~map,cali_fit_wet_dry_minus_0)
+summary(cali_fit_wet_dry_minus_0_lm)
+#slope: 0.44
+#intercept: 140.8
+
+#plues 400 mm slope and intercept
+cali_fit_wet_dry_plus_400<-cali_fit %>% filter(mm.dev %in% c('400'))
+cali_fit_wet_dry_plus_400_lm<-lm(NPP~map,cali_fit_wet_dry_plus_400)
+summary(cali_fit_wet_dry_plus_400_lm)
+#Slope: 0.25
+#intercept: 278.5
+
+
 cali_fit_wet_dry_2<-cali_fit %>% filter(map %in% c('200','400','900'))
 library(ggplot2)
 
@@ -823,10 +847,17 @@ ggplot(sgs_cover_3,aes(Year,Cover,color=as.factor(group))) +
 
 
 ########test with color ramps############
+
+#playing around with California
 break_cali_npp_test<-quantile(cali_test$mm.dev,seq(from=0.10, to = .90,by=0.1),na.rm=TRUE)
 cali_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="california_annuals")
-
+head(cali_test)
 hist(cali_test$mm.y)
+
+#select specific columns
+cali_filtered <- cali_test %>% 
+  select(x, y,region.x,year,mm.x,npp.x,mm.y,mm.dev)
+write.csv(cali_filtered,file='california_raw_toy_data.csv')
 
 cali_test_2 <- cali_test %>% dplyr::filter(mm.dev > -201, mm.dev < 401) %>%
               dplyr::filter(mm.y > 100, mm.y < 1000)

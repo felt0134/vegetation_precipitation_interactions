@@ -90,8 +90,8 @@ cali_cover<-read.csv(file.path(wd_cover_means, "california_annuals_cover_estimat
 cali_cover$region<-'cali_annuals'
 
 #cold deserts
-cold_deserts_cover<-read.csv(file.path(wd_cover_means, "cold_deserts_cover.csv"))
-cold_deserts_cover$region <- 'cold_deserts'
+northern_mixed_cover<-read.csv(file.path(wd_cover_means, "northern_mixed_cover.csv"))
+northern_mixed_cover$region <- 'northern_mixed'
 
 #Northern mixed prairies
 northern_mixed_cover<-read.csv(file.path(wd_cover_means, "northern_mixed_cover.csv"))
@@ -163,40 +163,80 @@ grama_gallette_cover$region <- 'grama_gallette'
 library(maptools)
 library(rgdal)
 library(sp)
+library(rgeos)
 
-head(mean_production$geodeticDa)
+#
+mean_mm_veg<-aggregate(mm.x~ x + y + region.x,mean,data=rangeland_npp_covariates_deviations_1)
+head(mean_mm_veg)
 
-plot(mean_production_raster)
-dat.poly <- rasterToPolygons(mean_production_raster, dissolve=TRUE)
-plot(dat.poly)
-r <- SpatialPolygonsDataFrame(mean_production[,1:2],
-                            mean_production)
+#california shapefile production
+cali_shape<-subset(mean_mm_veg,region.x=='california_annuals')
+head(cali_shape)
+cali_shape_2<-cali_shape[-3]
+cali_shape_raster<-rasterFromXYZ(cali_shape_2)
+plot(cali_shape_raster)
+r <- cali_shape_raster> -Inf
 
-crs(dat.poly) <- "+proj=utm +zone=18 +datum=WGS84 +units=m +no_defs 
-                 +ellps=WGS84 +towgs84=0,0,0" 
+cali_shp<-rasterToPolygons(r, dissolve=TRUE)
+plot(cali_shp)
+crs(cali_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
-plot(r)
+writeOGR(cali_shp, dsn=getwd(),layer="cali_shp",driver="ESRI Shapefile")
 
-extent(r)
+#hot deserts
+hot_deserts_shape<-subset(mean_mm_veg,region.x=='hot_deserts')
+head(hot_deserts_shape)
+hot_deserts_shape_2<-hot_deserts_shape[-3]
+hot_deserts_shape_raster<-rasterFromXYZ(hot_deserts_shape_2)
+plot(hot_deserts_shape_raster)
+h <- hot_deserts_shape_raster> -Inf
 
-r.2<-SpatialPolygonsDataFrame(r)
+hot_deserts_shp<-rasterToPolygons(h, dissolve=TRUE)
+plot(hot_deserts_shp)
+crs(hot_deserts_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
-writeOGR(r, getwd(),
-         "r", driver="ESRI Shapefile")
+writeOGR(hot_deserts_shp, dsn=getwd(),layer="hot_deserts_shp",driver="ESRI Shapefile")
 
-WGScoor<-  mean_production#data to convert
-coordinates(WGScoor)=~x+y #column names of the lat long cols
-proj4string(WGScoor)<- CRS("++proj=longlat +datum=WGS84") # set coordinate system to WGS
-WGScoor.df <- SpatialPointsDataFrame(WGScoor, data.frame(id=1:length(WGScoor)))
-LLcoor<-spTransform(WGScoor.df,CRS("+proj=longlat"))
-LLcoor.df=SpatialPointsDataFrame(LLcoor, data.frame(id=1:length(LLcoor)))
-<-writeOGR(LLcoor.df, dsn=getwd(),layer="MyShapefile",driver="ESRI Shapefile")
+#cold deserts
+cold_deserts_shape<-subset(mean_mm_veg,region.x=='cold_deserts')
+head(cold_deserts_shape)
+cold_deserts_shape_2<-cold_deserts_shape[-3]
+cold_deserts_shape_raster<-rasterFromXYZ(cold_deserts_shape_2)
+plot(cold_deserts_shape_raster)
+c <- cold_deserts_shape_raster> -Inf
 
-plot(LLcoor)
+cold_deserts_shp<-rasterToPolygons(c, dissolve=TRUE)
+plot(cold_deserts_shp)
+crs(cold_deserts_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(cold_deserts_shp, dsn=getwd(),layer="cold_deserts_shp",driver="ESRI Shapefile")
+
+#northern mixed prairies
+northern_mixed_shape<-subset(mean_mm_veg,region.x=='northern_mixed_prairies')
+head(northern_mixed_shape)
+northern_mixed_shape_2<-northern_mixed_shape[-3]
+northern_mixed_shape_raster<-rasterFromXYZ(northern_mixed_shape_2)
+plot(northern_mixed_shape_raster)
+n <- northern_mixed_shape_raster> -Inf
+
+northern_mixed_shp<-rasterToPolygons(n, dissolve=TRUE)
+plot(northern_mixed_shp)
+crs(northern_mixed_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(northern_mixed_shp, dsn=getwd(),layer="northern_mixed_shp",driver="ESRI Shapefile")
 
 
-WGScoor<-  mean_production
-coordinates(WGScoor)=~x+y
-proj4string(WGScoor)<- CRS("+proj=longlat +datum=WGS84")
-LLcoor<-spTransform(WGScoor,CRS("+proj=longlat"))
-raster::shapefile(LLcoor, "MyShapefile_2.shp")
+#shortgrass steppe
+summary(mean_mm_veg)
+sgs_shape<-subset(mean_mm_veg,region.x=='semi_arid_steppe')
+head(sgs_shape)
+sgs_shape_2<-sgs_shape[-3]
+sgs_shape_raster<-rasterFromXYZ(sgs_shape_2)
+plot(sgs_shape_raster)
+n <- sgs_shape_raster> -Inf
+
+sgs_shp<-rasterToPolygons(n, dissolve=TRUE)
+plot(sgs_shp)
+crs(sgs_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(sgs_shp, dsn=getwd(),layer="sgs_shp",driver="ESRI Shapefile")

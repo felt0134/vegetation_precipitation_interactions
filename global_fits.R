@@ -35,7 +35,8 @@ xNew <- seq(f[1],f[2])
 yNew <- predict(cali_slope_model,list(map = xNew))
 predict.cali.slope<-data.frame(xNew,yNew)
 
-#
+#toy data
+write.csv(cali_fit,file='cali_global_model_output.csv')
 
 #######hot deserts#########
 
