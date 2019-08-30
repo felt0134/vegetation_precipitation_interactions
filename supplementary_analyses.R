@@ -273,8 +273,43 @@ writeOGR(hot_deserts_shape_above_shp, dsn=getwd(),layer="hot_deserts_shape_above
 
 #compare cover
 #make directory for cover files extracted from online range-cover application
-wd_cover_means<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/vegetation_precipitation_interactions/Cover_Means/From Cleaned NPP Raster to Shapefiles"
+wd_cover_means_clean<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/vegetation_precipitation_interactions/Cover_Means/From Cleaned NPP Raster to Shapefiles"
+
 #Cali annuals
+cali_cover<-read.csv(file.path(wd_cover_means_clean, "California_Annuals_Cover_cleaned.csv"))
+cali_cover$region<-'cali_annuals'
+
+#cold deserts
+cold_deserts_cover<-read.csv(file.path(wd_cover_means_clean, "cold_deserts_cover_cleaned.csv"))
+cold_deserts_cover$region <- 'cold_deserts'
+
+#Northern mixed prairies
+northern_mixed_cover<-read.csv(file.path(wd_cover_means_clean, "northern_mixed_cover_clean.csv"))
+northern_mixed_cover$region <- 'northern_mixed'
+head(northern_mixed_cover)
+
+#shortgrass steppe
+sgs_cover<-read.csv(file.path(wd_cover_means_clean, "sgs_cover_clean.csv"))
+sgs_cover$region <- 'sgs'
+head(sgs_cover)
+
+#hot deserts
+hot_deserts_cover<-read.csv(file.path(wd_cover_means_clean, "hot_deserts_cover_cleaned.csv"))
+hot_deserts_cover$region <- 'hot_deserts'
+head(hot_deserts_cover)
+
+#merging
+merge_1<- rbind(cali_cover,cold_deserts_cover)
+merge_2<- rbind(merge_1,northern_mixed_cover)
+merge_3<- rbind(merge_2,sgs_cover)
+merge_4<- rbind(merge_3,hot_deserts_cover)
+summary(merge_4)
+
+#aggregate to get cover means
+annuals_mean<-aggregate(Annual.forb...grass.cover~region,mean,data=merge_4)
+perrenials_mean<-aggregate(Perennial.forb...grass.cover~region,mean,data=merge_4)
+shrubs_mean<-aggregate(Shrub.cover~region,mean,data=merge_4)
+bare_ground_mean<-aggregate(Bare.ground.cover~region,mean,data=merge_4)
 
 #below regiona map
 hd_below_map<-read.csv(file.path(wd_cover_means, "hot_deserts_below_map_cover_cleaned.csv"))
