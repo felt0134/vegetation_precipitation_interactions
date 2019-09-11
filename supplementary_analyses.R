@@ -158,7 +158,7 @@ grama_gallette_cover<-read.csv(file.path(wd_cover_means, "grama_gallette_Cover.c
 grama_gallette_cover$region <- 'grama_gallette'
 
 
-### create shapefile of NPP regions fro cleaned raster product###########
+### create shapefile of NPP regions from cleaned raster product###########
 
 library(maptools)
 library(rgdal)
@@ -311,7 +311,7 @@ perrenials_mean<-aggregate(Perennial.forb...grass.cover~region,mean,data=merge_4
 shrubs_mean<-aggregate(Shrub.cover~region,mean,data=merge_4)
 bare_ground_mean<-aggregate(Bare.ground.cover~region,mean,data=merge_4)
 
-#below regiona map
+#below regional map
 hd_below_map<-read.csv(file.path(wd_cover_means, "hot_deserts_below_map_cover_cleaned.csv"))
 hd_below_map$map<-'below'
 summary(hd_below_map)
@@ -323,3 +323,188 @@ summary(hd_above_map)
 hot_deserts_cover_a_b<-rbind(hd_below_map,hd_above_map)
 mean_bare_ground<-aggregate(Bare.ground.cover~map,mean,data=hot_deserts_cover_a_b)
 mean_perrenial<-aggregate(Perennial.forb...grass.cover~map,mean,data=hot_deserts_cover_a_b)
+
+#plotting
+library(ggplot2)
+
+#figure SX
+
+#california
+
+#get rid of unneeded columns
+cali_cover_2 <- cali_cover[-c(6,7,8,9)]
+
+#melt to single column
+data_long_cali_cover <- gather(cali_cover_2,Vegetation, cover,-Year, factor_key=TRUE)
+
+#plot temporal dynamics of veg cover
+ggplot(data_long_cali_cover,aes(Year,cover,color=Vegetation)) +
+  geom_line(size=1.5) +
+  #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  scale_colour_manual(values=c('Annual.forb...grass.cover'='red','Perennial.forb...grass.cover'='darkgreen',
+                             'Shrub.cover'='blue','Bare.ground.cover'='orange'),
+                    labels=c('Annual.forb...grass.cover'='Annual grass and forb','Perennial.forb...grass.cover'='Perrenial grass and forb',
+                             'Shrub.cover'='Shrub','Bare.ground.cover'='Bare ground')) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,70)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=17), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=17),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    #legend.position = c(0.82,0.95),
+    #legend.position = c(0.82,0.85),
+    legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+##cold deserts
+cold_deserts_cover_2 <- cold_deserts_cover[-c(6,7,8,9)]
+
+#melt to single column
+data_long_cold_deserts_cover <- gather(cold_deserts_cover_2,Vegetation, cover,-Year, factor_key=TRUE)
+
+#plot temporal dynamics of veg cover
+ggplot(data_long_cold_deserts_cover,aes(Year,cover,color=Vegetation)) +
+  geom_line(size=1.5) +
+  #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  scale_colour_manual(values=c('Annual.forb...grass.cover'='red','Perennial.forb...grass.cover'='darkgreen',
+                               'Shrub.cover'='blue','Bare.ground.cover'='orange'),
+                      labels=c('Annual.forb...grass.cover'='Annual grass and forb','Perennial.forb...grass.cover'='Perrenial grass and forb',
+                               'Shrub.cover'='Shrub','Bare.ground.cover'='Bare ground')) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,70)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=17), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=17),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    #legend.position = c(0.82,0.95),
+    #legend.position = c(0.82,0.85),
+    legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+##northern mixed prairies
+northern_mixed_cover_2 <- northern_mixed_cover[-c(6,7,8,9)]
+
+#melt to single column
+data_long_northern_mixed_cover <- gather(northern_mixed_cover_2,Vegetation, cover,-Year, factor_key=TRUE)
+
+#plot temporal dynamics of veg cover
+ggplot(data_long_northern_mixed_cover,aes(Year,cover,color=Vegetation)) +
+  geom_line(size=1.5) +
+  #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  scale_colour_manual(values=c('Annual.forb...grass.cover'='red','Perennial.forb...grass.cover'='darkgreen',
+                               'Shrub.cover'='blue','Bare.ground.cover'='orange'),
+                      labels=c('Annual.forb...grass.cover'='Annual grass and forb','Perennial.forb...grass.cover'='Perrenial grass and forb',
+                               'Shrub.cover'='Shrub','Bare.ground.cover'='Bare ground')) +
+  scale_y_continuous(expand = c(0,0),limits=c(0,70)) +
+  #xlab('Change in sensitivity per mm of MAP') +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=17), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=17),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    #legend.position = c(0.82,0.95),
+    #legend.position = c(0.82,0.85),
+    legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+##shortgrass steppe
+sgs_cover_2 <- sgs_cover[-c(6,7,8,9)]
+
+#melt to single column
+data_long_sgs_cover <- gather(sgs_cover_2,Vegetation, cover,-Year, factor_key=TRUE)
+
+#plot temporal dynamics of veg cover
+ggplot(data_long_sgs_cover,aes(Year,cover,color=Vegetation)) +
+  geom_line(size=1.5) +
+  #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  scale_colour_manual(values=c('Annual.forb...grass.cover'='red','Perennial.forb...grass.cover'='darkgreen',
+                               'Shrub.cover'='blue','Bare.ground.cover'='orange'),
+                      labels=c('Annual.forb...grass.cover'='Annual grass and forb','Perennial.forb...grass.cover'='Perrenial grass and forb',
+                               'Shrub.cover'='Shrub','Bare.ground.cover'='Bare ground')) +
+  #xlab('Change in sensitivity per mm of MAP') +
+  scale_y_continuous(expand = c(0,0),limits=c(0,70)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=17), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=17),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    #legend.position = c(0.82,0.95),
+    #legend.position = c(0.82,0.85),
+    legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+##hot deserts
+hot_deserts_cover_2 <- hot_deserts_cover[-c(6,7,8,9)]
+
+#melt to single column
+data_long_hot_deserts_cover <- gather(hot_deserts_cover_2,Vegetation, cover,-Year, factor_key=TRUE)
+
+#plot temporal dynamics of veg cover
+ggplot(data_long_hot_deserts_cover,aes(Year,cover,color=Vegetation)) +
+  geom_line(size=1.5) +
+  #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
+  scale_colour_manual(values=c('Annual.forb...grass.cover'='red','Perennial.forb...grass.cover'='darkgreen',
+                               'Shrub.cover'='blue','Bare.ground.cover'='orange'),
+                      labels=c('Annual.forb...grass.cover'='Annual grass and forb','Perennial.forb...grass.cover'='Perennial grass and forb',
+                               'Shrub.cover'='Shrub','Bare.ground.cover'='Bare ground')) +
+  #xlab('Change in sensitivity per mm of MAP') +
+  scale_y_continuous(expand = c(0,0),limits=c(0,70)) +
+  ylab('') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=17), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=17),
+    axis.title = element_text(color='black',size=15),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    legend.position = c(0.6,0.75),
+    #legend.position = c(0.82,0.85),
+    #legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
