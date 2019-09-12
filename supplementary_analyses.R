@@ -508,3 +508,52 @@ ggplot(data_long_hot_deserts_cover,aes(Year,cover,color=Vegetation)) +
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
+
+# hot deserts wet versus dry sites
+hot_deserts_cover_a_b_2 <- hot_deserts_cover_a_b[-c(6,7,8)]
+hot_deserts_cover_a_b_3 <- gather(hot_deserts_cover_a_b_2,Vegetation, cover,-c(Year,map), factor_key=TRUE)
+hot_deserts_cover_a_b_4<-aggregate(cover~ Vegetation + map,mean,data=hot_deserts_cover_a_b_3)
+
+#plot it
+library(ggplot2)
+ggplot(hot_deserts_cover_a_b_4,aes(Vegetation,cover,fill=map)) +
+  stat_summary(fun.y='mean',geom='point',pch=21,size=8) +
+  scale_fill_manual(values=c('below'='red','above'='blue'),name='Mean annual precipitation') +
+  scale_x_discrete(labels=c("Annual.forb...grass.cover"="Annual grass and forb","Perennial.forb...grass.cover"="Perennial grass and forb",
+                            "Shrub.cover"="Shrub","Bare.ground.cover"="Bare ground")) +
+  ylab('% Cover') +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=14,angle=30,hjust=1),
+    axis.text.y = element_text(color='black',size=18),
+    axis.title = element_text(color='black',size=35),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_text(size=20),
+    legend.text = element_text(size=17),
+    legend.position = c(0.3,0.8),
+    #legend.position = c(0.82,0.85),
+    #legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#map of mean annual precipitation in hot deserts
+
+#taken from the shapefile production code
+break_mean_ppt_deserts<-quantile(hot_deserts_shape_2$mm.x,seq(from=0.01, to = .99,by=0.01),na.rm=TRUE)
+break_mean_npp<-mean_production$npp.x
+npp_mean_allsites
+plot(us)
+
+spplot(hot_deserts_shape_raster,#scales = list(draw = TRUE),
+       at=break_mean_ppt_deserts,
+       #par.settings = list(axis.line = list(col = 'transparent')),
+       asp=0.01,
+       col.regions = 
+         rev(topo.colors(length(break_mean_ppt_deserts)-1)),
+       main="") +
+  latticeExtra::layer(sp.polygons(dat.poly, lwd = 1))
