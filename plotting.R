@@ -457,9 +457,61 @@ ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
 library(dplyr)
 
 #hot deserts
+
+#dynamics of the spatial model
 hot_deserts_fit_wet_dry<-hot_deserts_fit %>% filter(mm.dev %in% c('-100','0','200'))
 hot_deserts_fit_wet_dry_2<-hot_deserts_fit %>% filter(map %in% c('100','300','600'))
-library(ggplot2)
+
+
+#minus 100 slope and intercept
+hot_deserts_fit_wet_dry_minus_100<-hot_deserts_fit %>% filter(mm.dev %in% c('-100'))
+hot_deserts_fit_wet_dry_minus_100_lm<-lm(NPP~map,hot_deserts_fit_wet_dry_minus_100)
+summary(hot_deserts_fit_wet_dry_minus_100_lm)
+#slope: 0.25
+#intercept: -0.34
+
+#average year: zero deviation
+hot_deserts_fit_wet_dry_minus_0<-hot_deserts_fit %>% filter(mm.dev %in% c('0'))
+hot_deserts_fit_wet_dry_minus_0_lm<-lm(NPP~map,hot_deserts_fit_wet_dry_minus_0)
+summary(hot_deserts_fit_wet_dry_minus_0_lm)
+#slope: 0.27
+#intercept: -.22
+
+#plues 400 mm slope and intercept
+hot_deserts_fit_wet_dry_plus_200<-hot_deserts_fit %>% filter(mm.dev %in% c('200'))
+hot_deserts_fit_wet_dry_plus_200_lm<-lm(NPP~map,hot_deserts_fit_wet_dry_plus_200)
+summary(hot_deserts_fit_wet_dry_plus_200_lm)
+#Slope: 0.31
+#intercept: 0.4
+
+hot_deserts_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="hot_deserts")
+
+#plot spatial relationship dynamics
+ggplot(hot_deserts_test,aes(mm.y,npp.x,color=mm.dev)) +
+  geom_point(pch=21,size=1) +
+  scale_colour_gradientn(colours = colfunc(10)) +
+  geom_abline(intercept=-0.34,slope=0.25,lwd=3,col='red') +
+  geom_abline(intercept=-.22,slope=0.27,lwd=3,col='black') +
+  geom_abline(intercept=0.4,slope=0.31,lwd=3,col='blue') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+
+#dyanmics of the temporal model
+
 ggplot(hot_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
   #scale_colour_manual(values=c('-100'='red','0'='black','200'='blue'),name='Precipitation deviation',
                     #labels=c('-100'='-100 mm','0'='0 mm','200'='+200 mm')) +
@@ -489,8 +541,61 @@ ggplot(hot_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
 
 #cold deserts
 summary(cold_deserts_fit)
+
+
+#dynamics of the spatial model
 cold_deserts_fit_wet_dry<-cold_deserts_fit %>% filter(mm.dev %in% c('-100','0','200'))
 cold_deserts_fit_wet_dry_2<-cold_deserts_fit %>% filter(map %in% c('100','300','900'))
+
+#minus 100 slope and intercept
+cold_deserts_fit_wet_dry_minus_100<-cold_deserts_fit %>% filter(mm.dev %in% c('-100'))
+cold_deserts_fit_wet_dry_minus_100_lm<-lm(NPP~map,cold_deserts_fit_wet_dry_minus_100)
+summary(cold_deserts_fit_wet_dry_minus_100_lm)
+#slope: 0.41
+#intercept: -50
+
+#average year: zero deviation
+cold_deserts_fit_wet_dry_minus_0<-cold_deserts_fit %>% filter(mm.dev %in% c('0'))
+cold_deserts_fit_wet_dry_minus_0_lm<-lm(NPP~map,cold_deserts_fit_wet_dry_minus_0)
+summary(cold_deserts_fit_wet_dry_minus_0_lm)
+#slope: 0.39
+#intercept: -31.3
+
+#plus 200 mm slope and intercept
+cold_deserts_fit_wet_dry_plus_200<-cold_deserts_fit %>% filter(mm.dev %in% c('200'))
+cold_deserts_fit_wet_dry_plus_200_lm<-lm(NPP~map,cold_deserts_fit_wet_dry_plus_200)
+summary(cold_deserts_fit_wet_dry_plus_200_lm)
+#Slope: 0.35
+#intercept: 62.18
+
+cold_deserts_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="cold_deserts")
+
+#plot spatial relationship dynamics
+ggplot(cold_deserts_test,aes(mm.y,npp.x,color=mm.dev)) +
+  geom_point(pch=19,size=1) +
+  scale_colour_gradientn(colours = colfunc(10)) +
+  geom_abline(intercept=-50,slope=0.41,lwd=3,col='red') +
+  geom_abline(intercept=-31.3,slope=0.39,lwd=3,col='black') +
+  geom_abline(intercept=62.18,slope=0.35,lwd=3,col='blue') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#dynamics of the temporal model
+
+
 library(ggplot2)
 ggplot(cold_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
   scale_colour_manual(values=c('-100'='red','0'='black','200'='blue'),name='Precipitation deviation',
@@ -544,24 +649,47 @@ summary(cali_fit_wet_dry_plus_400_lm)
 #Slope: 0.25
 #intercept: 278.5
 
+#plot spatial relationship dynamics
+ggplot(cali_test,aes(mm.y,npp.x,color=mm.dev)) +
+  geom_point(pch=21,size=1) +
+  scale_colour_gradientn(colours = colfunc(10)) +
+  geom_abline(intercept=71.91,slope=0.53,lwd=3,col='red') +
+  geom_abline(intercept=140.8,slope=0.44,lwd=3,col='black') +
+  geom_abline(intercept=278.5,slope=0.25,lwd=3,col='blue') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
 
-cali_fit_wet_dry_2<-cali_fit %>% filter(map %in% c('200','400','900'))
+
+cali_fit_wet_dry_2<-cali_fit %>% filter(map %in% c('200','400','800'))
 library(ggplot2)
 
 ggplot(cali_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
   #geom_point(data=cali_test_3,aes(x=mm.dev,y=npp.x),color='red',size=.1) +
-  geom_point(data=cali_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=1,alpha=0.3) +
-  geom_point(data=cali_mean_map,aes(x=mm.dev,y=npp.x),color='black',size=1,alpha=0.3) +
-  geom_point(data=cali_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=1,alpha=.3) +
+  geom_point(data=cali_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=1,pch=21) +
+  geom_point(data=cali_mean_map,aes(x=mm.dev,y=npp.x),color='black',size=1,pch=21) +
+  geom_point(data=cali_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=1,pch=21) +
   #scale_colour_manual(values=c('-200'='red','0'='black','400'='blue'),name='Precipitation deviation',
                      # labels=c('-200'='-200 mm','0'='0 mm','400'='+400 mm')) +
-  scale_colour_manual(values=c('200'='red','400' = 'black','900'='blue'),name='Mean annual precipitation',
-  labels=c('200'='200 mm','400'= '400 mm','900'='900 mm')) +
-  stat_smooth(method='lm',se=TRUE,size=2) +
+  scale_colour_manual(values=c('200'='red','400' = 'black','800'='blue'),name='Mean annual precipitation',
+  labels=c('200'='200 mm','400'= '400 mm','800'='800 mm')) +
+  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
   xlim(-199,401) +
   #ggtitle('hot deserts') +
-  xlab('ppt dev') +
-  ylab('npp') +
+  xlab('') +
+  ylab('') +
   theme(
     axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=15),
@@ -583,6 +711,56 @@ ggplot(cali_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
 summary(northern_mixed_fit)
 northern_mixed_fit_wet_dry<-northern_mixed_fit %>% filter(mm.dev %in% c('-200','0','200'))
 northern_mixed_fit_wet_dry_2<-northern_mixed_fit %>% filter(map %in% c('150','400','900'))
+
+#spatial dynamics
+
+#minus 100 slope and intercept
+northern_mixed_fit_wet_dry_minus_200<-northern_mixed_fit %>% filter(mm.dev %in% c('-200'))
+northern_mixed_fit_wet_dry_minus_200_lm<-lm(NPP~map,northern_mixed_fit_wet_dry_minus_200)
+summary(northern_mixed_fit_wet_dry_minus_200_lm)
+#slope: 0.69
+#intercept: -127.8
+
+#average year: zero deviation
+northern_mixed_fit_wet_dry_minus_0<-northern_mixed_fit %>% filter(mm.dev %in% c('0'))
+northern_mixed_fit_wet_dry_minus_0_lm<-lm(NPP~map,northern_mixed_fit_wet_dry_minus_0)
+summary(northern_mixed_fit_wet_dry_minus_0_lm)
+#slope: 0.66
+#intercept: -64.68
+
+#plus 200 mm slope and intercept
+northern_mixed_fit_wet_dry_plus_200<-northern_mixed_fit %>% filter(mm.dev %in% c('200'))
+northern_mixed_fit_wet_dry_plus_200_lm<-lm(NPP~map,northern_mixed_fit_wet_dry_plus_200)
+summary(northern_mixed_fit_wet_dry_plus_200_lm)
+#Slope: 0.64
+#intercept: -1.53
+
+northern_mixed_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="northern_mixed_prairies")
+
+#plot spatial relationship dynamics
+ggplot(northern_mixed_test,aes(mm.y,npp.x,color=mm.dev)) +
+  geom_point(pch=21,size=1) +
+  scale_colour_gradientn(colours = colfunc(10)) +
+  geom_abline(intercept=-127.8,slope=0.69,lwd=3,col='red') +
+  geom_abline(intercept=-64.68,slope=0.66,lwd=3,col='black') +
+  geom_abline(intercept=-1.53,slope=0.64,lwd=3,col='blue') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+
 library(ggplot2)
 ggplot(northern_mixed_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
   scale_colour_manual(values=c('-200'='red','0'='black','200'='blue'),name='Precipitation deviation',
@@ -614,6 +792,57 @@ ggplot(northern_mixed_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
 summary(sgs_fit)
 sgs_fit_wet_dry<-sgs_fit %>% filter(mm.dev %in% c('-200','0','200'))
 sgs_fit_wet_dry_2<-sgs_fit %>% filter(map %in% c('275','425','675'))
+
+
+#spatial dynamics
+
+#minus 100 slope and intercept
+sgs_fit_wet_dry_minus_200<-sgs_fit %>% filter(mm.dev %in% c('-200'))
+sgs_fit_wet_dry_minus_200_lm<-lm(NPP~map,sgs_fit_wet_dry_minus_200)
+summary(sgs_fit_wet_dry_minus_200_lm)
+#slope: .48
+#intercept: -72.98
+
+#average year: zero deviation
+sgs_fit_wet_dry_minus_0<-sgs_fit %>% filter(mm.dev %in% c('0'))
+sgs_fit_wet_dry_minus_0_lm<-lm(NPP~map,sgs_fit_wet_dry_minus_0)
+summary(sgs_fit_wet_dry_minus_0_lm)
+#slope: 0.44
+#intercept: 3
+
+#plus 200 mm slope and intercept
+sgs_fit_wet_dry_plus_200<-sgs_fit %>% filter(mm.dev %in% c('200'))
+sgs_fit_wet_dry_plus_200_lm<-lm(NPP~map,sgs_fit_wet_dry_plus_200)
+summary(sgs_fit_wet_dry_plus_200_lm)
+#Slope: 0.40
+#intercept: 79
+
+sgs_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="semi_arid_steppe")
+
+#plot spatial relationship dynamics
+ggplot(sgs_test,aes(mm.y,npp.x,color=mm.dev)) +
+  geom_point(pch=21,size=1) +
+  scale_colour_gradientn(colours = colfunc(10)) +
+  geom_abline(intercept=-72.98,slope=0.48,lwd=3,col='red') +
+  geom_abline(intercept=3,slope=0.44,lwd=3,col='black') +
+  geom_abline(intercept=79,slope=0.40,lwd=3,col='blue') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#temporal dynamics
 
 ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
   #scale_colour_manual(values=c('-200'='red','0'='black','200'='blue'),name='Precipitation deviation',
@@ -848,11 +1077,14 @@ ggplot(sgs_cover_3,aes(Year,Cover,color=as.factor(group))) +
 
 ########test with color ramps############
 
+library(colorRamps)
+colfunc<-colorRampPalette(c("red","royalblue"))
+plot(rep(1,50),col=(colfunc(50)), pch=19,cex=2)
 #playing around with California
-break_cali_npp_test<-quantile(cali_test$mm.dev,seq(from=0.10, to = .90,by=0.1),na.rm=TRUE)
+break_cali_npp_test<-quantile(cali_test$mm.dev,seq(from=0.1, to = .99,by=0.1),na.rm=TRUE)
 cali_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="california_annuals")
 head(cali_test)
-hist(cali_test$mm.y)
+hist(cali_test$mm.dev)
 
 #select specific columns
 cali_filtered <- cali_test %>% 
@@ -876,22 +1108,17 @@ hist(cali_test_2$mm.dev)
 summary(cali_test_2)
 cali_test_2 = cali_test %>% filter(mm.dev == quantile(cali_test$mm.dev,0.90))
 
-cali_test$dry <- cali_test$mm.dev < -200
-head(cali_test_2)
-ggplot(cali_test_2,aes(mm.y,npp.x,color=mm.dev)) +
-  #geom_point(aes(colour = mm.dev),alpha=0.5,size=1) +
-  #scale_y_continuous(breaks=quantiles)
-  geom_point(aes(color = mm.dev),alpha=0.25,size=1) + 
-  scale_colour_gradient2(midpoint=0,low = "red", mid='grey', high = "royalblue3") +
-  #scale_colour_gradientn(colours = heat.colors(3))
-  #geom_point(aes(fill = mm.dev)) + 
-  #scale_fill_gradientn(colours=c("black","yellow","red"), 
-                 #      breaks=c(-200,0,400), labels=format(c("-200","0","400")))
-  #scale_x_continuous(limit=c(50,1100)) +
-  #geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
-  geom_line(data=cali_fit_wet_dry_2, aes(x=map,y=NPP))
-  xlab('Mean annual precip') +
-  ylab('NPP') +
+cali_fit_dry_year<-subset(cali_fit)
+
+#plot spatial relationship dynamics
+ggplot(cali_test,aes(mm.y,npp.x,color=mm.dev)) +
+  geom_point(pch=21,size=1) +
+  scale_colour_gradientn(colours = colfunc(10)) +
+  geom_abline(intercept=71.91,slope=0.53,lwd=3,col='red') +
+  geom_abline(intercept=140.8,slope=0.44,lwd=3,col='black') +
+  geom_abline(intercept=278.5,slope=0.25,lwd=3,col='blue') +
+  xlab('') +
+  ylab('') +
   theme(
     axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=15),
@@ -900,7 +1127,7 @@ ggplot(cali_test_2,aes(mm.y,npp.x,color=mm.dev)) +
     legend.key = element_blank(),
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
-    #legend.position = c('none'),
+    legend.position = c('none'),
     panel.background = element_rect(fill=NA),
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
