@@ -1,5 +1,6 @@
 library(ggplot2)
 library(lattice)
+library(grid)
 
 #function to reference for facet plots
 veg_names <- c(
@@ -250,6 +251,7 @@ head(spatial_temporal)
 data_long_spatial_temporal <- gather(spatial_temporal,model,coefficient,-site, factor_key=TRUE)
 head(data_long_spatial_temporal)
 data_spatial<-subset(data_long_spatial_temporal,model=='Spatial')
+
 ggplot(data_long_spatial_temporal ,aes(x=coefficient,fill=model)) +
   geom_histogram(binwidth = .005,color='black') +
   facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
@@ -329,11 +331,11 @@ sensitivty_inset_cali<-ggplot(cali_annuals_sensitivity,aes(mm.x,coef)) +
   geom_line(data=cali_fit,aes(map,temporal_slope),size=2,color='red') +
   xlab('MAP') +
   #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  ylab('Temporal sensitivity') +
+  ylab('Sensitivity') +
   theme(
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=8),
-    axis.title = element_text(color='black',size=12),
+    axis.title = element_text(color='black',size=14),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     strip.background =element_rect(fill="white"),
@@ -352,12 +354,12 @@ sensitivty_inset_hot_deserts<-ggplot(hot_deserts_sensitivity,aes(mm.x,coef)) +
   #geom_line(data=predict.hot_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('MAP') +
   #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  ylab('Temporal sensitivity') +
+  ylab('Sensitivity') +
   #xlab("Mean annual precipitation (mm)") +
   theme(
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=8),
-    axis.title = element_text(color='black',size=12),
+    axis.title = element_text(color='black',size=14),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     strip.background =element_rect(fill="white"),
@@ -378,11 +380,11 @@ sensitivty_inset_cold_deserts<-ggplot(cold_deserts_sensitivity,aes(mm.x,coef)) +
   #geom_line(data=predict.cold_deserts.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('MAP') +
   #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  ylab('Temporal sensitivity') +
+  ylab('Sensitivity') +
   theme(
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=8),
-    axis.title = element_text(color='black',size=12),
+    axis.title = element_text(color='black',size=14),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     strip.background =element_rect(fill="white"),
@@ -402,12 +404,12 @@ sensitivity_inset_sgs<-ggplot(sgs_sensitivity,aes(mm.x,coef)) +
   #scale_x_continuous(limit=c(50,1100)) +
   #geom_line(data=predict.sgs.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('MAP') +
-  #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  ylab('Temporal sensitivity') +
+  #ylab(bquote('MAP ('*mm yr^{-1}*')')) +
+  ylab('Sensitivity') +
   theme(
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=8),
-    axis.title = element_text(color='black',size=12),
+    axis.title = element_text(color='black',size=14),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     strip.background =element_rect(fill="white"),
@@ -427,11 +429,11 @@ sensitivity_inset_northern_mixed<-ggplot(northern_mixed_sensitivity,aes(mm.x,coe
   #geom_line(data=predict.northern_mixed.slope,aes(xNew,yNew),color='red',size=1.5) +
   xlab('MAP') +
   #ylab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  ylab('Temporal sensitivity') +
+  ylab('Sensitivity') +
   theme(
     axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
     axis.text.y = element_text(color='black',size=8),
-    axis.title = element_text(color='black',size=12),
+    axis.title = element_text(color='black',size=14),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     strip.background =element_rect(fill="white"),
@@ -447,12 +449,12 @@ ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
   geom_histogram(binwidth = 0.5,color='black') +
   scale_fill_manual(name = 'Spatiotemporal model',values=c('veg'='red','no.veg'='lightblue'),
                     labels=c('veg'='With vegetation','no.veg'='Without vegetation')) +
-  xlab('Variation in NPP explained') +
+  xlab('Variation in NPP explained (%)') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=12),
-    axis.title = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=25),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     legend.title = element_text(size=17),
@@ -468,6 +470,10 @@ ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
 #plot
 
 #####bivariate versions of 3d plot figure 3a######
+
+colfunc <- colorRampPalette(c("red", "blue"))
+colfunc(10)
+plot(rep(1,10),col=colfunc(10),pch=19,cex=3)
 
 #hot deserts
 
@@ -487,17 +493,17 @@ hot_deserts_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="hot_de
 
 main_hot_deserts<-ggplot(hot_deserts_test,aes(mm.y,npp.x,fill=mm.dev)) +
   geom_point(pch=21,size=1.25,alpha=0.75,color='white') +
-  scale_fill_gradientn(colours = colfunc(10),name='Range (mm)') +
+  scale_fill_gradientn(colours = colfunc(10),name='Range (mm)',breaks=c(-200,0,200,500)) +
   geom_smooth(data = hot_deserts_fit_wet_dry_minus_100,aes(map,NPP,color='myline1'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = hot_deserts_fit_wet_dry_minus_0,aes(map,NPP, color='myline2'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = hot_deserts_fit_wet_dry_plus_200,aes(map,NPP,color='myline3' ),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  scale_colour_manual(name='Precipitation deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
+  scale_colour_manual(name='Deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
                       labels=c('myline1'='-100','myline2'= '0','myline3'='200')) + 
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=20),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
@@ -505,20 +511,22 @@ main_hot_deserts<-ggplot(hot_deserts_test,aes(mm.y,npp.x,fill=mm.dev)) +
     strip.text = element_text(size=15),
     legend.direction  = 'horizontal', 
     legend.position = 'top',
-    legend.text = element_text(size=10),
+    legend.text = element_text(size=11),
+    legend.title = element_text(size=11),
     panel.background = element_rect(fill=NA),
     legend.key.size = unit(.4, "cm"),
     legend.key.width = unit(0.7,"cm"), 
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
+    axis.line.y = element_line(colour = "black")) +
+    guides(col = guide_legend(order = 1))
 
 
 #inset plot
-vp <- viewport(width = 0.3, height = 0.27, x = 0.27,y=0.77)
+vp <- viewport(width = 0.3, height = 0.27, x = 0.28,y=0.77)
 
 #executing the inset, you create a function the utlizes all the previous code
-library(grid)
+
 
 full <- function() {
   print(main_hot_deserts)
@@ -543,25 +551,25 @@ hot_deserts_wet_map <- hot_deserts_test %>% dplyr::filter(mm.y > 550, mm.y < 650
 summary(hot_deserts_dry_map)
 
 ggplot(hot_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=hot_deserts_dry_map,aes(x=mm.dev,y=npp.x),pch=21,size=1.25,alpha=0.75,fill='white',color='red') +
-  geom_point(data=hot_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',fill='white',size=1.25,pch=21) +
-  geom_point(data=hot_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',fill='white',size=1.25,pch=21) +
-  scale_colour_manual(values=c('100'='red','300' = 'black','600'='blue'),name='Mean annual precipitation (mm)',
+  geom_point(data=hot_deserts_dry_map,aes(x=mm.dev,y=npp.x),pch=21,size=2,alpha=0.75,fill='white',color='red') +
+  geom_point(data=hot_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',fill='white',size=2,pch=21) +
+  geom_point(data=hot_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',fill='white',size=2,pch=21) +
+  scale_colour_manual(values=c('100'='red','300' = 'black','600'='blue'),name='MAP (mm)',
                       labels=c('100'='100','300'= '300','600'='600')) +
-  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
   xlim(-101,201) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
-    axis.title = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=20),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=12),
-    legend.text = element_text(size=12),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=14),
     legend.direction  = 'horizontal', 
     legend.position = 'top',
     strip.background =element_rect(fill="white"),
@@ -593,13 +601,13 @@ main_cold_deserts<-ggplot(cold_deserts_test,aes(mm.y,npp.x,fill=mm.dev)) +
   geom_smooth(data = cold_deserts_fit_wet_dry_minus_100,aes(map,NPP,color='myline1'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = cold_deserts_fit_wet_dry_minus_0,aes(map,NPP, color='myline2'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = cold_deserts_fit_wet_dry_plus_200,aes(map,NPP,color='myline3' ),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  scale_colour_manual(name='Precipitation deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
+  scale_colour_manual(name='Deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
                       labels=c('myline1'='-200','myline2'= '0','myline3'='200')) + 
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=20),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
@@ -609,7 +617,8 @@ main_cold_deserts<-ggplot(cold_deserts_test,aes(mm.y,npp.x,fill=mm.dev)) +
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
-    legend.text = element_text(size=10),
+    legend.text = element_text(size=11),
+    legend.title = element_text(size=13),
     panel.background = element_rect(fill=NA),
     legend.key.size = unit(.4, "cm"),
     legend.key.width = unit(0.7,"cm"), 
@@ -618,10 +627,10 @@ main_cold_deserts<-ggplot(cold_deserts_test,aes(mm.y,npp.x,fill=mm.dev)) +
     axis.line.y = element_line(colour = "black"))
 
 #inset plot
-vp <- viewport(width = 0.3, height = 0.27, x = 0.27,y=0.77)
+vp <- viewport(width = 0.3, height = 0.27, x = 0.28,y=0.77)
 
 #executing the inset, you create a function the utlizes all the previous code
-library(grid)
+
 
 full <- function() {
   print(main_cold_deserts)
@@ -638,34 +647,34 @@ cold_deserts_dry_map <- cold_deserts_test %>% dplyr::filter(mm.y > 89, mm.y < 11
 summary(cold_deserts_dry_map)
 
 
-cold_deserts_mean_map <- cold_deserts_test %>% dplyr::filter(mm.y = 300) 
-summary(cold_deserts_dry_map)
+cold_deserts_mean_map <- cold_deserts_test %>% dplyr::filter(mm.y > 299, mm.y < 301) 
+summary(cold_deserts_mean_map)
 
 cold_deserts_wet_map <- cold_deserts_test %>% dplyr::filter(mm.y > 875, mm.y < 925) 
 summary(cold_deserts_dry_map)
 
 #temporal dynamics
 ggplot(cold_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=cold_deserts_dry_map,aes(x=mm.dev,y=npp.x),color='red',pch=21,size=1.25,alpha=0.75,fill='white') +
-  geom_point(data=cold_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',pch=21,size=1.25,alpha=0.75,fill='white') +
-  geom_point(data=cold_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',pch=21,size=1.25,alpha=0.75,fill='white') +
-  scale_colour_manual(values=c('100'='red','300' = 'black','900'='blue'),name='Mean annual precipitation (mm)',
+  geom_point(data=cold_deserts_dry_map,aes(x=mm.dev,y=npp.x),color='red',pch=21,size=2,alpha=1,fill='white') +
+  geom_point(data=cold_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',pch=21,size=2,alpha=1,fill='white') +
+  geom_point(data=cold_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',pch=21,size=2,alpha=1,fill='white') +
+  scale_colour_manual(values=c('100'='red','300' = 'black','900'='blue'),name='MAP (mm)',
                       labels=c('100'='100','300'= '300','900'='900')) +
-  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
   xlim(-99,201) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=15),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=12),
-    legend.text = element_text(size=12),
-    legend.position = c(0.22,0.85),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=14),
+    legend.position = 'top',
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
     panel.background = element_rect(fill=NA),
@@ -685,6 +694,7 @@ cali_fit_wet_dry_minus_0<-cali_fit %>% filter(mm.dev %in% c('0'))
 #plus 400 mm slope and intercept
 cali_fit_wet_dry_plus_400<-cali_fit %>% filter(mm.dev %in% c('400'))
 
+cali_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="california_annuals")
 
 #plot spatial relationship dynamics
 main_cali<-ggplot(cali_test,aes(mm.y,npp.x,fill=mm.dev)) +
@@ -694,13 +704,13 @@ main_cali<-ggplot(cali_test,aes(mm.y,npp.x,fill=mm.dev)) +
   geom_smooth(data = cali_fit_wet_dry_minus_0,aes(map,NPP, color='myline2'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = cali_fit_wet_dry_plus_400,aes(map,NPP,color='myline3' ),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   #geom_smooth(data = cali_fit_wet_dry_3,aes(map,NPP,color=deviation),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  scale_colour_manual(name='Precipitation deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
+  scale_colour_manual(name='Deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
                       labels=c('myline1'='-200','myline2'= '0','myline3'='400')) + 
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=20),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
@@ -710,7 +720,8 @@ main_cali<-ggplot(cali_test,aes(mm.y,npp.x,fill=mm.dev)) +
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
-    legend.text = element_text(size=10),
+    legend.text = element_text(size=11),
+    legend.title = element_text(size=13),
     panel.background = element_rect(fill=NA),
     legend.key.size = unit(.4, "cm"),
     legend.key.width = unit(0.7,"cm"), 
@@ -719,10 +730,9 @@ main_cali<-ggplot(cali_test,aes(mm.y,npp.x,fill=mm.dev)) +
     axis.line.y = element_line(colour = "black"))
 
 #inset plot
-vp <- viewport(width = 0.3, height = 0.27, x = 0.27,y=0.77)
+vp <- viewport(width = 0.3, height = 0.27, x = 0.28,y=0.77)
 
 #executing the inset, you create a function the utlizes all the previous code
-library(grid)
 
 full <- function() {
   print(main_cali)
@@ -747,25 +757,25 @@ summary(cali_wet_map)
 
 #subset and get slopes and intercepts
 ggplot(cali_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=cali_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=1.25,pch=21,fill='white',alpha=0.75) +
-  geom_point(data=cali_mean_map,aes(x=mm.dev,y=npp.x),color='black',size=1.25,pch=21,fill='white',alpha=0.75) +
-  geom_point(data=cali_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=1.25,pch=21,fill='white',alpha=0.75) +
-  scale_colour_manual(values=c('200'='red','400' = 'black','800'='blue'),name='Mean annual precipitation (mm)',
+  geom_point(data=cali_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=cali_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=cali_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=2,pch=21,fill='white',alpha=1) +
+  scale_colour_manual(values=c('200'='red','400' = 'black','800'='blue'),name='MAP (mm)',
   labels=c('200'='200','400'= '400','800'='800')) +
-  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
   xlim(-199,401) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=15),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=12),
-    legend.text = element_text(size=12),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=14),
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
@@ -802,13 +812,13 @@ main_northern_mixed<-ggplot(northern_mixed_test,aes(mm.y,npp.x,fill=mm.dev)) +
   geom_smooth(data = northern_mixed_fit_wet_dry_minus_200,aes(map,NPP,color='myline1'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = northern_mixed_fit_wet_dry_minus_0,aes(map,NPP, color='myline2'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = northern_mixed_fit_wet_dry_plus_200,aes(map,NPP,color='myline3' ),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  scale_colour_manual(name='Precipitation deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
+  scale_colour_manual(name='Deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
                       labels=c('myline1'='-200','myline2'= '0','myline3'='200')) + 
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=20),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
@@ -818,7 +828,8 @@ main_northern_mixed<-ggplot(northern_mixed_test,aes(mm.y,npp.x,fill=mm.dev)) +
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
-    legend.text = element_text(size=10),
+    legend.text = element_text(size=11),
+    legend.title = element_text(size=13),
     panel.background = element_rect(fill=NA),
     legend.key.size = unit(.4, "cm"),
     legend.key.width = unit(0.7,"cm"), 
@@ -827,7 +838,7 @@ main_northern_mixed<-ggplot(northern_mixed_test,aes(mm.y,npp.x,fill=mm.dev)) +
     axis.line.y = element_line(colour = "black"))
 
 #inset
-vp <- viewport(width = 0.3, height = 0.27, x = 0.27,y=0.77)
+vp <- viewport(width = 0.3, height = 0.27, x = 0.28,y=0.77)
 
 #executing the inset, you create a function the utlizes all the previous code
 full <- function() {
@@ -850,25 +861,25 @@ northern_mixed_test_wet_map <- northern_mixed_test %>% dplyr::filter(mm.y > 850,
 summary(northern_mixed_test_wet_map)
 
 ggplot(northern_mixed_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=northern_mixed_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=1.25,pch=21,fill='white',alpha=0.75) +
-  geom_point(data=northern_mixed_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=1.25,pch=21,fill='white',alpha=0.75) +
-  geom_point(data=northern_mixed_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=1.25,pch=21,fill='white',alpha=0.75) +
-  scale_colour_manual(values=c('150'='red','400' = 'black','900'='blue'),name='Mean annual precipitation (mm)',
+  geom_point(data=northern_mixed_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=northern_mixed_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=northern_mixed_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=2,pch=21,fill='white',alpha=1) +
+  scale_colour_manual(values=c('150'='red','400' = 'black','900'='blue'),name='MAP (mm)',
                       labels=c('100'='100','300'= '300','900'='900')) +
-  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
   xlim(-201,201) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=15),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=12),
-    legend.text = element_text(size=12),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=14),
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
@@ -902,13 +913,13 @@ main_sgs<-ggplot(sgs_test,aes(mm.y,npp.x,fill=mm.dev)) +
   geom_smooth(data = sgs_fit_wet_dry_minus_200,aes(map,NPP,color='myline1'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = sgs_fit_wet_dry_minus_0,aes(map,NPP, color='myline2'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
   geom_smooth(data = sgs_fit_wet_dry_plus_200,aes(map,NPP,color='myline3' ),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  scale_colour_manual(name='Precipitation deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
+  scale_colour_manual(name='Deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
                       labels=c('myline1'='-200','myline2'= '0','myline3'='200')) + 
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=20),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
@@ -918,7 +929,8 @@ main_sgs<-ggplot(sgs_test,aes(mm.y,npp.x,fill=mm.dev)) +
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
-    legend.text = element_text(size=10),
+    legend.text = element_text(size=11),
+    legend.title = element_text(size=13),
     panel.background = element_rect(fill=NA),
     legend.key.size = unit(.4, "cm"),
     legend.key.width = unit(0.7,"cm"), 
@@ -926,7 +938,7 @@ main_sgs<-ggplot(sgs_test,aes(mm.y,npp.x,fill=mm.dev)) +
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
-vp <- viewport(width = 0.3, height = 0.27, x = 0.27,y=0.77)
+vp <- viewport(width = 0.3, height = 0.27, x = 0.28,y=0.77)
 
 #executing the inset, you create a function the utlizes all the previous code
 full <- function() {
@@ -950,25 +962,25 @@ sgs_test_wet_map <- northern_mixed_test %>% dplyr::filter(mm.y > 670, mm.y < 680
 summary(northern_mixed_test_wet_map)
 
 ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=sgs_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=1.25,pch=21,fill='white',alpha=0.75) +
-  geom_point(data=sgs_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=1.25,pch=21,fill='white',alpha=0.75) +
-  geom_point(data=sgs_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=1.25,pch=21,fill='white',alpha=0.75) +
-  scale_colour_manual(values=c('275'='red','425' = 'black','675'='blue'),name='Mean annual precipitation (mm)',
+  geom_point(data=sgs_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=sgs_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=sgs_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=2,pch=21,fill='white',alpha=1) +
+  scale_colour_manual(values=c('275'='red','425' = 'black','675'='blue'),name='MAP (mm)',
                       labels=c('275'='275','425'= '425','675'='675')) +
-  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
   xlim(-201,201) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
     axis.title = element_text(color='black',size=15),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=12),
-    legend.text = element_text(size=12),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=14),
     legend.direction  = 'horizontal', 
     legend.position = 'top',
     strip.background =element_rect(fill="white"),
@@ -980,31 +992,55 @@ ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
 
 
 #### spatial and temporal slopes by veg types #########
-ggplot(coefficients_wide_map_ordered,aes(x=temporal_sensitivity,fill=site)) +
-  #geom_histogram(binwidth = .001,color='black') +
-  #geom_vline(xintercept=0,color='red',size=1.5) +
-  geom_density(color='black',alpha=0.75) +
+
+#spatial slopes
+ggplot(coefficients_wide_map_ordered,aes(x=Spatial,fill=site)) +
+  geom_density(color='black',alpha=0.75,aes(y=..scaled..)) +
   #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
   scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
                              california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
                     labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
-                            california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
-  #xlab(bquote('Spatial sensitivity ('*g/m^2/mm*')')) +
-  xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  #xlab('Change in sensitivity per mm of MAP') +
+                             california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
+  xlab(bquote('Spatial sensitivity ('*g/m^2/mm*')')) +
   ylab('') +
   #scale_x_continuous(expand = c(0,0),limits=c(0,0.85)) +
   #scale_y_continuous(expand = c(0,0),limits=c(0,400)) +
   theme(
-    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=12),
-    axis.title = element_text(color='black',size=15),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=25),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=12),
+    legend.position = 'top',
+    #legend.direction  = 'horizontal', 
+    #legend.position = c(0.95,0.85),
+    #legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+#temporal slopes
+ggplot(coefficients_wide_map_ordered,aes(x=temporal_sensitivity,fill=site)) +
+  geom_density(color='black',alpha=0.75,aes(y=..scaled..)) +
+  scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
+                             california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
+                    labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
+                            california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
+  xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=25),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     legend.title = element_blank(),
     legend.text = element_text(size=17),
-    #legend.position = c(0.82,0.95),
-    #legend.position = c(0.82,0.85),
     legend.position = "none",
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
@@ -1012,6 +1048,35 @@ ggplot(coefficients_wide_map_ordered,aes(x=temporal_sensitivity,fill=site)) +
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
+
+#spatiotemporal interaction
+head(coefficients_wide_map_ordered)
+ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal,fill=site)) +
+  geom_vline(xintercept=0,color='red',size=1.5) +
+  geom_density(color='black',alpha=0.75,aes(y=..scaled..)) +
+  scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
+                             california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
+                    labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
+                             california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
+  xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
+  xlab('Change in sensitivity per mm of MAP') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=23),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
 
 ###########temporal variation in vegetation cover among veg types #########
 
@@ -1183,105 +1248,3 @@ ggplot(sgs_cover_3,aes(Year,Cover,color=as.factor(group))) +
     axis.line.y = element_line(colour = "black"))
 
 
-########test with color ramps############
-
-library(colorRamps)
-colfunc<-colorRampPalette(c("red","royalblue"))
-plot(rep(1,50),col=(colfunc(50)), pch=19,cex=2)
-#playing around with California
-break_cali_npp_test<-quantile(cali_test$mm.dev,seq(from=0.1, to = .99,by=0.1),na.rm=TRUE)
-cali_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="california_annuals")
-head(cali_test)
-hist(cali_test$mm.dev)
-
-#select specific columns
-cali_filtered <- cali_test %>% 
-  select(x, y,region.x,year,mm.x,npp.x,mm.y,mm.dev)
-write.csv(cali_filtered,file='california_raw_toy_data.csv')
-
-cali_test_2 <- cali_test %>% dplyr::filter(mm.dev > -201, mm.dev < 401) %>%
-              dplyr::filter(mm.y > 100, mm.y < 1000)
-
-cali_dry_map <- cali_test %>% dplyr::filter(mm.y > 189, mm.y < 211) 
-  summary(cali_dry_map)
-  
-  
-cali_mean_map <- cali_test %>% dplyr::filter(mm.y > 389, mm.y < 411) 
-  summary(cali_mean_map)
-  
-cali_wet_map <- cali_test %>% dplyr::filter(mm.y > 775, mm.y < 825) 
-  summary(cali_wet_map)
-  
-hist(cali_test_2$mm.dev)
-summary(cali_test_2)
-cali_test_2 = cali_test %>% filter(mm.dev == quantile(cali_test$mm.dev,0.90))
-
-cali_fit_dry_year<-subset(cali_fit)
-
-#plot spatial relationship dynamics
-ggplot(cali_test,aes(mm.y,npp.x,color=mm.dev)) +
-  geom_point(pch=21,size=1) +
-  scale_colour_gradientn(colours = colfunc(10)) +
-  geom_smooth(data = cali_fit_wet_dry,aes(map,NPP),method='lm',se=FALSE,size=3,fullrange=TRUE,color='red') +
-  
-  geom_abline(intercept=71.91,slope=0.53,lwd=3,col='red') +
-  geom_abline(intercept=140.8,slope=0.44,lwd=3,col='black') +
-  geom_abline(intercept=278.5,slope=0.25,lwd=3,col='blue') +
-  xlab('') +
-  ylab('') +
-  theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
-    axis.title = element_text(color='black',size=20),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    legend.position = c('none'),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
-cali_fit_wet_dry_3<-cali_fit %>% filter(mm.dev %in% c('-200','0','400'))
-
-cali_fit_wet_dry_3$deviation <- cali_fit_wet_dry_3$mm.dev
-ggplot() +
-  geom_smooth(data = cali_fit_wet_dry_3,aes(map,NPP,color=as.factor(deviation),method='lm',se=FALSE,size=3,fullrange=TRUE)) +
-  scale_colour_manual(values=c('-200'='red','0' = 'black','400'='blue'),name='Precipitation deviation',
-                      labels=c('-200'='-200 mm','0'= '0 mm','400'='+400 mm')) +
-  geom_point(data=cali_test,aes(x=mm.y,y=npp.x,color=as.continuous(mm.dev)),size=1,pch=21) +
-    + scale_colour_gradientn(colours = colfunc(10)) +
-  
-
-ggplot(cali_fit_wet_dry_3,aes(map,NPP,color=as.factor(mm.dev))) +
-  geom_point(data=cali_test,aes(x=mm.y,y=npp.x),color='black',size=1,pch=21) + scale_colour_gradientn(colours = colfunc(10)) +
-  #geom_point(data=cali_test_3,aes(x=mm.dev,y=npp.x),color='red',size=.1) +
-  #geom_point(data=cali_test,aes(x=mm.y,y=npp.x,color=mm.dev),size=1,pch=21) + scale_colour_gradientn(colours = colfunc(10)) +
-  #geom_point(data=cali_mean_map,aes(x=mm.dev,y=npp.x),color='black',size=1,pch=21) +
-  #geom_point(data=cali_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=1,pch=21) +
-  #scale_colour_manual(values=c('-200'='red','0'='black','400'='blue'),name='Precipitation deviation',
-  # labels=c('-200'='-200 mm','0'='0 mm','400'='+400 mm')) +
-  scale_colour_manual(values=c('-200'='red','0' = 'black','400'='blue'),name='Precipitation deviation',
-                      labels=c('200'='-200 mm','0'= '0 mm','400'='+400 mm')) +
-  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  xlim(-199,401) +
-  #ggtitle('hot deserts') +
-  xlab('') +
-  ylab('') +
-  theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
-    axis.title = element_text(color='black',size=15),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    #legend.title = element_blank(),
-    legend.title = element_text(size=14),
-    legend.text = element_text(size=14),
-    legend.position = c(0.8,0.1),
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
