@@ -127,7 +127,7 @@ head(coefficients_wide_map)
 coefficients_wide_map$temporal_sensitivity <-
   coefficients_wide_map$Temporal + coefficients_wide_map$Spatiotemporal*coefficients_wide_map$map
 
-#check 95% CI
+####check 95% CI########
 error.95 <-function(x) {
   n = length(x)
   std.error = sd(x)/sqrt(n)
