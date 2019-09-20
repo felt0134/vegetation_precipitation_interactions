@@ -127,6 +127,10 @@ head(coefficients_wide_map)
 coefficients_wide_map$temporal_sensitivity <-
   coefficients_wide_map$Temporal + coefficients_wide_map$Spatiotemporal*coefficients_wide_map$map
 
+mean.temporal<-aggregate(temporal_sensitivity ~site,mean,data=coefficients_wide_map)
+mean.spatial<-aggregate(Spatial ~site,mean,data=coefficients_wide_map)
+mean.spatiotemporal<-aggregate(Spatiotemporal ~site,mean,data=coefficients_wide_map)
+
 ####check 95% CI########
 error.95 <-function(x) {
   n = length(x)
@@ -138,6 +142,8 @@ error.95 <-function(x) {
 ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
 mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
 mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
+
+
 #####coefficient of determination#########
 
 #veg
@@ -155,3 +161,8 @@ r.square.noveg.binded$model <- 'no.veg'
 bind.veg.noveg<-rbind(r.square.noveg.binded,r.square.veg.binded)
 head(bind.veg.noveg)
 bind.veg.noveg$var <- bind.veg.noveg$r.square*100
+
+summary(bind.veg.noveg)
+head(bind.veg.noveg)
+var.means<-aggregate(var~model,mean,data=bind.veg.noveg)
+(83.02-54.38)/54.38
