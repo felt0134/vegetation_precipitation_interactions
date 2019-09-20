@@ -466,8 +466,6 @@ ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
-#####other#########
-#plot
 
 #####bivariate versions of 3d plot figure 3a######
 
@@ -990,6 +988,7 @@ ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
+citation()
 
 #### spatial and temporal slopes by veg types #########
 
@@ -1013,10 +1012,10 @@ ggplot(coefficients_wide_map_ordered,aes(x=Spatial,fill=site)) +
     legend.key = element_blank(),
     legend.title = element_blank(),
     legend.text = element_text(size=12),
-    legend.position = 'top',
+    #legend.position = 'top',
     #legend.direction  = 'horizontal', 
     #legend.position = c(0.95,0.85),
-    #legend.position = "none",
+    legend.position = "none",
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
     panel.background = element_rect(fill=NA),
