@@ -130,19 +130,21 @@ coefficients_wide_map$temporal_sensitivity <-
 mean.temporal<-aggregate(temporal_sensitivity ~site,mean,data=coefficients_wide_map)
 mean.spatial<-aggregate(Spatial ~site,mean,data=coefficients_wide_map)
 mean.spatiotemporal<-aggregate(Spatiotemporal ~site,mean,data=coefficients_wide_map)
+mean.temporal.zero<-aggregate(Temporal ~site,mean,data=coefficients_wide_map)
 
 ####check 95% CI########
+#95 CI from a normal distribution
 error.95 <-function(x) {
   n = length(x)
-  std.error = sd(x)/sqrt(n)
-  error <- qnorm(0.975)*se(x)
+  se = sd(x)/sqrt(n)
+  error <- qnorm(0.975)*se
   return(error)
 }
 
-ci.site<-aggregate(slope~site,error.95,data=data_long_temporal_spatial)
-mean.site<-aggregate(slope~site,mean,data=data_long_temporal_spatial)
-mean.ci.site.temporal.spatial.slope<-merge(ci.site,mean.site,by='site')
-
+ci.spatial<-aggregate(Spatial~site,error.95,data=coefficients_wide_map)
+ci.spatiotemporal<-aggregate(Spatiotemporal~site,error.95,data=coefficients_wide_map)
+ci.temporal<-aggregate(temporal_sensitivity~site,error.95,data=coefficients_wide_map)
+ci.temporal.zero<-aggregate(Temporal~site,error.95,data=coefficients_wide_map)
 
 #####coefficient of determination#########
 

@@ -498,7 +498,7 @@ ggplot(data_long_hot_deserts_cover,aes(Year,cover,color=Vegetation)) +
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     legend.title = element_blank(),
-    legend.text = element_text(size=17),
+    legend.text = element_text(size=30),
     legend.position = c(0.6,0.75),
     #legend.position = c(0.82,0.85),
     #legend.position = "none",
