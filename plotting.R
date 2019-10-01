@@ -489,7 +489,7 @@ hot_deserts_fit_wet_dry_plus_200<-hot_deserts_fit %>% filter(mm.dev %in% c('200'
 #subset to hot deserts
 hot_deserts_test<-subset(rangeland_npp_covariates_deviations_1,region.x=="hot_deserts")
 
-main_hot_deserts<-ggplot(hot_deserts_test,aes(mm.y,npp.x,fill=mm.dev)) +
+main_hot_deserts<-ggplot(hot_deserts_fit_wet_dry_2,aes(mm.y,npp.x,fill=mm.dev)) +
   geom_point(pch=21,size=1.25,alpha=0.75,color='white') +
   scale_fill_gradientn(colours = colfunc(10),name='Range (mm)',breaks=c(-200,0,200,500)) +
   geom_smooth(data = hot_deserts_fit_wet_dry_minus_100,aes(map,NPP,color='myline1'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
@@ -534,7 +534,7 @@ full()
 
 
 #dynamics of the temporal model
-hot_deserts_fit_wet_dry_2<-hot_deserts_fit %>% filter(map %in% c('100','300','600'))
+hot_deserts_fit_wet_dry_2<-hot_deserts_fit %>% filter(map %in% c('100','300','500'))
 
 
 #select specific columns
@@ -545,15 +545,15 @@ summary(hot_deserts_dry_map)
 hot_deserts_mean_map <- hot_deserts_test %>% dplyr::filter(mm.y > 299,mm.y <301) 
 summary(hot_deserts_dry_map)
 
-hot_deserts_wet_map <- hot_deserts_test %>% dplyr::filter(mm.y > 550, mm.y < 650) 
+hot_deserts_wet_map <- hot_deserts_test %>% dplyr::filter(mm.y > 475, mm.y < 525) 
 summary(hot_deserts_dry_map)
 
 ggplot(hot_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
   geom_point(data=hot_deserts_dry_map,aes(x=mm.dev,y=npp.x),pch=21,size=2,alpha=0.75,fill='white',color='red') +
-  geom_point(data=hot_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',fill='white',size=2,pch=21) +
-  geom_point(data=hot_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',fill='white',size=2,pch=21) +
-  scale_colour_manual(values=c('100'='red','300' = 'black','600'='blue'),name='MAP (mm)',
-                      labels=c('100'='100','300'= '300','600'='600')) +
+  geom_point(data=hot_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',fill='white',size=2,pch=21,alpha=0.75) +
+  geom_point(data=hot_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',fill='white',size=2,pch=21,alpha=0.75) +
+  scale_colour_manual(values=c('100'='red','300' = 'black','500'='blue'),name='MAP (mm)',
+                      labels=c('100'='100','300'= '300','500'='500')) +
   geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
   xlim(-101,201) +
   #ggtitle('hot deserts') +
@@ -1245,5 +1245,50 @@ ggplot(sgs_cover_3,aes(Year,Cover,color=as.factor(group))) +
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
+
+
+#hot deserts binned code...
+
+main_hot_deserts<-ggplot(hot_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
+  geom_point(data=hot_deserts_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=1,alpha=0.75,fill='white',color='red') +
+  geom_point(data=hot_deserts_mean_year,aes(x=mm.y,y=npp.x),color='gray47',fill='white',size=1,pch=21,alpha=0.75) +
+  geom_point(data=hot_deserts_wet_year,aes(x=mm.y,y=npp.x),color='blue',fill='white',size=1,pch=21,alpha=0.75) +
+  scale_colour_manual(values=c('-100'='red','0' = 'black','200'='blue'),name='Deviation (mm)',
+                      labels=c('100'='-100','0'= '0','200'='200')) +
+  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  xlim(100,500) +
+  #ggtitle('hot deserts') +
+  xlab('') +
+  ylab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    #legend.title = element_blank(),
+    legend.title = element_text(size=15),
+    legend.text = element_text(size=14),
+    legend.direction  = 'horizontal', 
+    legend.position = 'top',
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+hot_deserts_fit_wet_dry<-hot_deserts_fit %>% filter(mm.dev %in% c('-100','0','200'))
+
+#select specific columns
+hot_deserts_dry_year <- hot_deserts_test %>% dplyr::filter(mm.dev > -105, mm.dev < -95 ) 
+summary(hot_deserts_test)
+plot(npp.x~mm.y,data=hot_deserts_dry_year)
+
+hot_deserts_mean_year <- hot_deserts_test %>% dplyr::filter(mm.dev > -5,mm.dev < 5) 
+summary(hot_deserts_dry_map)
+
+hot_deserts_wet_year <- hot_deserts_test %>% dplyr::filter(mm.dev > 195, mm.dev < 205) 
+summary(hot_deserts_dry_map) 
 
 
