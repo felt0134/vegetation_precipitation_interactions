@@ -557,3 +557,142 @@ spplot(hot_deserts_shape_raster,#scales = list(draw = TRUE),
          rev(topo.colors(length(break_mean_ppt_deserts)-1)),
        main="") +
   latticeExtra::layer(sp.polygons(dat.poly, lwd = 1))
+
+####create shapefiles of different sensitivity levels in california####
+
+head(cali_annuals_sensitivity) #from the plotting script - temporal sensitivities across cali annuals ecoregion
+summary(cali_annuals_sensitivity)
+cali_annuals_sensitivity_2<-cali_annuals_sensitivity[-c(3,4)]
+head(cali_annuals_sensitivity_2)
+0.5-(-.13)
+cali_0.1<- cali_annuals_sensitivity_2 %>% filter(coef < 0.1)
+head(cali_low)
+cali_0.2<- cali_annuals_sensitivity_2 %>% filter(coef > 0.1, coef < 0.2)
+summary(cali_0.2)
+cali_0.3<- cali_annuals_sensitivity_2 %>% filter(coef > 0.2, coef < 0.3)
+cali_0.4<- cali_annuals_sensitivity_2 %>% filter(coef > 0.3, coef < 0.4)
+cali_0.5<- cali_annuals_sensitivity_2 %>% filter(coef > 0.4, coef < 0.51)
+
+#turn into shapefiles...
+#below 0.1 sensitivity
+cali_0.1_raster<-rasterFromXYZ(cali_0.1)
+plot(cali_0.1_raster)
+ca.1 <- cali_0.1_raster> -Inf
+
+ca.1_shp<-rasterToPolygons(ca.1, dissolve=TRUE)
+plot(ca.1_shp)
+crs(ca.1_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(ca.1_shp, dsn=getwd(),layer="california_annuals.1_shp",driver="ESRI Shapefile")
+
+#below 0.2 sensitivity
+cali_0.2_raster<-rasterFromXYZ(cali_0.2)
+plot(cali_0.2_raster)
+ca.2 <- cali_0.2_raster> -Inf
+
+ca.2_shp<-rasterToPolygons(ca.2, dissolve=TRUE)
+plot(ca.2_shp)
+crs(ca.2_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(ca.2_shp, dsn=getwd(),layer="california_annuals.2_shp",driver="ESRI Shapefile")
+
+#below 0.3 sensitivity
+cali_0.3_raster<-rasterFromXYZ(cali_0.3)
+plot(cali_0.3_raster)
+ca.3 <- cali_0.3_raster> -Inf
+
+ca.3_shp<-rasterToPolygons(ca.3, dissolve=TRUE)
+plot(ca.3_shp)
+crs(ca.3_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(ca.3_shp, dsn=getwd(),layer="california_annuals.3_shp",driver="ESRI Shapefile")
+
+#below 0.4 sensitivity
+cali_0.4_raster<-rasterFromXYZ(cali_0.4)
+plot(cali_0.4_raster)
+ca.4 <- cali_0.4_raster> -Inf
+
+ca.4_shp<-rasterToPolygons(ca.4, dissolve=TRUE)
+plot(ca.4_shp)
+crs(ca.4_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(ca.4_shp, dsn=getwd(),layer="california_annuals.4_shp",driver="ESRI Shapefile")
+
+#below 0.5 sensitivity
+cali_0.5_raster<-rasterFromXYZ(cali_0.5)
+plot(cali_0.5_raster)
+ca.5 <- cali_0.5_raster> -Inf
+
+ca.5_shp<-rasterToPolygons(ca.5, dissolve=TRUE)
+plot(ca.5_shp)
+crs(ca.5_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(ca.5_shp, dsn=getwd(),layer="california_annuals.5_shp",driver="ESRI Shapefile")
+
+#read in cover datasets
+library(plyr)
+library(readr)
+#below 0.4 sensitivity
+setwd("~/Desktop")
+mydir = "G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/Shapefiles_From_Cleaned_NPP_Data/California_sensitivity_levels/cal_sensitivity_cover_datasets"
+myfiles = list.files(path=mydir, pattern="*.csv", full.names=TRUE)
+myfiles
+dat_csv = ldply(myfiles, read_csv)
+as.data.frame(dat_csv)
+str(dat_csv)
+head(dat_csv)
+mean(dat_csv$`Tree cover`)
+plot(`Tree cover` ~ sensitivity,data=dat_csv)
+summary(cali_0.5)
+
+#upload insidivually to add mean sensitivities
+#0.1
+summary(cali_0.1)
+cali.01.cover<-read.csv(myfiles[1])
+cali.01.cover$sensitivity.2 <- '0.057'
+#0.2
+summary(cali_0.2)
+cali.02.cover<-read.csv(myfiles[2])
+cali.02.cover$sensitivity.2 <- '0.14'
+#0.3
+summary(cali_0.3)
+cali.03.cover<-read.csv(myfiles[3])
+cali.03.cover$sensitivity.2 <- '0.24'
+#0.4
+summary(cali_0.4)
+cali.04.cover<-read.csv(myfiles[4])
+cali.04.cover$sensitivity.2 <- '0.35'
+#0.5
+summary(cali_0.5)
+cali.05.cover<-read.csv(myfiles[5])
+cali.05.cover$sensitivity.2 <- '0.45'
+str(cali.01.cover)
+#merge all of them
+cali_cover_2<-rbind(cali.01.cover,cali.02.cover)
+head(cali_cover_2)
+cali_cover_2<-rbind(cali_cover_2,cali.03.cover)
+cali_cover_3<-rbind(cali_cover_2,cali.04.cover)
+cali_cover_4<-rbind(cali_cover_3,cali.05.cover)
+
+#plot it
+library(ggplot2)
+ggplot(cali_cover_4,aes(sensitivity.2,Annual.forb...grass.cover)) +
+  #geom_point(size=1,pch=1) +
+  geom_point(size=5,pch=21,fill='white',color='black') +
+  geom_smooth(method='lm',formula=y~x) +
+  ylab('% Annual grass/forb cover') +
+  xlab(bquote('Temporal NPP sensitivity ('*g/m^2/mm*')')) +
+  #ylab('Sensitivity') +
+  theme(
+    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=23),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
