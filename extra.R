@@ -127,22 +127,7 @@ par(mar=c(1,1,1,1))
  
  plot(mean_mm_raster)
  
-crop_mm_raster<-crop(mean_mm_raster,extent(states_all_sites)) 
-#you'll want to modify many of the options on the plot function here to make it nice.  I don't like the default legend, so I suppress it, and wrote the function below to draw a more approachable legend:
-
-color.bar <- function(lut, min, max=-min, nticks=11, ticks=seq(min, max, len=nticks), ticLABS=NULL,title='') {
-scale = (length(lut))
-ifelse(is.null(ticLABS), ticLABELS <- prettyNum(signif(ticks, 2)), ticLABELS <- ticLABS) 
-
-plot(c(0,1), c(0,1), type='n', bty='n', xaxt='n', xlab='', yaxt='n', ylab='', main=title)
-axis(2, at=seq(0, 1, len=nticks), labels=ticLABELS, las=2)
-
-for (i in 1:(length(lut))) {
-y = (i-1)/scale #+ min
-rect(0,y,10,y+1/scale, col=lut[i], border=NA)
-}
-}
-
+#
 
 
 #For the isolines, I don't have a ready example, but I think this function might be what you need: https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/kde2d.html
@@ -159,7 +144,48 @@ latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2,fill='firebrick3', lwd = 
 latticeExtra::layer(sp.polygons(Grama.Galleta.Steppe.shape.2, fill='firebrick3', lwd = 0.1))
 
 
---------------------------------------------------------------------------------------------------------
-  
-  
-  
+###2 dimensial kernal density
+
+library(MASS)
+head(hot_deserts_test)
+myPal <- colorRampPalette(c("white","blue","gold", "orange", "red"))
+dens <- kde2d(hot_deserts_test$mm.y, hot_deserts_test$npp.x)
+image(dens, col=transp(myPal(300),.7), add=TRUE) 
+contour(dens, add=T) 
+filled.contour(dens,color.palette=colorRampPalette(c('white','blue','yellow','red','darkred')))
+
+ggplot(data=hot_deserts_test,aes(mm.y,npp.x)) + 
+  #geom_point(size=.01) +
+  #stat_density2d(aes(fill=..level..,alpha=..level..),geom='polygon',colour='black') + 
+  stat_density_2d(aes(fill = stat(nlevel)),geom = "polygon",size=.1,colour='black') +
+  scale_fill_viridis_c() +
+  #scale_fill_continuous(low="green",high="red") +
+  filled.contour(dens,color.palette=colorRampPalette(c('white','blue','yellow','red','darkred'))) +
+  geom_smooth(data = hot_deserts_fit_wet_dry_minus_100,aes(map,NPP,color='myline1'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(data = hot_deserts_fit_wet_dry_minus_0,aes(map,NPP, color='myline2'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(data = hot_deserts_fit_wet_dry_plus_200,aes(map,NPP,color='myline3' ),method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  #geom_smooth(method=lm,linetype=2,colour="red",se=F) + 
+  guides(alpha="none") +
+  scale_colour_manual(name='Deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
+                      labels=c('myline1'='-100','myline2'= '0','myline3'='200')) + 
+  ylab('NPP') +
+  xlab('MAP') +
+  theme(
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=20),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.direction  = 'horizontal', 
+    legend.position = 'top',
+    legend.text = element_text(size=11),
+    legend.title = element_text(size=11),
+    panel.background = element_rect(fill=NA),
+    legend.key.size = unit(.4, "cm"),
+    legend.key.width = unit(0.7,"cm"), 
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black")) +
+  guides(col = guide_legend(order = 1))
