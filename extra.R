@@ -83,7 +83,7 @@ proj4string(mean_mm_raster)<-CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +l
  
 r.range <- round(c(minValue(mean_mm_raster), maxValue(mean_mm_raster)))
 
-plot(crop_mm_raster,breaks = bks_map,axes=F,col = bkcols.precip,
+plot(crop_mm_raster,breaks = bks_map,axes=F,box=F,col = bkcols.precip,
      legend.width=2,
      axis.args=list(at=seq(r.range[1], r.range[2], 100),
                                        labels=seq(r.range[1], r.range[2], 100),
@@ -99,7 +99,7 @@ proj4string(mean_production_raster)<-CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat
 
 r.range.npp <- round(c(minValue(mean_production_raster), maxValue(mean_production_raster)))
 
-plot(mean_production_raster,breaks = bks_npp,axes=F,col = bkcols.npp,
+plot(mean_production_raster,breaks = bks_npp,box=F,axes=F,col = bkcols.npp,
      legend.width=2,
      axis.args=list(at=seq(r.range.npp[1], r.range.npp[2], 100),
                     labels=seq(r.range.npp[1], r.range.npp[2], 100),
@@ -111,20 +111,22 @@ plot(mean_production_raster)
 #sensitivity to precip
 sensitivity=c("purple",'cyan3','green','yellow','orange','red')
 bkcols.sensitivity <- colorRampPalette(sensitivity)(length(bks)-1)
-r.range <- round(c(minValue(sensitivity_raster), maxValue(sensitivity_raster),0.001))
+r.range.sens <- round(c(minValue(sensitivity_raster), maxValue(sensitivity_raster)),digits=2)
 
-plot(sensitivity_raster,breaks = bks,axes=F,box=T,col = bkcols.sensitivity,
+plot(sensitivity_raster,breaks = bks,axes=F,box=F,col = bkcols.sensitivity,
      legend.width=2,
-     axis.args=list(at=seq(r.range[1], r.range[2], 0.05),
-                    labels=seq(r.range[1], r.range[2], 0.05),
+     axis.args=list(at=seq(r.range.sens[1], r.range.sens[2], 0.1),
+                    labels=seq(r.range.sens[1], r.range.sens[2], 0.1),
                     cex.axis=0.6),
      legend.args=list(text='', side=4, font=2, line=2.5, cex=0.8))
-plot(states_all_sites, lwd = 1,add=TRUE)
-
- 
+plot(states_all_sites,lwd = 1,add=TRUE)
+box(lty = '1373', col = 'red')
+e<-extent(sensitivity_raster)
+test_crop<-crop(states_all_sites,e)
+plot(test_crop)
 states_all_sites
 par(mar=c(1,1,1,1))
- 
+par(mar=c(0,0,0,0))
  plot(mean_mm_raster)
  
 #
