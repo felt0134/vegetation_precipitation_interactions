@@ -87,7 +87,7 @@ wd_cover_means<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_S
 
 #Cali annuals
 cali_cover<-read.csv(file.path(wd_cover_means, "california_annuals_cover_estimates.csv"))
-cali_cover$region<-'cali_annuals'
+cali_cover$region<-'hot_deserts'
 
 #cold deserts
 northern_mixed_cover<-read.csv(file.path(wd_cover_means, "northern_mixed_cover.csv"))
@@ -277,7 +277,7 @@ wd_cover_means_clean<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands
 
 #Cali annuals
 cali_cover<-read.csv(file.path(wd_cover_means_clean, "California_Annuals_Cover_cleaned.csv"))
-cali_cover$region<-'cali_annuals'
+cali_cover$region<-'hot_deserts'
 
 #cold deserts
 cold_deserts_cover<-read.csv(file.path(wd_cover_means_clean, "cold_deserts_cover_cleaned.csv"))
@@ -560,12 +560,12 @@ spplot(hot_deserts_shape_raster,#scales = list(draw = TRUE),
 
 ####create shapefiles of different sensitivity levels in california####
 
-head(cali_annuals_sensitivity) #from the plotting script - temporal sensitivities across cali annuals ecoregion
-summary(cali_annuals_sensitivity)
-cali_annuals_sensitivity_2<-cali_annuals_sensitivity[-c(3,4)]
-head(cali_annuals_sensitivity_2)
+head(hot_deserts_sensitivity) #from the plotting script - temporal sensitivities across cali annuals ecoregion
+summary(hot_deserts_sensitivity)
+hot_deserts_sensitivity_2<-hot_deserts_sensitivity[-c(3,4)]
+head(hot_deserts_sensitivity_2)
 0.5-(-.13)
-cali_0.1<- cali_annuals_sensitivity_2 %>% filter(coef < 0.1)
+cali_0.1<- hot_deserts_sensitivity_2 %>% filter(coef < 0.1)
 head(cali_low)
 cali_0.2<- cali_annuals_sensitivity_2 %>% filter(coef > 0.1, coef < 0.2)
 summary(cali_0.2)
@@ -676,17 +676,147 @@ cali_cover_4<-rbind(cali_cover_3,cali.05.cover)
 
 #plot it
 library(ggplot2)
-ggplot(cali_cover_4,aes(sensitivity.2,Annual.forb...grass.cover)) +
+ggplot(cali_cover_4,aes(as.numeric(sensitivity.2),as.numeric(Tree.cover))) +
   #geom_point(size=1,pch=1) +
   geom_point(size=5,pch=21,fill='white',color='black') +
-  geom_smooth(method='lm',formula=y~x) +
-  ylab('% Annual grass/forb cover') +
-  xlab(bquote('Temporal NPP sensitivity ('*g/m^2/mm*')')) +
+  geom_smooth(method = 'lm', formula = y ~ poly(x,2),size=1) +
+  ylab('% Tree cover') +
+  #xlab(bquote('Temporal NPP sensitivity ('*g/m^2/mm*')')) +
+  scale_x_continuous(limits = c(0, 0.5)) +
+  xlab('') +
+  theme(
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=25),
+    #axis.title.x = element_text(color='black',size=25),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    legend.position = c('none'),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
+
+
+####create shapefiles of different sensitivity levels in hot_deserts####
+
+head(hot_deserts_sensitivity) #from the plotting script - temporal sensitivities across cali annuals ecoregion
+summary(hot_deserts_sensitivity)
+hot_deserts_sensitivity_2<-hot_deserts_sensitivity[-c(3,4)]
+head(hot_deserts_sensitivity_2)
+0.5-(-.13)
+hd_0.1<- hot_deserts_sensitivity_2 %>% filter(coef < 0.1)
+head(hd_0.1)
+summary(hd_0.1)
+hd_0.2<- hot_deserts_sensitivity_2 %>% filter(coef > 0.1, coef < 0.2)
+summary(hd_0.2)
+hd_0.3<- hot_deserts_sensitivity_2 %>% filter(coef > 0.2, coef < 0.3)
+summary(hd_0.3)
+hd_0.4<- hot_deserts_sensitivity_2 %>% filter(coef > 0.3, coef < 0.4)
+summary(hd_0.4)
+#turn into shapefiles...
+#below 0.1 sensitivity
+hd_0.1_raster<-rasterFromXYZ(hd_0.1)
+plot(hd_0.1_raster)
+hd.1 <- hd_0.1_raster> -Inf
+
+hd.1_shp<-rasterToPolygons(hd.1, dissolve=TRUE)
+plot(hd.1_shp)
+crs(hd.1_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(hd.1_shp, dsn=getwd(),layer="hot_deserts.1_shp",driver="ESRI Shapefile")
+
+#below 0.2 sensitivity
+hd_0.2_raster<-rasterFromXYZ(hd_0.2)
+plot(hd_0.2_raster)
+hd.2 <- hd_0.2_raster> -Inf
+
+hd.2_shp<-rasterToPolygons(hd.2, dissolve=TRUE)
+plot(hd.2_shp)
+crs(hd.2_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(hd.2_shp, dsn=getwd(),layer="hot_deserts.2_shp",driver="ESRI Shapefile")
+
+#below 0.3 sensitivity
+hd_0.3_raster<-rasterFromXYZ(hd_0.3)
+plot(hd_0.3_raster)
+hd.3 <- hd_0.3_raster> -Inf
+
+hd.3_shp<-rasterToPolygons(hd.3, dissolve=TRUE)
+plot(hd.3_shp)
+crs(hd.3_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(hd.3_shp, dsn=getwd(),layer="hot_deserts.3_shp",driver="ESRI Shapefile")
+
+#below 0.4 sensitivity
+hd_0.4_raster<-rasterFromXYZ(hd_0.4)
+plot(hd_0.4_raster)
+hd.4 <- hd_0.4_raster> -Inf
+
+hd.4_shp<-rasterToPolygons(hd.4, dissolve=TRUE)
+plot(hd.4_shp)
+crs(hd.4_shp) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+writeOGR(hd.4_shp, dsn=getwd(),layer="hot_deserts.4_shp",driver="ESRI Shapefile")
+
+
+#read in cover datasets
+library(plyr)
+library(readr)
+#below 0.4 sensitivity
+setwd("~/Desktop")
+mydir.hd = "G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/Shapefiles_From_Cleaned_NPP_Data/hot_deserts_sensitivity_levels/hd_sensitivity_cover_datasets"
+myfiles.hd = list.files(path=mydir.hd, pattern="*.csv", full.names=TRUE)
+myfiles.hd
+dat_csv.hd = ldply(myfiles.hd, read_csv)
+as.data.frame(dat_csv.hd)
+str(dat_csv)
+head(dat_csv.hd)
+plot(`Perennial forb & grass cover` ~ sensitivity,data=dat_csv.hd)
+summary(cali_0.5)
+
+#upload insidivually to add mean sensitivities
+#0.1
+summary(hd_0.1)
+hd.01.cover<-read.csv(myfiles.hd[1])
+hd.01.cover$sensitivity.2 <- '0.077'
+#0.2
+summary(hd_0.2)
+hd.02.cover<-read.csv(myfiles.hd[2])
+hd.02.cover$sensitivity.2 <- '0.15'
+#0.3
+summary(hd_0.3)
+hd.03.cover<-read.csv(myfiles.hd[3])
+hd.03.cover$sensitivity.2 <- '0.24'
+#0.4
+summary(hd_0.4)
+hd.04.cover<-read.csv(myfiles.hd[4])
+hd.04.cover$sensitivity.2 <- '0.33'
+
+#merge all of them
+hd_cover_2<-rbind(hd.01.cover,hd.02.cover)
+head(hd_cover_2)
+hd_cover_2<-rbind(hd_cover_2,hd.03.cover)
+hd_cover_3<-rbind(hd_cover_2,hd.04.cover)
+
+#plot it
+library(ggplot2)
+ggplot(hd_cover_3,aes(as.numeric(sensitivity.2),as.numeric(Perennial.forb...grass.cover))) +
+  #geom_point(size=1,pch=1) +
+  geom_point(size=5,pch=21,fill='white',color='black') +
+  geom_smooth(method = 'lm', formula = y ~ poly(x,2),size=1) +
+  ylab('% Perennial grass and forb cover') +
+  scale_y_continuous(limits = c(8, 35)) +
+  #xlab(bquote('Temporal NPP sensitivity ('*g/m^2/mm*')')) +
+  xlab('') +
   #ylab('Sensitivity') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=15),
-    axis.title = element_text(color='black',size=23),
+    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=20),
+    axis.title = element_text(color='black',size=22),
+    #axis.title.x = element_text(color='black',size=25),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     strip.background =element_rect(fill="white"),
