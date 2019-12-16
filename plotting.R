@@ -100,7 +100,10 @@ plot(mojave.sonoran.shape)
 #step 2:
 mojave.sonoran.shape.2 <- sp::spTransform(mojave.sonoran.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(mojave.sonoran.shape.2)
-writeOGR(mojave.sonoran.shape, ".", "test", driver="ESRI Shapefile") 
+writeOGR(mojave.sonoran.shape, ".", "test", driver="ESRI Shapefile")
+mojave.sonoran.shape.3 <- spTransform(mojave.sonoran.shape.2, CRS(aea.proj))
+plot(mojave.sonoran.shape.3)
+
 
 #chihuahan
 ChihuahuanDesert.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ChihuahuanDesert",layer="ChihuahuanDesert")
@@ -110,6 +113,8 @@ plot(ChihuahuanDesert.shape)
 #step 2:
 ChihuahuanDesert.shape.2 <- sp::spTransform(ChihuahuanDesert.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(ChihuahuanDesert.shape.2)
+ChihuahuanDesert.shape.3 <- spTransform(ChihuahuanDesert.shape.2, CRS(aea.proj))
+plot(ChihuahuanDesert.shape.3)
 
 #grama galleta steppe
 Grama.Galleta.Steppe.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/GramaGalletaSteppe",layer="GramaGalletaSteppe")
@@ -119,6 +124,8 @@ plot(Grama.Galleta.Steppe.shape)
 #step 2:
 Grama.Galleta.Steppe.shape.2 <- sp::spTransform(Grama.Galleta.Steppe.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(Grama.Galleta.Steppe.shape.2)
+Grama.Galleta.Steppe.shape.3 <- spTransform(Grama.Galleta.Steppe.shape.2, CRS(aea.proj))
+plot(Grama.Galleta.Steppe.shape.3)
 
 #california annuals
 CaliforniaAnnual.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/CaliforniaAnnual",layer="CaliforniaAnnual")
@@ -128,6 +135,8 @@ plot(CaliforniaAnnual.shape)
 #step 2:
 CaliforniaAnnual.shape.2 <- sp::spTransform(CaliforniaAnnual.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(CaliforniaAnnual.shape.2)
+CaliforniaAnnual.shape.3 <- spTransform(CaliforniaAnnual.shape.2, CRS(aea.proj))
+plot(CaliforniaAnnual.shape.3)
 
 #cold deserts
 ColdDeserts.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ColdDeserts",layer="ColdDeserts")
@@ -137,6 +146,8 @@ plot(ColdDeserts.shape)
 #step 2:
 ColdDeserts.shape.2 <- sp::spTransform(ColdDeserts.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(ColdDeserts.shape.2,col='blue')
+ColdDeserts.shape.3 <- spTransform(ColdDeserts.shape.2, CRS(aea.proj))
+plot(ColdDeserts.shape.3)
 
 #shortgrass steppe
 SGS.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/SGS",layer="SGS")
@@ -146,6 +157,8 @@ plot(SGS.shape)
 #step 2:
 SGS.shape.2 <- sp::spTransform(SGS.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(SGS.shape.2)
+SGS.shape.3 <- spTransform(SGS.shape.2, CRS(aea.proj))
+plot(SGS.shape.3)
 
 #northernmixed
 NorthernMixedSubset.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/NorthernMixedSubset",layer="NorthernMixedSubset")
@@ -156,6 +169,9 @@ plot(NorthernMixedSubset.shape)
 NorthernMixedSubset.shape.2 <- sp::spTransform(NorthernMixedSubset.shape, CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 plot(NorthernMixedSubset.shape.2)
 crop(NorthernMixedSubset.shape.2,mean_production_raster)
+NorthernMixedSubset.shape.3 <- spTransform(NorthernMixedSubset.shape.2, CRS(aea.proj))
+plot(NorthernMixedSubset.shape.3)
+
 ###### maps prep ########
 library(colorspace)
 library(latticeExtra)
@@ -163,30 +179,30 @@ library(sp)
 
 #shapefile referecne for state outlines
 us<-getData("GADM", country='USA', level=1,download=TRUE)
-states_all_sites <- us[us$NAME_1 %in% c('California','New Mexico','Arizona','Utah',
+states_all_sites <- orcounty.shp.proj[orcounty.shp.proj$NAME_1 %in% c('California','New Mexico','Arizona','Utah',
                                         'Arizona','Colorado','Washington','Wyoming',
                                         'Idaho','Oregon','Idaho','Montana','Texas',
                                         'North Dakota','South Dakota','Nebraska',
                                         'Oklahoma','Kansas'),]
+
+aea.proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96+x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
+aea.proj.2<- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+orcounty.shp.proj <- spTransform(us , CRS(aea.proj))
+plot(orcounty.shp.proj)
+crs(states_all_sites)
+crs(sensitivity_raster)
+#plot shapefiles
 plot(states_all_sites)
-extend(states_all_sites)
-crop.test<-extend(mean_production_raster,extent(states_all_sites))
-mean_raster_2<-extent(mean_production_raster)
-spplot(crop.test,#scales = list(draw = TRUE),
-       at=bks_npp,
-       par.settings = list(axis.line = list(col = 'transparent')), 
-       asp=0.6,
-       colorkey=FALSE,
-       col.regions = FALSE) +
-  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.5)) +
-  latticeExtra::layer(sp.polygons(NorthernMixedSubset.shape.2,fill='steelblue2', lwd = .1)) +
-  latticeExtra::layer(sp.polygons(SGS.shape.2, lwd = 0.1,fill='green4')) +
-  latticeExtra::layer(sp.polygons(CaliforniaAnnual.shape.2,fill='grey', lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(ChihuahuanDesert.shape.2, fill='firebrick3', lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(ColdDeserts.shape.2, fill='gold', lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2,fill='firebrick3', lwd = 0.1)) +
-  latticeExtra::layer(sp.polygons(Grama.Galleta.Steppe.shape.2, fill='firebrick3', lwd = 0.1)) +
-plot(crop.test)
+plot(NorthernMixedSubset.shape.3,col='steelblue2', lwd = .1,add=TRUE)
+plot(SGS.shape.3, lwd = 0.1,col='green4', lwd = .1,add=TRUE)
+plot(CaliforniaAnnual.shape.3,col='grey', lwd = .1,add=TRUE)
+plot(ChihuahuanDesert.shape.3, col='firebrick3', lwd = .1,add=TRUE)
+plot(mojave.sonoran.shape.3, col='firebrick3', lwd = .1,add=TRUE)
+plot(Grama.Galleta.Steppe.shape.3, col='firebrick3', lwd = .1,add=TRUE)
+plot(ColdDeserts.shape.3, col='gold', lwd = .1,add=TRUE)
+
+  library(mapproj)
+
 ###### Figure 1c: mean npp graph#######
 mean_production<-aggregate(npp.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
 mean_production_raster<-rasterFromXYZ(mean_production)
@@ -449,13 +465,13 @@ sensitivity_inset_northern_mixed<-ggplot(northern_mixed_sensitivity,aes(mm.x,coe
 ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
   geom_histogram(binwidth = 0.5,color='black') +
   scale_fill_manual(name = 'Spatiotemporal model',values=c('veg'='red','no.veg'='lightblue'),
-                    labels=c('veg'='With vegetation','no.veg'='Without vegetation')) +
+                    labels=c('veg'='With ecoregion','no.veg'='Without ecoregion')) +
   xlab('Variation in NPP explained (%)') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=25),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
+    axis.title = element_text(color='black',size=30),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     legend.title = element_text(size=17),
@@ -642,37 +658,37 @@ full()
 cold_deserts_fit_wet_dry_2<-cold_deserts_fit %>% filter(map %in% c('100','300','700'))
 
 #select specific columns
-cold_deserts_dry_map <- cold_deserts_test %>% dplyr::filter(mm.y > 89, mm.y < 111) 
+cold_deserts_dry_map <- cold_deserts_test %>% dplyr::filter(mm.y > 90, mm.y < 110) 
 summary(cold_deserts_dry_map)
 
 
 cold_deserts_mean_map <- cold_deserts_test %>% dplyr::filter(mm.y > 299, mm.y < 301) 
 summary(cold_deserts_mean_map)
 
-cold_deserts_wet_map <- cold_deserts_test %>% dplyr::filter(mm.y > 675, mm.y < 725) 
+cold_deserts_wet_map <- cold_deserts_test %>% dplyr::filter(mm.y > 690, mm.y < 710) 
 summary(cold_deserts_dry_map)
 
 #temporal dynamics
 ggplot(cold_deserts_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=cold_deserts_dry_map,aes(x=mm.dev,y=npp.x),color='red',pch=21,size=2,alpha=1,fill='white') +
-  geom_point(data=cold_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',pch=21,size=2,alpha=1,fill='white') +
-  geom_point(data=cold_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',pch=21,size=2,alpha=1,fill='white') +
+  geom_point(data=cold_deserts_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',pch=21,size=3,alpha=1,fill='white') +
+  geom_point(data=cold_deserts_wet_map,aes(x=mm.dev,y=npp.x),color='blue',pch=21,size=3,alpha=1,fill='white') +
+  geom_point(data=cold_deserts_dry_map,aes(x=mm.dev,y=npp.x),color='red',pch=21,size=3.25,alpha=1,fill='white') +
   scale_colour_manual(values=c('100'='red','300' = 'black','700'='blue'),name='MAP (mm)',
                       labels=c('100'='100','300'= '300','700'='900')) +
-  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
   xlim(-99,201) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
     axis.title = element_text(color='black',size=15),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=15),
-    legend.text = element_text(size=14),
+    legend.title = element_text(size=25),
+    legend.text = element_text(size=20),
     legend.position = 'top',
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
@@ -856,16 +872,16 @@ summary(northern_mixed_test_dry_map)
 northern_mixed_test_mean_map <- northern_mixed_test %>% dplyr::filter(mm.y > 399,mm.y < 401) 
 summary(northern_mixed_test_dry_map)
 
-northern_mixed_test_wet_map <- northern_mixed_test %>% dplyr::filter(mm.y > 645, mm.y < 655) 
+northern_mixed_test_wet_map <- northern_mixed_test %>% dplyr::filter(mm.y > 649, mm.y < 651) 
 summary(northern_mixed_test_wet_map)
 
 ggplot(northern_mixed_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=northern_mixed_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=2,pch=21,fill='white',alpha=1) +
-  geom_point(data=northern_mixed_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=2,pch=21,fill='white',alpha=1) +
-  geom_point(data=northern_mixed_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=northern_mixed_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=3,pch=21,fill='white',alpha=1) +
+  geom_point(data=northern_mixed_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=3.5,pch=21,fill='white',alpha=1) +
+  geom_point(data=northern_mixed_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=3.5,pch=21,fill='white',alpha=1) +
   scale_colour_manual(values=c('200'='red','400' = 'black','650'='blue'),name='MAP (mm)',
                       labels=c('200'='200','400'= '400','650'='650')) +
-  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
   xlim(-201,201) +
   #ggtitle('hot deserts') +
   xlab('') +
@@ -877,8 +893,8 @@ ggplot(northern_mixed_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=15),
-    legend.text = element_text(size=14),
+    legend.title = element_text(size=25),
+    legend.text = element_text(size=20),
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
@@ -928,8 +944,8 @@ main_sgs<-ggplot(sgs_test,aes(mm.y,npp.x,fill=mm.dev)) +
     legend.direction  = 'horizontal', 
     #legend.margin = margin(r = 125, l = 125),
     legend.position = 'top',
-    legend.text = element_text(size=11),
-    legend.title = element_text(size=13),
+    legend.text = element_text(size=25),
+    legend.title = element_text(size=20),
     panel.background = element_rect(fill=NA),
     legend.key.size = unit(.4, "cm"),
     legend.key.width = unit(0.7,"cm"), 
@@ -950,36 +966,36 @@ full()
 sgs_fit_wet_dry_2<-sgs_fit %>% filter(map %in% c('275','425','675'))
 
 #select specific columns
-sgs_test_dry_map <- northern_mixed_test %>% dplyr::filter(mm.y > 270, mm.y < 280) 
+sgs_test_dry_map <- northern_mixed_test %>% dplyr::filter(mm.y > 274, mm.y < 276) 
 summary(sgs_test_dry_map)
 
 
-sgs_test_mean_map <- northern_mixed_test %>% dplyr::filter(mm.y > 424,mm.y < 426) 
+sgs_test_mean_map <- northern_mixed_test %>% dplyr::filter(mm.y > 424, mm.y < 426) 
 summary(sgs_test_dry_map)
 
 sgs_test_wet_map <- northern_mixed_test %>% dplyr::filter(mm.y > 670, mm.y < 680) 
 summary(northern_mixed_test_wet_map)
 
 ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
-  geom_point(data=sgs_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=2,pch=21,fill='white',alpha=1) +
-  geom_point(data=sgs_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=2,pch=21,fill='white',alpha=1) +
-  geom_point(data=sgs_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=2,pch=21,fill='white',alpha=1) +
+  geom_point(data=sgs_test_mean_map,aes(x=mm.dev,y=npp.x),color='gray47',size=3,pch=21,fill='white',alpha=1) +
+  geom_point(data=sgs_test_wet_map,aes(x=mm.dev,y=npp.x),color='blue',size=3.25,pch=21,fill='white',alpha=1) +
+  geom_point(data=sgs_test_dry_map,aes(x=mm.dev,y=npp.x),color='red',size=3,pch=21,fill='white',alpha=1) +
   scale_colour_manual(values=c('275'='red','425' = 'black','675'='blue'),name='MAP (mm)',
                       labels=c('275'='275','425'= '425','675'='675')) +
-  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
   xlim(-201,201) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
     axis.title = element_text(color='black',size=15),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=15),
-    legend.text = element_text(size=14),
+    legend.title = element_text(size=25),
+    legend.text = element_text(size=20),
     legend.direction  = 'horizontal', 
     legend.position = 'top',
     strip.background =element_rect(fill="white"),
@@ -1006,9 +1022,9 @@ ggplot(coefficients_wide_map_ordered,aes(x=Spatial,fill=site)) +
   #scale_x_continuous(expand = c(0,0),limits=c(0,0.85)) +
   #scale_y_continuous(expand = c(0,0),limits=c(0,400)) +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=25),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
+    axis.title = element_text(color='black',size=30),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     legend.title = element_blank(),
@@ -1034,9 +1050,9 @@ ggplot(coefficients_wide_map_ordered,aes(x=temporal_sensitivity,fill=site)) +
   xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=25),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
+    axis.title = element_text(color='black',size=30),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     legend.title = element_blank(),
@@ -1062,9 +1078,9 @@ ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal,fill=site)) +
   xlab('Change in sensitivity per mm of MAP') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=15), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=23),
+    axis.text.x = element_text(color='black',size=18), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
+    axis.title = element_text(color='black',size=27),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     legend.title = element_blank(),
@@ -1299,37 +1315,37 @@ main_hot_deserts<-ggplot(hot_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.
 cold_deserts_fit_wet_dry<-cold_deserts_fit %>% filter(mm.dev %in% c('-100','0','200'))
 
 #select specific columns
-cold_deserts_dry_year <- cold_deserts_test %>% dplyr::filter(mm.dev > -105, mm.dev < -95 ) 
+cold_deserts_dry_year <- cold_deserts_test %>% dplyr::filter(mm.dev > -101, mm.dev < -99 ) 
 summary(cold_deserts_test)
 plot(npp.x~mm.y,data=cold_deserts_dry_year)
 
-cold_deserts_mean_year <- cold_deserts_test %>% dplyr::filter(mm.dev > -5,mm.dev < 5) 
+cold_deserts_mean_year <- cold_deserts_test %>% dplyr::filter(mm.dev > -1,mm.dev < 1) 
 summary(cold_deserts_dry_map)
 
-cold_deserts_wet_year <- cold_deserts_test %>% dplyr::filter(mm.dev > 195, mm.dev < 205) 
+cold_deserts_wet_year <- cold_deserts_test %>% dplyr::filter(mm.dev > 199, mm.dev < 201) 
 summary(cold_deserts_dry_map) 
 
 
 main_cold_deserts<-ggplot(cold_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
-  geom_point(data=cold_deserts_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=1,alpha=0.75,fill='white',color='red') +
-  geom_point(data=cold_deserts_mean_year,aes(x=mm.y,y=npp.x),color='gray47',fill='white',size=1,pch=21,alpha=0.75) +
-  geom_point(data=cold_deserts_wet_year,aes(x=mm.y,y=npp.x),color='blue',fill='white',size=1,pch=21,alpha=0.75) +
+  geom_point(data=cold_deserts_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=3.25,alpha=1,fill='white',color='red') +
+  geom_point(data=cold_deserts_mean_year,aes(x=mm.y,y=npp.x),color='gray47',fill='white',size=3,pch=21,alpha=1) +
+  geom_point(data=cold_deserts_wet_year,aes(x=mm.y,y=npp.x),color='blue',fill='white',size=3,pch=21,alpha=1) +
   scale_colour_manual(values=c('-100'='red','0' = 'black','200'='blue'),name='Deviation (mm)',
                       labels=c('-100'='-100','0'= '0','200'='200')) +
-  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
   xlim(100,700) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
     axis.title = element_text(color='black',size=20),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=15),
-    legend.text = element_text(size=14),
+    legend.title = element_text(size=25),
+    legend.text = element_text(size=20),
     legend.direction  = 'horizontal', 
     legend.position = 'top',
     strip.background =element_rect(fill="white"),
@@ -1389,37 +1405,37 @@ main_cali<-ggplot(cali_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
 northern_mixed_fit_wet_dry<-northern_mixed_fit %>% filter(mm.dev %in% c('-200','0','200'))
 
 #select specific columns
-northern_mixed_dry_year <- northern_mixed_test %>% dplyr::filter(mm.dev > -205, mm.dev < -195 ) 
+northern_mixed_dry_year <- northern_mixed_test %>% dplyr::filter(mm.dev > -201, mm.dev < -199 ) 
 summary(northern_mixed_test)
 plot(npp.x~mm.y,data=northern_mixed_dry_year)
 
-northern_mixed_mean_year <- northern_mixed_test %>% dplyr::filter(mm.dev > -5,mm.dev < 5) 
+northern_mixed_mean_year <- northern_mixed_test %>% dplyr::filter(mm.dev > -1,mm.dev < 1) 
 summary(northern_mixed_dry_map)
 
-northern_mixed_wet_year <- northern_mixed_test %>% dplyr::filter(mm.dev > 195, mm.dev < 205) 
+northern_mixed_wet_year <- northern_mixed_test %>% dplyr::filter(mm.dev > 199, mm.dev < 201) 
 summary(northern_mixed_dry_map) 
 
 
 main_northern_mixed<-ggplot(northern_mixed_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
-  geom_point(data=northern_mixed_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=1,alpha=0.75,fill='white',color='red') +
-  geom_point(data=northern_mixed_mean_year,aes(x=mm.y,y=npp.x),color='gray47',fill='white',size=1,pch=21,alpha=0.75) +
-  geom_point(data=northern_mixed_wet_year,aes(x=mm.y,y=npp.x),color='blue',fill='white',size=1,pch=21,alpha=0.75) +
+  geom_point(data=northern_mixed_mean_year,aes(x=mm.y,y=npp.x),color='gray47',fill='white',size=3,pch=21,alpha=1) +
+  geom_point(data=northern_mixed_wet_year,aes(x=mm.y,y=npp.x),color='blue',fill='white',size=3,pch=21,alpha=1) +
+  geom_point(data=northern_mixed_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=3,alpha=1,fill='white',color='red') +
   scale_colour_manual(values=c('-200'='red','0' = 'black','200'='blue'),name='Deviation (mm)',
                       labels=c('-200'='-200','0'= '0','200'='200')) +
-  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
   xlim(200,675) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=20),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
+    axis.title = element_text(color='black',size=25),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=15),
-    legend.text = element_text(size=14),
+    legend.title = element_text(size=25),
+    legend.text = element_text(size=20),
     legend.direction  = 'horizontal', 
     legend.position = 'top',
     strip.background =element_rect(fill="white"),
@@ -1434,37 +1450,37 @@ main_northern_mixed<-ggplot(northern_mixed_fit_wet_dry,aes(map,NPP,color=as.fact
 sgs_fit_wet_dry<-sgs_fit %>% filter(mm.dev %in% c('-200','0','200'))
 
 #select specific columns
-sgs_dry_year <- sgs_test %>% dplyr::filter(mm.dev > -205, mm.dev < -195 ) 
+sgs_dry_year <- sgs_test %>% dplyr::filter(mm.dev > -201, mm.dev < -199 ) 
 summary(sgs_test)
 plot(npp.x~mm.y,data=sgs_dry_year)
 
-sgs_mean_year <- sgs_test %>% dplyr::filter(mm.dev > -5,mm.dev < 5) 
+sgs_mean_year <- sgs_test %>% dplyr::filter(mm.dev > -1,mm.dev < 1) 
 summary(sgs_dry_map)
 
-sgs_wet_year <- sgs_test %>% dplyr::filter(mm.dev > 195, mm.dev < 205) 
+sgs_wet_year <- sgs_test %>% dplyr::filter(mm.dev > 199, mm.dev < 202) 
 summary(sgs_dry_map) 
 
 
 main_sgs<-ggplot(sgs_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
-  geom_point(data=sgs_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=1,alpha=0.75,fill='white',color='red') +
-  geom_point(data=sgs_mean_year,aes(x=mm.y,y=npp.x),color='gray47',fill='white',size=1,pch=21,alpha=0.75) +
-  geom_point(data=sgs_wet_year,aes(x=mm.y,y=npp.x),color='blue',fill='white',size=1,pch=21,alpha=0.75) +
+  geom_point(data=sgs_mean_year,aes(x=mm.y,y=npp.x),color='gray47',fill='white',size=3,pch=21,alpha=1) +
+  geom_point(data=sgs_wet_year,aes(x=mm.y,y=npp.x),color='blue',fill='white',size=3,pch=21,alpha=1) +
+  geom_point(data=sgs_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=3,alpha=1,fill='white',color='red') +
   scale_colour_manual(values=c('-200'='red','0' = 'black','200'='blue'),name='Deviation (mm)',
                       labels=c('-200'='-200','0'= '0','200'='200')) +
-  geom_smooth(method='lm',se=FALSE,size=3,fullrange=TRUE) +
+  geom_smooth(method='lm',se=FALSE,size=2,fullrange=TRUE) +
   xlim(275,675) +
   #ggtitle('hot deserts') +
   xlab('') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=20),
+    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=25),
+    axis.title = element_text(color='black',size=25),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
     #legend.title = element_blank(),
-    legend.title = element_text(size=15),
-    legend.text = element_text(size=14),
+    legend.title = element_text(size=25),
+    legend.text = element_text(size=20),
     legend.direction  = 'horizontal', 
     legend.position = 'top',
     strip.background =element_rect(fill="white"),
