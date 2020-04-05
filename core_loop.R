@@ -1,6 +1,6 @@
 library(reshape2)
 library(tidyverse)
-
+#written using R versiion 3.5.1
 #make lists to put looped fles into
 list.coefficients.final<-list()
 list.variograms<-list()

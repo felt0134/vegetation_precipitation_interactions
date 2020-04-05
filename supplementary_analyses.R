@@ -833,3 +833,45 @@ ggplot(hd_cover_3,aes(as.numeric(sensitivity.2),as.numeric(Perennial.forb...gras
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
+
+
+#look at ranges of mean and deviations of precip for each ecoregion
+#sgs
+sgs_summary<-subset(rangeland_npp_covariates_deviations_1,region.x=='semi_arid_steppe')
+summary(sgs_summary)
+hist(sgs_summary$mm.dev) #normally distributed
+hist(sgs_summary$mm.y)
+quantile(sgs_summary$mm.dev, c(.95))
+quantile(sgs_summary$mm.dev, c(.05))
+
+#northern mixed
+northern_mixed_summary<-subset(rangeland_npp_covariates_deviations_1,region.x=='northern_mixed_prairies')
+summary(northern_mixed_summary)
+hist(northern_mixed_summary$mm.dev) #normally distributed
+hist(northern_mixed_summary$mm.y)
+quantile(northern_mixed_summary$mm.dev, c(.95))
+quantile(northern_mixed_summary$mm.dev, c(.05))
+
+#hot deserts
+hot_deserts_summary<-subset(rangeland_npp_covariates_deviations_1,region.x=='hot_deserts')
+summary(hot_deserts_summary)
+hist(hot_deserts_summary$mm.dev) #normally distributed
+hist(hot_deserts_summary$mm.y)
+quantile(hot_deserts_summary$mm.dev, c(.95))
+quantile(hot_deserts_summary$mm.dev, c(.05)) #more than -100, but can't go lower because some sites has MAP below 100...
+
+#cold deserts
+cold_deserts_summary<-subset(rangeland_npp_covariates_deviations_1,region.x=='cold_deserts')
+summary(cold_deserts_summary)
+hist(cold_deserts_summary$mm.dev) #normally distributed
+hist(cold_deserts_summary$mm.y)
+quantile(cold_deserts_summary$mm.dev, c(.95))
+quantile(cold_deserts_summary$mm.dev, c(.05))
+
+#california annuals
+cali_annuals_summary<-subset(rangeland_npp_covariates_deviations_1,region.x=='california_annuals')
+summary(cali_annuals_summary)
+hist(cali_annuals_summary$mm.dev) #normally distributed
+hist(cali_annuals_summary$mm.y)
+quantile(cali_annuals_summary$mm.dev, c(.95))
+quantile(cali_annuals_summary$mm.dev, c(.05))

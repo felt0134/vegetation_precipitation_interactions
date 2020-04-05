@@ -122,6 +122,7 @@ site_map<-data.frame(site,map)
 
 coefficients_wide_map<-merge(coefficients_wide,site_map,by=c('site'))
 head(coefficients_wide_map)
+write.csv(coefficients_wide_map,file='coefficients_wide_map.csv')
 
 #temporal slope at MAP for each vegetation type
 coefficients_wide_map$temporal_sensitivity <-
@@ -168,3 +169,7 @@ summary(bind.veg.noveg)
 head(bind.veg.noveg)
 var.means<-aggregate(var~model,mean,data=bind.veg.noveg)
 (83.02-54.38)/54.38
+
+#save to csvs
+View(bind.veg.noveg)
+write.csv(bind.veg.noveg,file='r.square.veg.noveg.csv')

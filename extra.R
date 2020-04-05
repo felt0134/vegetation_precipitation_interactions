@@ -122,10 +122,10 @@ proj4string(mean_mm_raster)<-CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +l
 r.range <- round(c(minValue(mean_mm_raster), maxValue(mean_mm_raster)))
 
 plot(crop_test_2,breaks = bks_map,axes=F,box=F,col = bkcols.precip,
-     legend.width=2,
+     legend.width=1,legend.shrink=0.75,
      axis.args=list(at=seq(r.range[1], r.range[2], 100),
                                        labels=seq(r.range[1], r.range[2], 100),
-                                   cex.axis=0.6),
+                                   cex.axis=1.75),
      legend.args=list(text='', side=1, font=2, line=2.5, cex=0.8))
 plot(shapefile_aes, lwd = 1,add=TRUE)
 
@@ -147,14 +147,14 @@ mean_production_raster_3<-crop(mean_production_raster_2,extent(crop_extent))
 
 #plot it
 plot(mean_production_raster_3,breaks = bks_npp,box=F,axes=F,col = bkcols.npp,
-     legend.width=2,
+     legend.width=1,legend.shrink=0.75,
      axis.args=list(at=seq(r.range.npp[1], r.range.npp[2], 100),
                     labels=seq(r.range.npp[1], r.range.npp[2], 100),
-                    cex.axis=0.6),
+                    cex.axis=1.75),
      legend.args=list(text='', side=1, font=2, line=2.5, cex=0.8))
 plot(out, lwd = 1,add=TRUE) 
 
-
+par(mfrow=c(1,1))
 #sensitivity to precip
 sensitivity=c("purple",'cyan3','green','yellow','orange','red')
 bkcols.sensitivity <- colorRampPalette(sensitivity)(length(bks)-1)
@@ -177,8 +177,8 @@ plot(sensitivity_raster_3,breaks = bks,axes=F,box=F,col = bkcols.sensitivity,leg
      legend.width=1, legend.shrink=.75,
      axis.args=list(at=seq(r.range.sens[1], r.range.sens[2], 0.1),
                     labels=seq(r.range.sens[1], r.range.sens[2], 0.1),
-                    cex.axis=0.6),
-     legend.args=list(text='', side=4, font=2, line=2.5, cex=15))
+                    cex.axis=1.75),
+     legend.args=list(text='', side=4, font=10, line=2.5, cex.axis=15))
 plot(shapefile_aes,add=TRUE,lwd = 1)
 
 help(plot, package="raster")
