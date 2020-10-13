@@ -1,9 +1,16 @@
+#load libraries needed
+
 library(ggplot2)
 library(lattice)
 library(grid)
 library(colorspace)
-#test
-#function to reference for facet plots
+library(rgdal)
+library(latticeExtra)
+library(sp)
+library(mapproj)
+
+#####extra stuff for plotting#####
+
 veg_names <- c(
   `hot_deserts` = "Hot deserts",
   `cold_deserts` = "Cold deserts",
@@ -13,86 +20,21 @@ veg_names <- c(
 )
 
 neworder <- c("semi_arid_steppe","northern_mixed_prairies","california_annuals","cold_deserts","hot_deserts")
+
 coefficients_wide_map_ordered <- arrange(mutate(coefficients_wide_map,
                            site=factor(site,levels=neworder)),site)
+#for reference
+mean_production<-aggregate(npp.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
+mean_production_raster<-rasterFromXYZ(mean_production)
+plot(mean_production_raster)
 
-#### Figure 3a; surface plots #########
-
-head(stratified_final)
-
-#hot deserts
-
-wireframe(NPP ~ mm.dev*map, data = hot_deserts_fit,
-          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
-          main = "Hot deserts",
-          drape = TRUE,
-          colorkey = FALSE,
-          par.settings = list(axis.line = list(col = 'transparent')),
-          col.regions = colorRampPalette(c("red","orange", "green"))(600),
-          scales = list(z.ticks=1, arrows=FALSE),
-          screen = list(z = -60, x = -60)
-)
-
-#california
-
-wireframe(NPP ~ mm.dev*map, data = cali_fit,
-          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
-          main = "California annuals",
-          drape = TRUE,
-          colorkey = FALSE,
-          par.settings = list(axis.line = list(col = 'transparent')),
-          col.regions = colorRampPalette(c("red","orange", "green"))(800),
-          scales = list(z.ticks=1, arrows=FALSE),
-          screen = list(z = -60, x = -60)
-)
-
-#cold deserts
-
-wireframe(NPP ~ mm.dev*map, data = cold_deserts_fit,
-          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
-          main = "Cold deserts",
-          drape = TRUE,
-          colorkey = FALSE,
-          par.settings = list(axis.line = list(col = 'transparent')),
-          col.regions = colorRampPalette(c("red","orange", "green"))(1100),
-          scales = list(z.ticks=1, arrows=FALSE),
-          screen = list(z = -60, x = -60)
-)
-
-
-#shortgrass steppe
-
-
-wireframe(NPP ~ mm.dev*map, data = sgs_fit,
-          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
-          main = "shortgrass steppe",
-          drape = TRUE,
-          colorkey = FALSE,
-          par.settings = list(axis.line = list(col = 'transparent')),
-          col.regions = colorRampPalette(c("red","orange", "green"))(900),
-          scales = list(z.ticks=1, arrows=FALSE),
-          screen = list(z = -60, x = -60)
-)
-
-#northern mixed prairies
-
-wireframe(NPP ~ mm.dev*map, data = northern_mixed_fit,
-          xlab = list("Precipitation deviation",rot=-50,cex=1.4), zlab = list("Net primary productivity",rot=92,cex=1.4),ylab = list('Mean annual precipitation',rot=22,cex=1.4),
-          main = "northern mixed prairies",
-          drape = TRUE,
-          colorkey = FALSE,
-          par.settings = list(axis.line = list(col = 'transparent')),
-          col.regions = colorRampPalette(c("red","orange", "green"))(100),
-          scales = list(z.ticks=1, arrows=FALSE),
-          screen = list(z = -60, x = -60)
-)
-
+#needed projection
+aea.proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96+x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
 
 ###### Figure 1a: shapefiles#######
-library(rgdal)
 
 #mojave sonoran
-mojave.sonoran.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/MojaveSonoran",layer="MojaveSonoran")
+mojave.sonoran.shape<-readOGR(dsn="/Volumes/GoogleDrive/My Drive/range-resilience/scope/study-area-shapefiles/MojaveSonoran",layer="MojaveSonoran")
 plot(mojave.sonoran.shape)
 mojave.sonoran.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(mojave.sonoran.shape)
@@ -104,9 +46,8 @@ writeOGR(mojave.sonoran.shape, ".", "test", driver="ESRI Shapefile")
 mojave.sonoran.shape.3 <- spTransform(mojave.sonoran.shape.2, CRS(aea.proj))
 plot(mojave.sonoran.shape.3)
 
-
 #chihuahan
-ChihuahuanDesert.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ChihuahuanDesert",layer="ChihuahuanDesert")
+ChihuahuanDesert.shape<-readOGR(dsn="/Volumes/GoogleDrive/My Drive/range-resilience/scope/study-area-shapefiles/ChihuahuanDesert",layer="ChihuahuanDesert")
 plot(ChihuahuanDesert.shape)
 ChihuahuanDesert.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(ChihuahuanDesert.shape)
@@ -117,7 +58,7 @@ ChihuahuanDesert.shape.3 <- spTransform(ChihuahuanDesert.shape.2, CRS(aea.proj))
 plot(ChihuahuanDesert.shape.3)
 
 #grama galleta steppe
-Grama.Galleta.Steppe.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/GramaGalletaSteppe",layer="GramaGalletaSteppe")
+Grama.Galleta.Steppe.shape<-readOGR(dsn="/Volumes/GoogleDrive/My Drive/range-resilience/scope/study-area-shapefiles/GramaGalletaSteppe",layer="GramaGalletaSteppe")
 plot(Grama.Galleta.Steppe.shape)
 Grama.Galleta.Steppe.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(Grama.Galleta.Steppe.shape)
@@ -128,7 +69,7 @@ Grama.Galleta.Steppe.shape.3 <- spTransform(Grama.Galleta.Steppe.shape.2, CRS(ae
 plot(Grama.Galleta.Steppe.shape.3)
 
 #california annuals
-CaliforniaAnnual.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/CaliforniaAnnual",layer="CaliforniaAnnual")
+CaliforniaAnnual.shape<-readOGR(dsn="/Volumes/GoogleDrive/My Drive/range-resilience/scope/study-area-shapefiles/CaliforniaAnnual",layer="CaliforniaAnnual")
 plot(CaliforniaAnnual.shape)
 CaliforniaAnnual.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(CaliforniaAnnual.shape)
@@ -139,7 +80,7 @@ CaliforniaAnnual.shape.3 <- spTransform(CaliforniaAnnual.shape.2, CRS(aea.proj))
 plot(CaliforniaAnnual.shape.3)
 
 #cold deserts
-ColdDeserts.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/ColdDeserts",layer="ColdDeserts")
+ColdDeserts.shape<-readOGR(dsn="/Volumes/GoogleDrive/My Drive/range-resilience/scope/study-area-shapefiles/ColdDeserts",layer="ColdDeserts")
 plot(CaliforniaAnnual.shape)
 ColdDeserts.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(ColdDeserts.shape)
@@ -150,7 +91,7 @@ ColdDeserts.shape.3 <- spTransform(ColdDeserts.shape.2, CRS(aea.proj))
 plot(ColdDeserts.shape.3)
 
 #shortgrass steppe
-SGS.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/SGS",layer="SGS")
+SGS.shape<-readOGR(dsn="/Volumes/GoogleDrive/My Drive/range-resilience/scope/study-area-shapefiles/SGS",layer="SGS")
 plot(SGS.shape)
 SGS.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(SGS.shape)
@@ -160,8 +101,8 @@ plot(SGS.shape.2)
 SGS.shape.3 <- spTransform(SGS.shape.2, CRS(aea.proj))
 plot(SGS.shape.3)
 
-#northernmixed
-NorthernMixedSubset.shape<-readOGR(dsn="G:/My Drive/range-resilience/scope/study-area-shapefiles/NorthernMixedSubset",layer="NorthernMixedSubset")
+#northern mixed
+NorthernMixedSubset.shape<-readOGR(dsn="/Volumes/GoogleDrive/My Drive/range-resilience/scope/study-area-shapefiles/NorthernMixedSubset",layer="NorthernMixedSubset")
 plot(NorthernMixedSubset.shape)
 NorthernMixedSubset.shape@bbox <- as.matrix(extent(mean_production_raster))
 plot(NorthernMixedSubset.shape)
@@ -173,25 +114,23 @@ NorthernMixedSubset.shape.3 <- spTransform(NorthernMixedSubset.shape.2, CRS(aea.
 plot(NorthernMixedSubset.shape.3)
 
 ###### maps prep ########
-library(colorspace)
-library(latticeExtra)
-library(sp)
 
-#shapefile referecne for state outlines
+#shapefile referecne for state outlines. This will results in a sp file being downloaded...
 us<-getData("GADM", country='USA', level=1,download=TRUE)
-states_all_sites <- orcounty.shp.proj[orcounty.shp.proj$NAME_1 %in% c('California','New Mexico','Arizona','Utah',
+states_all_sites <- us[us$NAME_1 %in% c('California','New Mexico','Arizona','Utah',
                                         'Arizona','Colorado','Washington','Wyoming',
                                         'Idaho','Oregon','Idaho','Montana','Texas',
                                         'North Dakota','South Dakota','Nebraska',
                                         'Oklahoma','Kansas'),]
+#projections
+#aea.proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96+x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
+#aea.proj.2<- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+#orcounty.shp.proj <- spTransform(us , CRS(aea.proj))
+#plot(orcounty.shp.proj)
+#crs(states_all_sites)
+#crs(sensitivity_raster)
 
-aea.proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96+x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
-aea.proj.2<- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-orcounty.shp.proj <- spTransform(us , CRS(aea.proj))
-plot(orcounty.shp.proj)
-crs(states_all_sites)
-crs(sensitivity_raster)
-#plot shapefiles
+#plot shapefiles: figure 1A
 plot(states_all_sites)
 plot(NorthernMixedSubset.shape.3,col='steelblue2', lwd = .1,add=TRUE)
 plot(SGS.shape.3, lwd = 0.1,col='green4', lwd = .1,add=TRUE)
@@ -201,123 +140,95 @@ plot(mojave.sonoran.shape.3, col='firebrick3', lwd = .1,add=TRUE)
 plot(Grama.Galleta.Steppe.shape.3, col='firebrick3', lwd = .1,add=TRUE)
 plot(ColdDeserts.shape.3, col='gold', lwd = .1,add=TRUE)
 
-  library(mapproj)
-
 ###### Figure 1c: mean npp graph#######
-mean_production<-aggregate(npp.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
-mean_production_raster<-rasterFromXYZ(mean_production)
-plot(mean_production_raster)
-break_mean_npp<-quantile(mean_production$npp.x,seq(from=0.01, to = .99,by=0.01),na.rm=TRUE)
-break_mean_npp<-mean_production$npp.x
-npp_mean_allsites
-plot(us)
 
-spplot(mean_production_raster,#scales = list(draw = TRUE),
-       at=break_mean_npp,
-       #par.settings = list(axis.line = list(col = 'transparent')),
-       asp=0.01,
-       col.regions = 
-         rev(terrain.colors(length(break_mean_npp)-1)),
-       main="") +
-  latticeExtra::layer(sp.polygons(dat.poly, lwd = 1))
+aea.proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96+x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
+npp= c('wheat3','wheat', "orange", "yellow",'green','darkgreen')
+bkcols.npp <- colorRampPalette(npp)(length(bks_npp)-1)
+bks_npp<- quantile(mean_production$npp.x, probs=seq(0.0, 1, by=0.05), na.rm = TRUE)
+proj4string(mean_production_raster)<-CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs")
 
+r.range.npp <- round(c(minValue(mean_production_raster), maxValue(mean_production_raster)))
+
+#update projection
+proj4string(mean_production_raster) <- CRS("+proj=longlat")
+mean_production_raster_2<-projectRaster(mean_production_raster, crs=aea.proj)
+plot(mean_production_raster_2)
+mean_production_raster_3<-crop(mean_production_raster_2,extent(crop_extent))
+
+#plot it
+plot(mean_production_raster_2,breaks = bks_npp,box=F,axes=F,col = bkcols.npp,
+     legend.width=1,legend.shrink=0.75,
+     axis.args=list(at=seq(r.range.npp[1], r.range.npp[2], 100),
+                    labels=seq(r.range.npp[1], r.range.npp[2], 100),
+                    cex.axis=1.75),
+     legend.args=list(text='', side=1, font=2, line=2.5, cex=0.8))
+plot(states_all_sites, lwd = 1,add=TRUE) 
 
 ###### Figure 1b: mean precipitation map##########
 head(rangeland_npp_covariates_deviations_1)
 mean_mm<-aggregate(mm.x~ x + y,mean,data=rangeland_npp_covariates_deviations_1)
 mean_mm_raster<-rasterFromXYZ(mean_mm)
 plot(mean_mm_raster)
-break_mean_mm<-quantile(mean_mm$mm.x,seq(from=0.01, to = .99,by=0.01),na.rm=TRUE)
-break_mean_mm<-mean_mm$mm.x
-mm.cropped<-extend(mean_mm_raster,extent(states_all_sites))
-spplot(mean_mm_raster,#scales = list(draw = TRUE),
-       at=break_mean_mm,
-       asp=.1,
-       #par.settings = list(axis.line = list(col = 'transparent')),
-       col.regions =
-         rev(topo.colors(length(break_mean_mm)-1)),
-       main="") +
-  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 1))
+precip= c("red", "orange", "yellow",'green','cyan3','purple')
+bks_map<- quantile(mean_mm$mm.x, probs=seq(0, 1, by=0.05), na.rm = TRUE)
+bkcols.precip <- colorRampPalette(precip)(length(bks_map)-1)
+proj4string(mean_mm_raster)<-CRS("+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=23 +lon_0=-96 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +datum=NAD83 +units=m +no_defs")
+r.range <- round(c(minValue(mean_mm_raster), maxValue(mean_mm_raster)))
+
+#update projection
+proj4string(mean_mm_raster) <- CRS("+proj=longlat")
+mean_mm_raster_2<-projectRaster(mean_mm_raster, crs=aea.proj)
+plot(mean_mm_raster_2)
+
+#crop_test_2
+plot(mean_mm_raster_2,breaks = bks_map,axes=F,box=F,col = bkcols.precip,
+     legend.width=1,legend.shrink=0.75,
+     axis.args=list(at=seq(r.range[1], r.range[2], 100),
+                    labels=seq(r.range[1], r.range[2], 100),
+                    cex.axis=1.75),
+     legend.args=list(text='', side=1, font=2, line=2.5, cex=0.8))
+plot(states_all_sites, lwd = 1,add=TRUE)
 
 ####### Figure 1d: NPP sensitivity to precipitation map########
+
 sensitivity_conus <- rangeland_npp_covariates_deviations_1 %>% group_by(x, y) %>%
   dplyr::do(model = lm(npp.x~mm.x, data = .)) %>%
   dplyr::mutate(coef=coef(model)[2])
 
-head(sensitivity_conus)
-sensitivity_conus_coef_only<- sensitivity_conus[ -c(3) ] #isolate coefficient so only slope is graphed
-head(sensitivity_conus_coef_only)
+#head(sensitivity_conus)
+sensitivity_conus_coef_only<- data.frame(sensitivity_conus[ -c(3) ]) #isolate coefficient so only slope is graphed
+#head(sensitivity_conus_coef_only)
 
+#make raster
+sensitivity_raster <- rasterFromXYZ(sensitivity_conus_coef_only)
 
-sensitivity_raster<-rasterFromXYZ(sensitivity_conus_coef_only)
-plot(sensitivity_raster)
-break_sensitivity<-quantile(sensitivity_conus_coef_only$coef,seq(from=0.0, to = 1,by=0.05),na.rm=TRUE)
+#make colors
+bks<- quantile(sensitivity_conus_coef_only$coef, probs=seq(0, 1, by=0.05), na.rm = TRUE)
+sensitivity=c("purple",'cyan3','green','yellow','orange','red')
+bkcols.sensitivity <- colorRampPalette(sensitivity)(length(bks)-1)
+r.range.sens <- round(c(minValue(sensitivity_raster), maxValue(sensitivity_raster)),digits=2)
 
-spplot(sensitivity_raster,#scales = list(draw = TRUE),
-       at=break_sensitivity,
-       asp=1,
-       col.regions =
-         rev(heat_hcl(length(break_sensitivity)-1)),
-       main="") +
-  latticeExtra::layer(sp.polygons(states_all_sites, lwd = 0.1))
+us.cropped<-crop(states_all_sites,extent(sensitivity_raster))
+plot(us.cropped)
+rast_new = projectExtent(sensitivity_raster)
+rast_new = projectRaster(sensitivity_raster)
+values(rast_new) = values(rast1)
+map("state",proj="conic",par=39.83,add=TRUE)
 
-######Figure 2a: plotting spatial and temporal slopes histogram#######
-head(coefficients_wide_map_ordered)
-spatial_temporal<-coefficients_wide_map_ordered[-c(2,3,5,6,7)]
-head(spatial_temporal)
-data_long_spatial_temporal <- gather(spatial_temporal,model,coefficient,-site, factor_key=TRUE)
-head(data_long_spatial_temporal)
-data_spatial<-subset(data_long_spatial_temporal,model=='Spatial')
+#update projection
+proj4string(sensitivity_raster) <- CRS("+proj=longlat")
+sensitivity_raster_2<-projectRaster(sensitivity_raster, crs=aea.proj)
+plot(mean_production_raster_2)
+#sensitivity_raster_3<-crop(sensitivity_raster_2,extent(crop_extent)) #may want more specified cropping...
 
-ggplot(data_long_spatial_temporal ,aes(x=coefficient,fill=model)) +
-  geom_histogram(binwidth = .005,color='black') +
-  facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
-  scale_fill_manual(values=c('temporal_sensitivity'='red','Spatial'='lightblue'),
-                    labels=c('temporal_sensitivity'='Temporal','Spatial'='Spatial')) +
-  xlab(bquote('Sensitivity ('*g/m^2/mm*')')) +
-  ylab('') +
-  scale_x_continuous(expand = c(0,0),limits=c(0,0.85)) +
-  scale_y_continuous(expand = c(0,0),limits=c(0,400)) +
-  theme(
-    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=12),
-    axis.title = element_text(color='black',size=15),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    legend.title = element_blank(),
-    legend.text = element_text(size=17),
-    legend.position = c(0.82,0.95),
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
-
-######plotting spatiotemporal slopes historgram#######
-
-ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal)) +
-  geom_histogram(binwidth = .000005,color='black',fill='white') +
-  geom_vline(xintercept=0,size=1,color='red') +
-  facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
-  xlab('Change in sensitivity per mm of MAP') +
-  ylab("") +
-  theme(
-    axis.text.x = element_text(color='black',size=10), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=12),
-    axis.title = element_text(color='black',size=15),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    legend.title = element_blank(),
-    legend.text = element_text(size=17),
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
+plot(sensitivity_raster_2,breaks = bks,axes=F,box=F,col = bkcols.sensitivity,legend=TRUE,
+     legend.width=1, legend.shrink=.75,
+     axis.args=list(at=seq(r.range.sens[1], r.range.sens[2], 0.1),
+                    labels=seq(r.range.sens[1], r.range.sens[2], 0.1),
+                    cex.axis=1.75),
+     legend.args=list(text='', side=4, font=10, line=2.5, cex.axis=15))
+plot(states_all_sites,add=TRUE,lwd = 1)
 
 #######change in sensitivity per mm of map all points###########
 head(rangeland_npp_covariates_deviations_1)
@@ -461,7 +372,7 @@ sensitivity_inset_northern_mixed<-ggplot(northern_mixed_sensitivity,aes(mm.x,coe
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
-#####variance explained: veg versus no veg figure 2d##########
+#####variance explained figure 2D: veg versus no veg figure 2d##########
 ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
   geom_histogram(binwidth = 0.5,color='black') +
   scale_fill_manual(name = 'Spatiotemporal model',values=c('veg'='red','no.veg'='lightblue'),
@@ -469,7 +380,7 @@ ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
   xlab('Variation in NPP explained (%)') +
   ylab('') +
   theme(
-    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
+    axis.text.x = element_text(color='black',size=25), 
     axis.text.y = element_text(color='black',size=25),
     axis.title = element_text(color='black',size=30),
     axis.ticks = element_line(color='black'),
@@ -486,9 +397,10 @@ ggplot(bind.veg.noveg ,aes(x=var,fill=model)) +
 
 #####bivariate versions of 3d plot figure 3a######
 
-colfunc <- colorRampPalette(c("red", "blue"))
-colfunc(10)
-plot(rep(1,10),col=colfunc(10),pch=19,cex=3)
+#color schemes
+#colfunc <- colorRampPalette(c("red", "blue"))
+#colfunc(10)
+#plot(rep(1,10),col=colfunc(10),pch=19,cex=3)
 
 #hot deserts
 
@@ -500,7 +412,7 @@ hot_deserts_fit_wet_dry_minus_100<-hot_deserts_fit %>% filter(mm.dev %in% c('-10
 #average year: zero deviation
 hot_deserts_fit_wet_dry_minus_0<-hot_deserts_fit %>% filter(mm.dev %in% c('0'))
 
-#plues 400 mm slope and intercept
+#plues 200 mm slope and intercept
 hot_deserts_fit_wet_dry_plus_200<-hot_deserts_fit %>% filter(mm.dev %in% c('200'))
 
 #subset to hot deserts
@@ -553,11 +465,9 @@ full()
 #dynamics of the temporal model
 hot_deserts_fit_wet_dry_2<-hot_deserts_fit %>% filter(map %in% c('100','300','500'))
 
-
 #select specific columns
 hot_deserts_dry_map <- hot_deserts_test %>% dplyr::filter(mm.y > 95, mm.y < 105) 
 summary(hot_deserts_dry_map)
-
 
 hot_deserts_mean_map <- hot_deserts_test %>% dplyr::filter(mm.y > 299,mm.y <301) 
 summary(hot_deserts_dry_map)
@@ -1007,93 +917,6 @@ ggplot(sgs_fit_wet_dry_2,aes(mm.dev,NPP,color=as.factor(map))) +
 
 citation()
 
-#### spatial and temporal slopes by veg types #########
-
-#spatial slopes
-ggplot(coefficients_wide_map_ordered,aes(x=Spatial,fill=site)) +
-  geom_density(color='black',alpha=0.75,aes(y=..scaled..)) +
-  #facet_wrap(~site,nrow=5,scales='free_y',labeller = as_labeller(veg_names)) +
-  scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
-                             california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
-                    labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
-                             california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
-  xlab(bquote('Spatial sensitivity ('*g/m^2/mm*')')) +
-  ylab('') +
-  #scale_x_continuous(expand = c(0,0),limits=c(0,0.85)) +
-  #scale_y_continuous(expand = c(0,0),limits=c(0,400)) +
-  theme(
-    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=25),
-    axis.title = element_text(color='black',size=30),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    legend.title = element_blank(),
-    legend.text = element_text(size=12),
-    #legend.position = 'top',
-    #legend.direction  = 'horizontal', 
-    #legend.position = c(0.95,0.85),
-    legend.position = "none",
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
-#temporal slopes
-ggplot(coefficients_wide_map_ordered,aes(x=temporal_sensitivity,fill=site)) +
-  geom_density(color='black',alpha=0.75,aes(y=..scaled..)) +
-  scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
-                             california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
-                    labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
-                            california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
-  xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  ylab('') +
-  theme(
-    axis.text.x = element_text(color='black',size=25), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=25),
-    axis.title = element_text(color='black',size=30),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    legend.title = element_blank(),
-    legend.text = element_text(size=17),
-    legend.position = "none",
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
-#spatiotemporal interaction
-head(coefficients_wide_map_ordered)
-ggplot(coefficients_wide_map_ordered,aes(x=Spatiotemporal,fill=site)) +
-  geom_vline(xintercept=0,color='red',size=1.5) +
-  geom_density(color='black',alpha=0.75,aes(y=..scaled..)) +
-  scale_fill_manual(values=c('semi_arid_steppe'='green4','northern_mixed_prairies'='lightblue',
-                             california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
-                    labels=c('semi_arid_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
-                             california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
-  xlab(bquote('Temporal sensitivity ('*g/m^2/mm*')')) +
-  xlab('Change in sensitivity per mm of MAP') +
-  ylab('') +
-  theme(
-    axis.text.x = element_text(color='black',size=18), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=25),
-    axis.title = element_text(color='black',size=27),
-    axis.ticks = element_line(color='black'),
-    legend.key = element_blank(),
-    legend.title = element_blank(),
-    legend.text = element_text(size=17),
-    legend.position = "none",
-    strip.background =element_rect(fill="white"),
-    strip.text = element_text(size=15),
-    panel.background = element_rect(fill=NA),
-    panel.border = element_blank(), #make the borders clear in prep for just have two axes
-    axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black"))
-
-
 ###########temporal variation in vegetation cover among veg types #########
 
 
@@ -1263,6 +1086,7 @@ ggplot(sgs_cover_3,aes(Year,Cover,color=as.factor(group))) +
     axis.line.x = element_line(colour = "black"),
     axis.line.y = element_line(colour = "black"))
 
+#binned###########
 
 #hot deserts spatial binned code.
 
@@ -1270,15 +1094,14 @@ hot_deserts_fit_wet_dry<-hot_deserts_fit %>% filter(mm.dev %in% c('-100','0','20
 
 #select specific columns
 hot_deserts_dry_year <- hot_deserts_test %>% dplyr::filter(mm.dev > -101, mm.dev < -99 ) 
-summary(hot_deserts_test)
-plot(npp.x~mm.y,data=hot_deserts_dry_year)
+#summary(hot_deserts_test)
+#plot(npp.x~mm.y,data=hot_deserts_dry_year)
 
 hot_deserts_mean_year <- hot_deserts_test %>% dplyr::filter(mm.dev > -1,mm.dev < 1) 
 summary(hot_deserts_dry_map)
 
 hot_deserts_wet_year <- hot_deserts_test %>% dplyr::filter(mm.dev > 199, mm.dev < 201) 
-summary(hot_deserts_dry_map) 
-
+#summary(hot_deserts_dry_map) 
 
 main_hot_deserts<-ggplot(hot_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
   geom_point(data=hot_deserts_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=3,alpha=1,fill='white',color='red') +
@@ -1316,15 +1139,14 @@ cold_deserts_fit_wet_dry<-cold_deserts_fit %>% filter(mm.dev %in% c('-100','0','
 
 #select specific columns
 cold_deserts_dry_year <- cold_deserts_test %>% dplyr::filter(mm.dev > -101, mm.dev < -99 ) 
-summary(cold_deserts_test)
-plot(npp.x~mm.y,data=cold_deserts_dry_year)
+#summary(cold_deserts_test)
+#plot(npp.x~mm.y,data=cold_deserts_dry_year)
 
 cold_deserts_mean_year <- cold_deserts_test %>% dplyr::filter(mm.dev > -1,mm.dev < 1) 
-summary(cold_deserts_dry_map)
+#summary(cold_deserts_dry_map)
 
 cold_deserts_wet_year <- cold_deserts_test %>% dplyr::filter(mm.dev > 199, mm.dev < 201) 
-summary(cold_deserts_dry_map) 
-
+#summary(cold_deserts_dry_map) 
 
 main_cold_deserts<-ggplot(cold_deserts_fit_wet_dry,aes(map,NPP,color=as.factor(mm.dev))) +
   geom_point(data=cold_deserts_dry_year,aes(x=mm.y,y=npp.x),pch=21,size=3.25,alpha=1,fill='white',color='red') +

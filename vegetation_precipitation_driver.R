@@ -1,92 +1,124 @@
-#driver script
-#load packages
-library(dplyr)
-library(spdep)
-library(splitstackshape)
-library(raster)
-library(gstat)
-library(rgdal)
-library(tidyr)
-#save
-#load initial dataframe
 
-test_wd<-"G:/My Drive/range-resilience/Sensitivity/CONUS_rangelands_NPP_Sensitivity/Processing NPP Data/NPP Data processing"
-rangeland_npp_covariates<-readRDS(file.path(test_wd, "npp_climate_rangelands_final.rds")) #loads file and name it annualSWA_OctDec I guess
-as.data.frame(rangeland_npp_covariates)
-summary(rangeland_npp_covariates)
+#Import and set up dataframe
 
+#set directory for loading NPP/cover files
 
-#small touch up to get rid of the dash in the 'semi-arid_steppe'
-rangeland_npp_covariates$region<-gsub('-', '_', rangeland_npp_covariates$region)
-unique(rangeland_npp_covariates$region)
+#go back up the directory tree
+setwd("./../../..")
 
-#get mean annual precip
+#load file
+rangeland_npp_covariates<-readRDS("./Processing NPP Data/NPP Data processing/Dryland_NPP.rds") #loads file and name it annualSWA_OctDec I guess
+#head(rangeland_npp_covariates)
+#unique(rangeland_npp_covariates$region)
+
+#take a look
+#summary(rangeland_npp_covariates)
+#head(rangeland_npp_covariates)
+#str(rangeland_npp_covariates)
+
+#get mean annual precip for each pixel
 mean_mm_site<-aggregate(mm~x+y+region,mean,data=rangeland_npp_covariates)
-head(mean_mm_site)
-summary(mean_mm_site)
+#head(mean_mm_site)
+#summary(mean_mm_site)
 
-#make MAP groupings for each vegetation type in preparation for stratification
-#hotdeserts
+#hot deserts
 hot_deserts_1 <-subset(mean_mm_site,region=="hot_deserts")
-summary(hot_deserts_1)
-hot_deserts_below <-hot_deserts_1 %>% dplyr::filter(mm < 286.14)
-hot_deserts_below$map <- 'below'
-hot_deserts_above  <-hot_deserts_1 %>%  dplyr::filter(mm > 286.14)
-hot_deserts_above$map <- 'above'
-hot_deserts_above_below <- rbind(hot_deserts_above,hot_deserts_below)
-#hot_deserts_above_below_2<-hot_deserts_above_below[-3]
-#head(hot_deserts_above_below_2)
-#summary(hot_deserts_above_below)
+#summary(hot_deserts_1) #regional mean annual precipitation is 286.1
+hot_deserts_above_below <- above_below_map(hot_deserts_1)
+rm(hot_deserts_1)
 
 #cold_deserts
 cold_deserts_1 <-subset(mean_mm_site,region=="cold_deserts")
-summary(cold_deserts_1)
-cold_deserts_below <-cold_deserts_1 %>% dplyr::filter(mm < 288.1)
-cold_deserts_below$map <- 'below'
-cold_deserts_above  <-cold_deserts_1 %>%  dplyr::filter(mm > 288.1 )
-cold_deserts_above$map <- 'above'
-cold_deserts_above_below <- rbind(cold_deserts_above,cold_deserts_below)
+#summary(cold_deserts_1) #regional mean annual precipitation is 288.1
+cold_deserts_above_below <- above_below_map(cold_deserts_1)
+rm(cold_deserts_1)
 
 #california_annuals
 california_annuals_1 <-subset(mean_mm_site,region=="california_annuals")
-summary(california_annuals_1)
-california_annuals_below <-california_annuals_1 %>% dplyr::filter(mm < 403.9)
-california_annuals_below$map <- 'below'
-california_annuals_above  <-california_annuals_1 %>%  dplyr::filter(mm > 403.9)
-california_annuals_above$map <- 'above'
-california_annuals_above_below <- rbind(california_annuals_above,california_annuals_below)
+#summary(california_annuals_1) #regional mean annual precipitation is 403.9
+california_annuals_above_below <- above_below_map(california_annuals_1)
+rm(california_annuals_1)
 
 #shortgrass steppe
-semiarid_steppe_1 <-subset(mean_mm_site,region=="semi_arid_steppe")
-summary(semiarid_steppe_1)
-semiarid_steppe_below <-semiarid_steppe_1 %>% dplyr::filter(mm < 417.1)
-semiarid_steppe_below$map <- 'below'
-semiarid_steppe_above  <-semiarid_steppe_1 %>%  dplyr::filter(mm > 417.1)
-semiarid_steppe_above$map <- 'above'
-semiarid_steppe_above_below <- rbind(semiarid_steppe_above,semiarid_steppe_below)
+semiarid_steppe_1 <-subset(mean_mm_site,region=="shortgrass_steppe")
+#summary(semiarid_steppe_1) #regional mean annual precip is 417.1
+semiarid_steppe_above_below <- above_below_map(semiarid_steppe_1)
+rm(semiarid_steppe_1)
 
-#northern mixed
+#northern mixed prairies
 northern_mixed_prairies_1 <-subset(mean_mm_site,region=="northern_mixed_prairies")
-summary(northern_mixed_prairies_1)
-northern_mixed_prairies_below <-northern_mixed_prairies_1 %>% dplyr::filter(mm < 404.3)
-northern_mixed_prairies_below$map <- 'below'
-northern_mixed_prairies_above  <-northern_mixed_prairies_1 %>%  dplyr::filter(mm > 404.3)
-northern_mixed_prairies_above$map <- 'above'
-northern_mixed_prairies_above_below <- rbind(northern_mixed_prairies_above,northern_mixed_prairies_below)
+#summary(northern_mixed_prairies_1) #regional mean annual precip is 404.3
+northern_mixed_prairies_above_below <- above_below_map(northern_mixed_prairies_1)
+rm(northern_mixed_prairies_1)
 
-#making colomn for per-pixel mean precip and npp
+#making colomnn for per-pixel mean npp
 rangeland_mean_npp<-aggregate(npp ~ x + y + region,mean,data=rangeland_npp_covariates)
-rangeland_mean_mm<-aggregate(mm ~ x + y + region,mean,data=rangeland_npp_covariates)
-mm_production_mean<-merge(rangeland_mean_npp,rangeland_mean_mm,by=c('x','y','region'))
-head(mm_production_mean)
-summary(mm_production_mean)
+
+#merge with mean precip
+mm_production_mean<-merge(rangeland_mean_npp,mean_mm_site,by=c('x','y','region'))
+#head(mm_production_mean)
+#summary(mm_production_mean)
+
+rm(rangeland_mean_npp,mean_mm_site)
 
 #merge initial dataframe with means
-rangeland_npp_covariates_deviations_1<-merge(rangeland_npp_covariates,mm_production_mean,by=c('x','y'))
-head(rangeland_npp_covariates_deviations_1)
+rangeland_npp_covariates<-merge(rangeland_npp_covariates,mm_production_mean,by=c('x','y','region'))
 
-#add percent mm and percent npp deviations to relatavize
-rangeland_npp_covariates_deviations_1$npp.dev<-rangeland_npp_covariates_deviations_1$npp.x - rangeland_npp_covariates_deviations_1$npp.y
-rangeland_npp_covariates_deviations_1$mm.dev<-rangeland_npp_covariates_deviations_1$mm.x - rangeland_npp_covariates_deviations_1$mm.y
-summary(rangeland_npp_covariates_deviations_1)
-head(rangeland_npp_covariates_deviations_1)
+#take a look
+#head(rangeland_npp_covariates_deviations_1)
+#summary(rangeland_npp_covariates_deviations_1)
+rm(mm_production_mean)
+
+#add mm and npp deviations from the mean
+rangeland_npp_covariates$npp.dev<-rangeland_npp_covariates$npp.x - rangeland_npp_covariates$npp.y
+rangeland_npp_covariates$mm.dev<-rangeland_npp_covariates$mm.x - rangeland_npp_covariates$mm.y
+
+#take a look
+#summary(rangeland_npp_covariates)
+#head(rangeland_npp_covariates)
+
+#
+#
+
+#cnan etither use fractional NPP, or fractional % cover data, for herbaceous vegetation covariate
+
+#import fractional npp dataframe#######
+# fractional_npp<-readRDS(('/Volumes/GoogleDrive/My Drive/range-resilience/Sensitivity/Processing NPP Data/Hebaceous NPP Data processing/Hebaceous_NPP_Processing/Fractional_NPP_Western_US.rds'))
+# #head(fractional_npp)
+# 
+# #get % herbaceous NPP
+# fractional_npp$perc_herb<-round((fractional_npp$annual_grass_forb + fractional_npp$perennial_grass_forb)/
+#   (fractional_npp$annual_grass_forb + fractional_npp$perennial_grass_forb +
+#   fractional_npp$shrub + fractional_npp$tree)*100,1)
+# 
+# fractional_npp<-fractional_npp[-c(4,5,6,7)]
+# #head(fractional_npp)
+# perc_herb_mean <-aggregate(perc_herb~x+y,mean,data=fractional_npp)
+# perc_herb_mean$perc_herb_mean<-round(perc_herb_mean$perc_herb,1)
+# perc_herb_mean<-perc_herb_mean[-c(3)]
+# #head(perc_herb_mean)
+# fractional_npp<-merge(fractional_npp,perc_herb_mean,by=c('x','y'))
+# #head(fractional_npp)
+# rm(perc_herb_mean)
+# 
+# #merge with dryland npp dataset
+# rangeland_npp_covariates<-merge(rangeland_npp_covariates,fractional_npp,
+#                                              by=c('x','y','year'))
+# #head(rangeland_npp_covariates)
+# rm(fractional_npp)
+##########
+
+#####import fractional cover dataframe######
+
+fractional_cover<-readRDS(('Processing NPP Data/Fractional Cover Processing/fractional_cover_processing/Fractional_cover_Western_US.rds'))
+#head(fractional_cover)
+fractional_cover <-aggregate(herb_cover~x+y,mean,data=fractional_cover)
+fractional_cover$perc_herb_mean <- fractional_cover$herb_cover
+fractional_cover$perc_herb_mean <- round(fractional_cover$perc_herb_mean,1)
+fractional_cover <- fractional_cover[-c(3)]
+
+#merge
+rangeland_npp_covariates<-merge(rangeland_npp_covariates,fractional_cover,
+                                by=c('x','y'))
+head(rangeland_npp_covariates)
+#Done. 

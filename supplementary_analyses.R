@@ -1,4 +1,5 @@
 #supplmentary analyses and graphs
+#NEEDS TO BE REVIEWED/CLEANED UP
 library(rgeos)
 library(maptools)
 library(raster)

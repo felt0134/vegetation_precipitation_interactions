@@ -1,175 +1,302 @@
 
 ####get coefficients into a usable dataframe #####
-summary(stratified_final_lm)
-df.coefficients <- do.call("rbind", list.coefficients.final)
-head(df.coefficients)
-df.coefficients.2 <- cbind(rownames(df.coefficients), data.frame(df.coefficients, row.names=NULL))
+list.coefficients.herb.region.no.threeway[1]
+#to look at model structure of output
+# #summary(stratified_final_lm_region) 
+# summary(stratified_final_lm_herb_map)
+# summary(stratified_final_lm_herb_region)
 
-colnames(df.coefficients.2)  <- c("predictor","coefficient","run.id")
+#model 1
+map_coefficients<-list_to_df(list.coefficients.noveg,region=F)
+#head(map_coefficients)
 
-df.coefficients.2$predictor<-gsub('[[:digit:]]+', '', df.coefficients.2$predictor)
-df.coefficients.2$predictor<-gsub(':', '_', df.coefficients.2$predictor)
-df2<-reshape(df.coefficients.2, idvar = "run.id", timevar = "predictor", direction = "wide")
-colnames(df2)[colnames(df2)=="coefficient.(Intercept)"] <- "intercept"
-head(df2)
-summary(df2)
+#model 2
+map_herb_coefficients<-list_to_df(list.coefficients.herb.map,region=F) #need to look into this
+#head(map_herb_coefficients)
 
-####spatial slopes#####
+#model 3
+map_region_coefficients <-list_to_df(list.coefficients.ecoregion.null,region=T)
+#head(map_region_coefficients)
 
-#california
-df2$california_annuals <- df2$coefficient.mm.y
-#cold deserts
-df2$cold_deserts <- df2$coefficient.mm.y + df2$coefficient.region.xcold_deserts_mm.y
-#hot_deserts
-df2$hot_deserts<-  df2$coefficient.mm.y + df2$coefficient.region.xhot_deserts_mm.y
-#northern mixed
-df2$northern_mixed_prairies <- df2$coefficient.mm.y  + df2$coefficient.region.xnorthern_mixed_prairies_mm.y
-#sgs
-df2$semi_arid_steppe <- df2$coefficient.mm.y + df2$coefficient.region.xsemi_arid_steppe_mm.y 
+#temporal slope at MAP for each ecoregion
+map_region_coefficients$temporal_sensitivity_map <-
+  map_region_coefficients$Temporal + map_region_coefficients$Spatiotemporal*map_region_coefficients$map
+#head(map_region_coefficients)
 
-spatial_slopes<-subset(df2,select=c('hot_deserts','cold_deserts','california_annuals','northern_mixed_prairies',
-                                    'semi_arid_steppe','run.id'))
-head(spatial_slopes)
-data_long_spatial <- gather(spatial_slopes, site, coefficient,-run.id, factor_key=TRUE)
-head(data_long_spatial)
-data_long_spatial$model<-'Spatial'
+#model 4
+herb_region_coefficients <-list_to_df_with_ecoregion(list.coefficients.herb.region,veg = T,full=F)
+#head(herb_region_coefficients)
 
+#model 5
+herb_region_coefficients_no.threeway <-list_to_df(list.coefficients.herb.region.no.threeway,region=T)
+#head(herb_region_coefficients_no.threeway)
 
-#####temporal slopes#######
+#model 6
+# #veg-mm.dev-ecoregion spatiotemporal interaction
+# herb_region_coefficients_full_veg <-list_to_df_with_ecoregion(list.coefficients.full,veg=T,full=F)
+# herb_region_coefficients_full_veg$st<-'veg.mm.dev'
+# #head(herb_region_coefficients_full_veg)
+# #map-mm.dev-ecoregion spatiotemporal interaction
+# herb_region_coefficients_full_veg_map <-list_to_df_with_ecoregion(list.coefficients.full,veg=F,full=T)
+# herb_region_coefficients_full_veg_map$st<-'map.mm.dev'
+# #head(herb_region_coefficients_full_veg_map)
+# herb_region_coefficients_full_merged<-rbind(herb_region_coefficients_full_veg_map,herb_region_coefficients_full_veg)
+# #merge them
+# 
+# st_mean<-aggregate(Spatiotemporal ~ region + st,mean,data=herb_region_coefficients_full_merged)
+# 
+# head(herb_region_coefficients_full_merged)
 
-#california annuals
-df2$california_annuals <- df2$coefficient.mm.dev
-#cold deserts
-df2$cold_deserts <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xcold_deserts 
-#hot_deserts
-df2$hot_deserts <-  df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xhot_deserts 
-#northern mixed
-df2$northern_mixed_prairies <- df2$coefficient.mm.dev + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies
-#sgs
-df2$semi_arid_steppe <- df2$coefficient.mm.dev  + df2$coefficient.mm.dev_region.xsemi_arid_steppe
+#get mean herb cover for each ecoregion
+region_mean_herb<-aggregate(perc_herb_mean~region,mean,data=rangeland_npp_covariates) 
+region_mean_herb$herb<-round(region_mean_herb$perc_herb,1)
+region_mean_herb<-region_mean_herb[-c(2)]
 
-temporal_slopes<-subset(df2,select=c('hot_deserts','cold_deserts','california_annuals','northern_mixed_prairies',
-                                     'semi_arid_steppe','run.id'))
-head(temporal_slopes)
-data_long_temporal <- gather(temporal_slopes, site, coefficient,-run.id, factor_key=TRUE)
-data_long_temporal$model<-'Temporal'
-head(data_long_temporal)
-summary(data_long_temporal)
+herb_region_coefficients<-merge(herb_region_coefficients,region_mean_herb,by=c('region'))
+#########
 
-#merge the spatial and temporal coefficient dataframes
-rbind_spatial_temporal<-rbind(data_long_spatial,data_long_temporal)
-head(rbind_spatial_temporal)
-summary(rbind_spatial_temporal)
+# summary statistics: model coefficicents #########
 
-#####temporal*spatial interaction ########
-#california annuals
-df2$california_annuals<- df2$coefficient.mm.dev_mm.y
-#cold deserts
-df2$cold_deserts <- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xcold_deserts_mm.y
-#hot_deserts
-df2$hot_deserts<-  df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xhot_deserts_mm.y
-#northern mixed
-df2$northern_mixed_prairies<- df2$coefficient.mm.dev_mm.y + df2$coefficient.mm.dev_region.xnorthern_mixed_prairies_mm.y
-#sgs
-df2$semi_arid_steppe <- df2$coefficient.mm.dev_mm.y  + df2$coefficient.mm.dev_region.xsemi_arid_steppe_mm.y
+# map-no ecoregion model #
 
-temporal_spatial_slopes<-subset(df2,select=c('hot_deserts','cold_deserts','california_annuals','northern_mixed_prairies',
-                                             'semi_arid_steppe','run.id'))
-head(temporal_spatial_slopes)
-data_long_temporal_spatial <- gather(temporal_spatial_slopes, site, coefficient,-run.id, factor_key=TRUE)
-data_long_temporal_spatial$model<-'Spatiotemporal'
-head(data_long_temporal_spatial)
-summary(data_long_temporal_spatial)
+# mean
+map_coefficient_means <-map_coefficients %>%
+  summarise_all(mean)
+map_coefficient_means<-data.frame(map_coefficient_means)
+map_coefficient_means$stat <- 'mean'
 
-#merge the spatial and temporal coefficient dataframes
-rbind_spatial_temporal_spatiotemporal<-rbind(data_long_temporal_spatial,rbind_spatial_temporal)
-head(rbind_spatial_temporal_spatiotemporal)
-summary(rbind_spatial_temporal)
+# 95% confidence interval
+map_coefficient_95ci <- map_coefficients %>%
+  summarise_all(error.95)
+map_coefficient_95ci <-data.frame(map_coefficient_95ci)
+map_coefficient_95ci$stat <- '95_ci'
 
-#####intercepts by veg types######
-
-#california annuals
-df2$california_annuals <- df2$intercept
-#cold deserts
-df2$cold_deserts <- df2$intercept + df2$coefficient.region.xcold_deserts
-#hot_deserts
-df2$hot_deserts <-  df2$intercept  + df2$coefficient.region.xhot_deserts
-#northern mixed
-df2$northern_mixed_prairies <- df2$intercept  + df2$coefficient.region.xnorthern_mixed_prairies
-#sgs
-df2$semi_arid_steppe<- df2$intercept + df2$coefficient.region.xsemi_arid_steppe
-
-vegetation_intercepts<-subset(df2,select=c('hot_deserts','cold_deserts','california_annuals','northern_mixed_prairies',
-                                           'semi_arid_steppe','run.id'))
-head(vegetation_intercepts)
-data_long_vegetation_intercepts <- gather(vegetation_intercepts, site, coefficient,-run.id, factor_key=TRUE)
-data_long_vegetation_intercepts$model<-'Intercept'
-head(data_long_vegetation_intercepts)
-summary(data_long_vegetation_intercepts)
-
-#all coefficient for each veg type
-coefficients_full<-rbind(data_long_vegetation_intercepts,rbind_spatial_temporal_spatiotemporal)
-head(coefficients_full)
-
-#for wide format
-coefficients_wide<- spread(coefficients_full, model, coefficient)
-head(coefficients_wide)
+map_coef_summary_merged<-rbind(map_coefficient_95ci,map_coefficient_means)
+write.csv(map_coef_summary_merged,
+          file = '/Volumes/GoogleDrive/My Drive/range-resilience/manuscripts/Vegetation_precipitation_interactions/Paper/figures/new/supporting/tables/map_coef.csv')
 
 
-site<-c('semi_arid_steppe','northern_mixed_prairies','california_annuals','cold_deserts','hot_deserts')
-map<-c(417.1,404.3,403.9,288.1,286.14)
-site_map<-data.frame(site,map)
+# map-ecoregion model #
 
-coefficients_wide_map<-merge(coefficients_wide,site_map,by=c('site'))
-head(coefficients_wide_map)
-write.csv(coefficients_wide_map,file='coefficients_wide_map.csv')
+# mean
+map_region_coefficient_means <-map_region_coefficients %>%
+  group_by(region) %>%
+  summarise_all(mean)
+map_region_coefficient_means<-data.frame(map_region_coefficient_means)
+map_region_coefficient_means$stat <- 'mean'
 
-#temporal slope at MAP for each vegetation type
-coefficients_wide_map$temporal_sensitivity <-
-  coefficients_wide_map$Temporal + coefficients_wide_map$Spatiotemporal*coefficients_wide_map$map
+# 95% confidence interval
+map_region_coefficient_95ci <- map_region_coefficients %>%
+  group_by(region) %>%
+  summarise_all(error.95)
+map_region_coefficient_95ci <-data.frame(map_region_coefficient_95ci)
+map_region_coefficient_95ci$stat <- '95_ci'
 
-mean.temporal<-aggregate(temporal_sensitivity ~site,mean,data=coefficients_wide_map)
-mean.spatial<-aggregate(Spatial ~site,mean,data=coefficients_wide_map)
-mean.spatiotemporal<-aggregate(Spatiotemporal ~site,mean,data=coefficients_wide_map)
-mean.temporal.zero<-aggregate(Temporal ~site,mean,data=coefficients_wide_map)
+map_region_coef_summary_merged<-rbind(map_region_coefficient_95ci,map_region_coefficient_means)
+write.csv(map_region_coef_summary_merged,
+          file = '/Volumes/GoogleDrive/My Drive/range-resilience/manuscripts/Vegetation_precipitation_interactions/Paper/figures/new/supporting/tables/map_region_coef.csv')
 
-####check 95% CI########
-#95 CI from a normal distribution
-error.95 <-function(x) {
-  n = length(x)
-  se = sd(x)/sqrt(n)
-  error <- qnorm(0.975)*se
-  return(error)
-}
+# herb-no ecoregion model #
 
-ci.spatial<-aggregate(Spatial~site,error.95,data=coefficients_wide_map)
-ci.spatiotemporal<-aggregate(Spatiotemporal~site,error.95,data=coefficients_wide_map)
-ci.temporal<-aggregate(temporal_sensitivity~site,error.95,data=coefficients_wide_map)
-ci.temporal.zero<-aggregate(Temporal~site,error.95,data=coefficients_wide_map)
+map_herb_coefficient_means <-map_herb_coefficients %>%
+  summarise_all(mean)
+map_herb_coefficients_means<-data.frame(map_herb_coefficient_means)
+map_herb_coefficient_means$stat <- 'mean'
 
-#####coefficient of determination#########
+#95% confidence interval
+map_herb_coefficient_95ci <- map_herb_coefficients %>%
+  summarise_all(error.95)
+map_herb_coefficient_95ci <-data.frame(map_herb_coefficient_95ci)
+map_herb_coefficient_95ci$stat <- '95_ci'
 
-#veg
-r.square.veg.binded <- do.call("rbind", list.r.square.veg)
-head(r.square.veg.binded)
-colnames(r.square.veg.binded)  <- c("r.square","run.id")
-r.square.veg.binded$model <- 'veg'
+map_herb_coef_summary_merged<-rbind(map_herb_coefficient_95ci,map_herb_coefficient_means)
+write.csv(map_herb_coef_summary_merged,
+          file = '/Volumes/GoogleDrive/My Drive/range-resilience/manuscripts/Vegetation_precipitation_interactions/Paper/figures/new/supporting/tables/map_herb_coef.csv')
+                                   
 
-#no veg
-r.square.noveg.binded <- do.call("rbind", list.r.square.noveg)
-head(r.square.noveg.binded)
-colnames(r.square.noveg.binded)  <- c("r.square","run.id")
-r.square.noveg.binded$model <- 'no.veg'
+# herb-region model #
 
-bind.veg.noveg<-rbind(r.square.noveg.binded,r.square.veg.binded)
-head(bind.veg.noveg)
-bind.veg.noveg$var <- bind.veg.noveg$r.square*100
+#mean
+herb_region_coefficient_means <- herb_region_coefficients %>%
+  group_by(region) %>%
+  summarise_all(mean)
+herb_region_coefficient_means<-data.frame(herb_region_coefficient_means)
+herb_region_coefficient_means$stat <- 'mean'
 
-summary(bind.veg.noveg)
-head(bind.veg.noveg)
-var.means<-aggregate(var~model,mean,data=bind.veg.noveg)
-(83.02-54.38)/54.38
+#95% confidence interval
+herb_region_coefficient_95ci <- herb_region_coefficients %>%
+  group_by(region) %>%
+  summarise_all(error.95)
+herb_region_coefficient_95ci <-data.frame(herb_region_coefficient_95ci)
+herb_region_coefficient_95ci$stat <- '95_ci'
 
-#save to csvs
-View(bind.veg.noveg)
-write.csv(bind.veg.noveg,file='r.square.veg.noveg.csv')
+herb_region_coef_summary_merged<-rbind(herb_region_coefficient_95ci,herb_region_coefficient_means)
+write.csv(herb_region_coef_summary_merged,
+          file = '/Volumes/GoogleDrive/My Drive/range-resilience/manuscripts/Vegetation_precipitation_interactions/Paper/figures/new/supporting/tables/herb_region_coef.csv')
+
+#
+#
+
+
+######
+###### summary statstics: MAP #######
+map_means_by_ecoregion<-aggregate(mm.y~x+y+region,mean,data=rangeland_npp_covariates)
+map_ci_by_ecoregion<-aggregate(mm.y~region,error.95,data=map_means_by_ecoregion)
+map_means_by_ecoregion<-aggregate(mm.y~region,mean,data=rangeland_npp_covariates)
+
+# AIC dataframe production #######
+
+#model 4
+aic.region.binded<-bind.aic(list.aic.region)
+aic.region.binded$model<-'ecoregion'
+
+#model 2
+aic.herb.map.binded<-bind.aic(list.aic.herb.map)
+aic.herb.map.binded$model<-'herb.map'
+
+#model 3
+aic.herb.region.binded<-bind.aic(list.aic.herb.region)
+aic.herb.region.binded$model<-'herb.region'
+
+#model 1
+aic.noveg.binded<-bind.aic(list.aic.noveg)
+aic.noveg.binded$model<-'no.veg'
+
+#model 5
+aic.herb.region.binded.no.threeway<-bind.aic(list.aic.herb.region.no.threeway)
+aic.herb.region.binded.no.threeway$model<-'no.threeway'
+
+#model 6
+aic.full<-bind.aic(list.aic.full)
+aic.full$model<-'full'
+
+aic.binded<-do.call("rbind", list(aic.herb.map.binded, aic.region.binded, aic.herb.region.binded,
+                                  aic.noveg.binded,aic.herb.region.binded.no.threeway))
+
+#head(aic.binded)
+#summary(aic.model.1234)
+aic_means<-aggregate(aic~model,mean,data=aic.binded)
+
+#get % reduction in aic from best (full) to next 'best' model...
+((subset(aic_means,model=='no.threeway')$aic - 
+    subset(aic_means,model=='herb.region')$aic)/subset(aic_means,model=='herb.region')$aic)*100
+
+
+#compare s-t interactions with map, herb, and ecoregion as interaction with mm.dev
+#ecoregion null model
+aic.ecoregion.null <- bind.aic(list.aic.ecoregion.null)
+aic.ecoregion.null$model <- 'ecoregion.null'
+
+aic.map.null<-bind.aic(list.aic.noveg)
+aic.map.null$model <- 'map.null'
+
+aic.herb.map.null <- bind.aic(list.aic.herb.map)
+aic.herb.map.null$model <- 'herb.null'
+
+nulls.binded.aic<-rbind(aic.herb.map.null,aic.map.null,aic.ecoregion.null)
+nulls.binded.aic<-aggregate(aic~model,mean,data=nulls.binded.aic)
+
+#
+#
+
+#####
+# BIC dataframe production #######
+
+#model 4
+bic.region.binded<-bind.bic(list.bic.region)
+bic.region.binded$model<-'ecoregion'
+
+#model 2
+bic.herb.map.binded<-bind.bic(list.bic.herb.map)
+bic.herb.map.binded$model<-'herb.map'
+
+#model 3
+bic.herb.region.binded<-bind.bic(list.bic.herb.region)
+bic.herb.region.binded$model<-'herb.region'
+
+#model 1
+bic.noveg.binded<-bind.bic(list.bic.noveg)
+bic.noveg.binded$model<-'no.veg'
+
+#model 5
+bic.herb.region.binded.no.threeway<-bind.bic(list.bic.herb.region.no.threeway)
+bic.herb.region.binded.no.threeway$model<-'no.threeway'
+
+#model 6
+bic.full<-bind.bic(list.bic.full)
+bic.full$model<-'full'
+
+bic.binded<-do.call("rbind", list(bic.herb.map.binded, bic.region.binded, bic.herb.region.binded,
+                                  bic.noveg.binded,bic.herb.region.binded.no.threeway,bic.full))
+
+#head(bic.binded)
+#summary(bic.model.1234)
+bic_means<-aggregate(bic~model,mean,data=bic.binded)
+
+#get % reduction in aic from best (full) to next 'best' model...
+((subset(bic_means,model=='herb.region')$bic - 
+    subset(bic_means,model=='full')$bic)/subset(bic_means,model=='herb.region')$bic)*100
+
+########
+# R-squared dataframe production ########
+
+#model 4
+r.squared.region.binded<-bind.r.squared(list.r.squared.region)
+r.squared.region.binded$model <- 'ecoregion'
+
+#model 2
+r.squared.herb.map.binded<-bind.r.squared(list.r.squared.herb.map)
+r.squared.herb.map.binded$model <- 'herb.map'
+
+r.squared.model.1.2<-rbind(r.squared.region.binded,r.squared.herb.map.binded)
+
+#model 3
+r.squared.region.binded<-bind.r.squared(list.r.squared.herb.region)
+r.squared.region.binded$model<-'herb.region'
+
+#model 1
+r.squared.noveg.binded<-bind.r.squared(list.r.squared.noveg)
+r.squared.noveg.binded$model<-'no.veg'
+
+r.squared.model.3.4<-rbind(r.squared.region.binded,r.squared.noveg.binded)
+
+r.squared.model.1234<-rbind(r.squared.model.1.2,r.squared.model.3.4)
+
+#head(r.squared.model.1234)
+r.squared.model.1234.mean<-aggregate(r.squared~model,mean,data=r.squared.model.1234)
+
+#0.57 + 0.55
+
+#model 6
+r.squared.full<-bind.r.squared(list.r.squared.full)
+r.squared.full$model <-'full'
+
+#model 7
+r.squared.no.int<-bind.r.squared(list.r.squared.no.int)
+r.squared.no.int$model <-'no.interaction'
+
+r.squared.model.6.7<-rbind(r.squared.no.int,r.squared.full)
+
+r.squared.model.123467<-rbind(r.squared.model.6.7,r.squared.model.1234)
+
+r.squared_means<-aggregate(r.squared~model,mean,data=r.squared.model.123467)
+
+#model 8
+r.squared.full.no.eco<-bind.r.squared(list.r.squared.full.noecoregion)
+summary(r.squared.full.no.eco)
+
+#compare s-t interactions with map, herb, and ecoregion as interaction with mm.dev
+#ecoregion null model
+r.squared.ecoregion.null <- bind.r.squared(list.r.squared.ecoregion.null)
+r.squared.ecoregion.null$model <- 'ecoregion.null'
+
+r.squared.map.null<-bind.r.squared(list.r.squared.noveg)
+r.squared.map.null$model <- 'map.null'
+
+r.squared.herb.map.null <- bind.r.squared(list.r.squared.herb.map)
+r.squared.herb.map.null$model <- 'herb.null'
+
+nulls.binded<-rbind(r.squared.herb.map.null,r.squared.map.null,r.squared.ecoregion.null)
+nulls.binded.r.square<-aggregate(r.squared~model,mean,data=nulls.binded)
+
+#done

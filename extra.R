@@ -132,6 +132,7 @@ plot(shapefile_aes, lwd = 1,add=TRUE)
 test_crop<-crop(shapefile_aes,extent(raster_AES))
 
 #mean primary production
+aea.proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96+x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
 npp= c('wheat3','wheat', "orange", "yellow",'green','darkgreen')
 bkcols.npp <- colorRampPalette(npp)(length(bks_npp)-1)
 bks_npp<- quantile(mean_production$npp.x, probs=seq(0.0, 1, by=0.05), na.rm = TRUE)
@@ -146,7 +147,7 @@ plot(mean_production_raster_2)
 mean_production_raster_3<-crop(mean_production_raster_2,extent(crop_extent))
 
 #plot it
-plot(mean_production_raster_3,breaks = bks_npp,box=F,axes=F,col = bkcols.npp,
+plot(mean_production_raster_2,breaks = bks_npp,box=F,axes=F,col = bkcols.npp,
      legend.width=1,legend.shrink=0.75,
      axis.args=list(at=seq(r.range.npp[1], r.range.npp[2], 100),
                     labels=seq(r.range.npp[1], r.range.npp[2], 100),
@@ -196,48 +197,64 @@ latticeExtra::layer(sp.polygons(mojave.sonoran.shape.2,fill='firebrick3', lwd = 
 latticeExtra::layer(sp.polygons(Grama.Galleta.Steppe.shape.2, fill='firebrick3', lwd = 0.1))
 
 
-###2 dimensial kernal density
+#compare herbaceous and ecoregion model AIC May 28 2020######
 
-library(MASS)
-head(hot_deserts_test)
-myPal <- colorRampPalette(c("white","blue","gold", "orange", "red"))
-dens <- kde2d(hot_deserts_test$mm.y, hot_deserts_test$npp.x)
-image(dens, col=transp(myPal(300),.7), add=TRUE) 
-contour(dens, add=T) 
-filled.contour(dens,color.palette=colorRampPalette(c('white','blue','yellow','red','darkred')))
-
-ggplot(data=hot_deserts_test,aes(mm.y,npp.x)) + 
-  #geom_point(size=.01) +
-  #stat_density2d(aes(fill=..level..,alpha=..level..),geom='polygon',colour='black') + 
-  stat_density_2d(aes(fill = stat(nlevel)),geom = "polygon",size=.1,colour='black') +
-  scale_fill_viridis_c() +
-  #scale_fill_continuous(low="green",high="red") +
-  filled.contour(dens,color.palette=colorRampPalette(c('white','blue','yellow','red','darkred'))) +
-  geom_smooth(data = hot_deserts_fit_wet_dry_minus_100,aes(map,NPP,color='myline1'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  geom_smooth(data = hot_deserts_fit_wet_dry_minus_0,aes(map,NPP, color='myline2'),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  geom_smooth(data = hot_deserts_fit_wet_dry_plus_200,aes(map,NPP,color='myline3' ),method='lm',se=FALSE,size=3,fullrange=TRUE) +
-  #geom_smooth(method=lm,linetype=2,colour="red",se=F) + 
-  guides(alpha="none") +
-  scale_colour_manual(name='Deviation (mm)',values=c(myline1 ="red", myline2 ="grey8", myline3 ="blue"),
-                      labels=c('myline1'='-100','myline2'= '0','myline3'='200')) + 
-  ylab('NPP') +
-  xlab('MAP') +
+average<-ggplot(aic.model.1234,aes(x=aic ,color=model)) +
+  geom_density(alpha=1,size=1,aes(y=..scaled..)) +
+  #geom_histogram(binwidth = 0.5,color='black') +
+  scale_colour_manual(name = 'Model (R syntax)',
+                    values=c('ecoregion' = 'black',
+                             'herb.map'='blue',
+                             'herb.region'='darkgreen',
+                             'no.veg' = 'brown'
+                             ),
+                    labels=c('ecoregion'='~mm.dev*ecoregion*mm.mean',
+                             'herb.map'='~mm.dev*perc_herb*mm.mean',
+                             'herb.region'='~mm.dev*ecoregion*perc_herb',
+                             'no.veg' = '~mm.dev*mm.mean')) +
+  xlab('AIC') +
+  ylab('Density') +
   theme(
-    axis.text.x = element_text(color='black',size=20), #angle=25,hjust=1),
-    axis.text.y = element_text(color='black',size=20),
-    axis.title = element_text(color='black',size=20),
+    axis.text.x = element_text(color='black',size=15), 
+    axis.text.y = element_text(color='black',size=15),
+    axis.title = element_text(color='black',size=30),
     axis.ticks = element_line(color='black'),
     legend.key = element_blank(),
+    legend.title = element_text(size=12),
+    legend.text = element_text(size=8),
+    #legend.position = c(0.30,0.8),
+    #legend.position = 'top',
     strip.background =element_rect(fill="white"),
     strip.text = element_text(size=15),
-    legend.direction  = 'horizontal', 
-    legend.position = 'top',
-    legend.text = element_text(size=11),
-    legend.title = element_text(size=11),
     panel.background = element_rect(fill=NA),
-    legend.key.size = unit(.4, "cm"),
-    legend.key.width = unit(0.7,"cm"), 
     panel.border = element_blank(), #make the borders clear in prep for just have two axes
     axis.line.x = element_line(colour = "black"),
-    axis.line.y = element_line(colour = "black")) +
-  guides(col = guide_legend(order = 1))
+    axis.line.y = element_line(colour = "black"))
+
+# %fraction of herbaceous npp across ecoregions
+
+ggplot(rangeland_npp_covariates,aes(x=perc_herb_mean,color=region)) +
+  #facet_wrap(~region) +
+  geom_density(alpha=1,aes(y=..scaled..),size=1) +
+  scale_colour_manual(values=c('shortgrass_steppe'='green4','northern_mixed_prairies'='lightblue',
+                             california_annuals='grey',cold_deserts='gold',hot_deserts='firebrick3'),
+                    labels=c('shortgrass_steppe'='Shortgrass steppe','northern_mixed_prairies'='Northern mixed prairies',
+                             california_annuals='California annuals',cold_deserts='Cold deserts',hot_deserts='Hot deserts')) +
+  xlab('% Herbaceous NPP') +
+  #xlab('Change in sensitivity per mm of MAP') +
+  ylab('Density') +
+  theme(
+    axis.text.x = element_text(color='black',size=18), #angle=25,hjust=1),
+    axis.text.y = element_text(color='black',size=18),
+    axis.title = element_text(color='black',size=25),
+    axis.ticks = element_line(color='black'),
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.text = element_text(size=17),
+    legend.position = "none",
+    strip.background =element_rect(fill="white"),
+    strip.text = element_text(size=15),
+    panel.background = element_rect(fill=NA),
+    panel.border = element_blank(), #make the borders clear in prep for just have two axes
+    axis.line.x = element_line(colour = "black"),
+    axis.line.y = element_line(colour = "black"))
